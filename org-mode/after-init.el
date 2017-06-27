@@ -21,6 +21,18 @@
 
 (setq org-cycle-separator-lines -1)
 
+(with-tomorrow-colors
+ (tomorrow-mode-name)
+ (setq org-todo-keyword-faces
+       `(("WORK" . (;;:background ,yellow
+                    :foreground ,yellow :weight bold :box nil))
+         ("WAIT" . (;;:background ,orange
+                    :foreground ,orange :weight bold :box nil))
+         ("GOOD" . (:background ,green :foreground ,background
+                    :weight bold :box nil))
+         ("REJECTED" . (:background ,red :foreground ,background
+                        :weight bold :box nil))))))
+
 ;;; TODO list
 
 (defun exordium-org-move-to-today ()

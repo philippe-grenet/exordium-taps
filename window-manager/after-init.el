@@ -21,6 +21,10 @@
 
 ;;; Split windows
 
+(defun num-windows ()
+  "Return the number of windows (unique buffers) in the current frame"
+  (length (cl-delete-duplicates (mapcar #'window-buffer (window-list)))))
+
 (defun toggle-window-split ()
   "Switch window split from horizontally to vertically, or vice versa.
 i.e. change right window to bottom, or change bottom window to right."
@@ -46,6 +50,14 @@ i.e. change right window to bottom, or change bottom window to right."
                     (split-window-vertically)
                   (split-window-horizontally))
                 (set-window-buffer (windmove-find-other-window neighbour-dir) other-buf))))))))
+
+(defun resplit-vertically ()
+  "Switch window split from horizontal to vertical, resizing the frame as well"
+  (interactive)
+  (if (not (= 2 (num-windows)))
+      (error "I don't see 2 windows")
+    (frame-show-two-windows)
+    (toggle-window-split)))
 
 ;;; Buffers
 
