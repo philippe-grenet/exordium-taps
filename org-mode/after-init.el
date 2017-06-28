@@ -31,7 +31,7 @@
          ("GOOD" . (:background ,green :foreground ,background
                     :weight bold :box nil))
          ("REJECTED" . (:background ,red :foreground ,background
-                        :weight bold :box nil))))))
+                        :weight bold :box nil)))))
 
 ;;; TODO list
 
