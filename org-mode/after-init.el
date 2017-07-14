@@ -1,6 +1,6 @@
 ;;;; Local extensions to Exordium: Org mode
 
-;;; Org agenda
+;;; Org agenda ----------------------------------------------------------------
 
 (setq org-agenda-files '("/Users/pgrenet/Documents/org/"))
 (setq org-agenda-custom-commands
@@ -12,7 +12,7 @@
           (alltodo "")))))
 (add-to-list 'org-emphasis-alist '("*" (:foreground "#de935f")))
 
-;;; Colors
+;;; Colors --------------------------------------------------------------------
 
 (setq org-priority-faces
       '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
@@ -30,10 +30,12 @@
                     :foreground ,orange :weight bold :box nil))
          ("GOOD" . (:background ,green :foreground ,background
                     :weight bold :box nil))
+         ("MEDIUM" . (:background ,orange :foreground ,background
+                      :weight bold :box nil))
          ("REJECTED" . (:background ,red :foreground ,background
                         :weight bold :box nil)))))
 
-;;; TODO list
+;;; TODO list -----------------------------------------------------------------
 
 (defun exordium-org-move-to-today ()
   "Move the current item to the today's tree"
@@ -41,7 +43,9 @@
   (org-mark-subtree)
   (kill-region (region-beginning) (region-end))
   (beginning-of-buffer)
-  (forward-line 4)
+  (forward-line 3)
+  (org-forward-heading-same-level 1)
+  (forward-line -1)
   (yank))
 
 (define-key org-mode-map (kbd "C-c t") #'exordium-org-move-to-today)
@@ -51,3 +55,8 @@
   (find-file "~/Documents/org/todo.org"))
 
 (global-set-key [(f12)] #'open-todos)
+
+;;; Capture -------------------------------------------------------------------
+
+(setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
+(define-key global-map "\C-cc" 'org-capture)
