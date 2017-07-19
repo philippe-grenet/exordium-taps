@@ -56,6 +56,12 @@
 
 (global-set-key [(f12)] #'open-todos)
 
+(defun open-candidates ()
+  (interactive)
+  (find-file "~/Documents/hire.org/notes/candidates.org"))
+
+(global-set-key [(shift f12)] #'open-candidates)
+
 ;;; Capture -------------------------------------------------------------------
 
 (setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
