@@ -3,12 +3,14 @@
 ;;; Frame geometry
 
 (defun frame-show-one-window ()
+  "Show a single window"
   (interactive)
   (delete-other-windows)
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
   (set-frame-width (selected-frame) 110))
 
 (defun frame-show-two-windows ()
+  "Show two windows with the top 2 buffers"
   (interactive)
   (delete-other-windows)
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
@@ -16,8 +18,22 @@
   (let ((win (split-window-right)))
     (switch-to-other-buffer)))
 
+(defun frame-show-component ()
+  "Show all 3 files for a C++ component"
+  (interactive)
+  (delete-other-windows)
+  (toggle-frame-fullscreen)
+  (cpp-switch-h-cpp nil)
+  (let ((win (split-window-right)))
+    (switch-to-other-buffer))
+  (cpp-switch-h-cpp t)
+  (let ((win (split-window-right)))
+    (switch-to-other-buffer))
+  (balance-windows))
+
 (global-set-key [(f9)] #'frame-show-one-window)
 (global-set-key [(f10)] #'frame-show-two-windows)
+(global-set-key [(shift f10)] #'frame-show-component)
 
 ;;; Split windows
 

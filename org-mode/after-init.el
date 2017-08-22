@@ -33,6 +33,8 @@
          ("MEDIUM" . (:background ,orange :foreground ,background
                       :weight bold :box nil))
          ("REJECTED" . (:background ,red :foreground ,background
+                        :weight bold :box nil))
+         ("WITHDREW" . (:background ,red :foreground ,background
                         :weight bold :box nil)))))
 
 ;;; TODO list -----------------------------------------------------------------
