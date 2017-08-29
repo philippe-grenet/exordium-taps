@@ -24,14 +24,17 @@
 (with-tomorrow-colors
  (tomorrow-mode-name)
  (setq org-todo-keyword-faces
-       `(("WORK" . (;;:background ,yellow
-                    :foreground ,yellow :weight bold :box nil))
-         ("WAIT" . (;;:background ,orange
-                    :foreground ,orange :weight bold :box nil))
-         ("GOOD" . (:background ,green :foreground ,background
-                    :weight bold :box nil))
-         ("MEDIUM" . (:background ,orange :foreground ,background
-                      :weight bold :box nil))
+       `(("WORK"     . (;;:background ,yellow
+                       :foreground ,yellow :weight bold :box nil))
+         ("WAIT"     . (;;:background ,orange
+                        :foreground ,orange :weight bold :box nil))
+         ;; for hire:
+         ("HIRED"    . (:background ,blue :foreground ,background
+                        :weight bold :box nil))
+         ("GOOD"     . (:background ,green :foreground ,background
+                        :weight bold :box nil))
+         ("MEDIUM"   . (:background ,orange :foreground ,background
+                        :weight bold :box nil))
          ("REJECTED" . (:background ,red :foreground ,background
                         :weight bold :box nil))
          ("WITHDREW" . (:background ,red :foreground ,background
