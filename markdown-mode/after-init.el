@@ -4,6 +4,8 @@
 (setq markdown-command "/opt/local/bin/pandoc")
 (add-hook 'markdown-mode-hook 'flyspell-mode)
 
+(setq markdown-fontify-code-blocks-natively t)
+
 (defun straighten-quotes (beg end)
   "Replace 'smart quotes' in buffer or region with ascii quotes."
   (interactive "r")
