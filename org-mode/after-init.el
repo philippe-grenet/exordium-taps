@@ -24,10 +24,16 @@
 (with-tomorrow-colors
  (tomorrow-mode-name)
  (setq org-todo-keyword-faces
-       `(("WORK"     . (;;:background ,yellow
-                       :foreground ,yellow :weight bold :box nil))
-         ("WAIT"     . (;;:background ,orange
-                        :foreground ,orange :weight bold :box nil))
+       `(("TODO"     . (:foreground ,red
+                        :weight bold :box nil))
+         ("DONE"     . (:foreground ,green
+                        :weight bold :box nil))
+         ("WORK"     . (:foreground ,yellow
+                        :weight bold :box nil))
+         ("WAIT"     . (:foreground ,orange
+                        :weight bold :box nil))
+         ("PAUSE"    . (:foreground ,blue
+                        :weight bold :box nil))
          ;; for hire:
          ("HIRED"    . (:background ,blue :foreground ,background
                         :weight bold :box nil))
