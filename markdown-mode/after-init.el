@@ -14,3 +14,5 @@
                             ("\x2018" . "'")
                             ("\x2019" . "'"))
                           nil beg end))
+
+(load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
