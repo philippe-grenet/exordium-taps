@@ -15,4 +15,9 @@
                             ("\x2019" . "'"))
                           nil beg end))
 
+;; Support for tables (this will be in Elpa one day)
 (load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
+
+;; Use the Mac's built in dictionary
+(load-file "~/.emacs.d/taps/markdown-mode/osx-dictionary.el")
+(define-key markdown-mode-map (kbd "s-$") 'osx-dictionary)
