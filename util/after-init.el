@@ -47,6 +47,22 @@ or comment block. See also `repunctuate-sentences'."
 (pc-mode)
 
 
+;; Keys
+(global-set-key [(f6)] #'exordium-highlight-symbol)
+(global-set-key [(end)] #'move-end-of-line)
+(global-set-key [(home)] #'move-beginning-of-line)
+
+;; F8 for Unicode
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+(define-key key-translation-map (kbd "<f8> s") (kbd "★"))
+(define-key key-translation-map (kbd "<f8> c") (kbd "✓"))
+(define-key key-translation-map (kbd "<f8> l") (kbd "❤"))
+(define-key key-translation-map (kbd "<f8> l") (kbd "❤"))
+(define-key key-translation-map (kbd "<f8> u") (kbd "☂"))
+(define-key key-translation-map (kbd "<f8> <right>") (kbd "⇒"))
+
+
 ;; Jean-Louis's diff
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (setq ediff-split-window-function 'split-window-horizontally)
