@@ -1,38 +1,41 @@
 ;;;; Local extensions to Exordium: Org mode
 
+(require 'org)
+
 ;;; Colors --------------------------------------------------------------------
 
-(setq org-priority-faces
-      '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
-        (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
-        (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
+(when (eq exordium-theme 'tomorrow-night)
+  (setq org-priority-faces
+        '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
+          (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
+          (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
 
-(setq org-cycle-separator-lines -1)
+  (setq org-cycle-separator-lines -1)
 
-(with-tomorrow-colors
- (tomorrow-mode-name)
- (setq org-todo-keyword-faces
-       `(("TODO"     . (:foreground ,red
-                        :weight bold :box nil))
-         ("DONE"     . (:foreground ,green
-                        :weight bold :box nil))
-         ("WORK"     . (:foreground ,yellow
-                        :weight bold :box nil))
-         ("WAIT"     . (:foreground ,orange
-                        :weight bold :box nil))
-         ("PAUSE"    . (:foreground ,blue
-                        :weight bold :box nil))
-         ;; for hire:
-         ("HIRED"    . (:background ,blue :foreground ,background
-                        :weight bold :box nil))
-         ("GOOD"     . (:background ,green :foreground ,background
-                        :weight bold :box nil))
-         ("MEDIUM"   . (:background ,orange :foreground ,background
-                        :weight bold :box nil))
-         ("REJECTED" . (:background ,red :foreground ,background
-                        :weight bold :box nil))
-         ("WITHDREW" . (:background ,red :foreground ,background
-                        :weight bold :box nil)))))
+  (with-tomorrow-colors
+   (tomorrow-mode-name)
+   (setq org-todo-keyword-faces
+         `(("TODO"     . (:foreground ,red
+                          :weight bold :box nil))
+           ("DONE"     . (:foreground ,green
+                          :weight bold :box nil))
+           ("WORK"     . (:foreground ,yellow
+                          :weight bold :box nil))
+           ("WAIT"     . (:foreground ,orange
+                          :weight bold :box nil))
+           ("PAUSE"    . (:foreground ,blue
+                          :weight bold :box nil))
+           ;; for hire:
+           ("HIRED"    . (:background ,blue :foreground ,background
+                          :weight bold :box nil))
+           ("GOOD"     . (:background ,green :foreground ,background
+                          :weight bold :box nil))
+           ("MEDIUM"   . (:background ,orange :foreground ,background
+                          :weight bold :box nil))
+           ("REJECTED" . (:background ,red :foreground ,background
+                          :weight bold :box nil))
+           ("WITHDREW" . (:background ,red :foreground ,background
+                          :weight bold :box nil))))))
 
 ;;; Task list -----------------------------------------------------------------
 

@@ -20,12 +20,14 @@ or comment block. See also `repunctuate-sentences'."
           (fill-paragraph))
       (message "No region or comment"))))
 
-(defun scratch-msg ()
+(defun msg ()
   "Create a new scratch bufer to edit markdown, that does not
   need to be safed."
   (interactive)
-  (switch-to-buffer (make-temp-name "scratch-"))
-  (markdown-mode))
+  (let ((buffer (generate-new-buffer (make-temp-name "scratch-"))))
+    (switch-to-buffer buffer)
+    (setq-local default-directory "/Users/pgrenet/Documents/scratch")
+    (markdown-mode)))
 
 
 ;; Meta and Super key for the BB keyboard
@@ -65,3 +67,9 @@ or comment block. See also `repunctuate-sentences'."
 ;; Jean-Louis's diff
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (setq ediff-split-window-function 'split-window-horizontally)
+
+
+;; Atomic chrome
+(require 'atomic-chrome)
+(with-demoted-errors "Can't start atomic-chrome: %S"
+  (atomic-chrome-start-server))
