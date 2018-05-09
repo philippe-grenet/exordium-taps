@@ -70,6 +70,6 @@ or comment block. See also `repunctuate-sentences'."
 
 
 ;; Atomic chrome
-(require 'atomic-chrome)
-(with-demoted-errors "Can't start atomic-chrome: %S"
-  (atomic-chrome-start-server))
+;; (require 'atomic-chrome)
+;; (with-demoted-errors "Can't start atomic-chrome: %S"
+;;   (atomic-chrome-start-server))

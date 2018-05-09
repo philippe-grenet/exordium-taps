@@ -778,13 +778,15 @@ alternatively a TAB should be used as the separator."
 
 (defun markdown-metaleft ()
   (interactive)
-  (when (markdown-pipe-table-at-point-p)
-    (call-interactively #'markdown-pipe-table-move-column-left)))
+  (if (markdown-pipe-table-at-point-p)
+      (call-interactively #'markdown-pipe-table-move-column-left)
+    (forward-same-syntax -1)))
 
 (defun markdown-metaright ()
   (interactive)
-  (when (markdown-pipe-table-at-point-p)
-    (call-interactively #'markdown-pipe-table-move-column-right)))
+  (if (markdown-pipe-table-at-point-p)
+      (call-interactively #'markdown-pipe-table-move-column-right)
+    (forward-same-syntax 1)))
 
 (defun markdown-shiftmetaup ()
   (interactive)
