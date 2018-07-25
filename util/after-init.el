@@ -49,6 +49,20 @@ or comment block. See also `repunctuate-sentences'."
 (pc-mode)
 
 
+;; Scroll
+
+(defun gcm-scroll-down ()
+  (interactive)
+  (scroll-up 1))
+
+(defun gcm-scroll-up ()
+  (interactive)
+  (scroll-down 1))
+
+(global-set-key (kbd "<s-down>") 'gcm-scroll-down)
+(global-set-key (kbd "<s-up>") 'gcm-scroll-up)
+
+
 ;; Keys
 (global-set-key [(f6)] #'exordium-highlight-symbol)
 (global-set-key [(end)] #'move-end-of-line)
@@ -70,6 +84,6 @@ or comment block. See also `repunctuate-sentences'."
 
 
 ;; Atomic chrome
-;; (require 'atomic-chrome)
-;; (with-demoted-errors "Can't start atomic-chrome: %S"
-;;   (atomic-chrome-start-server))
+(require 'atomic-chrome)
+(with-demoted-errors "Can't start atomic-chrome: %S"
+  (atomic-chrome-start-server))
