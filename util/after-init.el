@@ -59,8 +59,8 @@ or comment block. See also `repunctuate-sentences'."
   (interactive)
   (scroll-down 1))
 
-(global-set-key (kbd "<s-down>") 'gcm-scroll-down)
-(global-set-key (kbd "<s-up>") 'gcm-scroll-up)
+(global-set-key (kbd "C-M-<down>") 'gcm-scroll-down)
+(global-set-key (kbd "C-M-<up>") 'gcm-scroll-up)
 
 
 ;; Keys
@@ -76,6 +76,9 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "<f8> l") (kbd "❤"))
 (define-key key-translation-map (kbd "<f8> u") (kbd "☂"))
 (define-key key-translation-map (kbd "<f8> <right>") (kbd "⇒"))
+
+;; Tab for autocomplete of directory path with Helm (default is C-j)
+(define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
 
 
 ;; Jean-Louis's diff

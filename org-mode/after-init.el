@@ -23,7 +23,7 @@
                           :weight bold :box nil))
            ("WAIT"     . (:foreground ,orange
                           :weight bold :box nil))
-           ("PAUSE"    . (:foreground ,blue
+           ("STOP"     . (:foreground ,comment
                           :weight bold :box nil))
            ;; for hire:
            ("HIRED"    . (:background ,blue :foreground ,background
