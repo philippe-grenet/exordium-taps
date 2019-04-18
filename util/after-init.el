@@ -81,9 +81,11 @@ or comment block. See also `repunctuate-sentences'."
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
 
 
-;; Jean-Louis's diff
+;; Miscellaneous
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (setq ediff-split-window-function 'split-window-horizontally)
+
+(setq interpreter-mode-alist (append interpreter-mode-alist '(("ksh93" . shell-script-mode))))
 
 
 ;; Atomic chrome
