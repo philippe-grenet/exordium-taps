@@ -90,5 +90,7 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; Atomic chrome
 (require 'atomic-chrome)
+(setq atomic-chrome-default-major-mode 'markdown-mode
+      atomic-chrome-buffer-open-style 'full)
 (with-demoted-errors "Can't start atomic-chrome: %S"
   (atomic-chrome-start-server))
