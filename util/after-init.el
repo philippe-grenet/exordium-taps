@@ -75,7 +75,11 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "<f8> c") (kbd "✓"))
 (define-key key-translation-map (kbd "<f8> l") (kbd "❤"))
 (define-key key-translation-map (kbd "<f8> u") (kbd "☂"))
-(define-key key-translation-map (kbd "<f8> <right>") (kbd "⇒"))
+
+(define-key key-translation-map (kbd "<f8> <right>") (kbd "➡"))
+(define-key key-translation-map (kbd "<f8> <left>") (kbd "⬅"))
+(define-key key-translation-map (kbd "<f8> <up>") (kbd "⬆"))
+(define-key key-translation-map (kbd "<f8> <down>") (kbd "⬇"))
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
