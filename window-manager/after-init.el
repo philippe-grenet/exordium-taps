@@ -9,6 +9,13 @@
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
   (set-frame-width (selected-frame) 130))
 
+(defun frame-show-one-window-xl ()
+  "Show a single window extra-large"
+  (interactive)
+  (delete-other-windows)
+  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
+  (set-frame-width (selected-frame) 166))
+
 (defun frame-show-two-windows ()
   "Show two windows with the top 2 buffers"
   (interactive)
@@ -32,6 +39,7 @@
   (balance-windows))
 
 (global-set-key [(f9)] #'frame-show-one-window)
+(global-set-key [(shift f9)] #'frame-show-one-window-xl)
 (global-set-key [(f10)] #'frame-show-two-windows)
 (global-set-key [(shift f10)] #'frame-show-component)
 
