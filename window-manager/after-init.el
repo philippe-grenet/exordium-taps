@@ -7,7 +7,7 @@
   (interactive)
   (delete-other-windows)
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
-  (set-frame-width (selected-frame) 120))
+  (set-frame-width (selected-frame) 130))
 
 (defun frame-show-two-windows ()
   "Show two windows with the top 2 buffers"

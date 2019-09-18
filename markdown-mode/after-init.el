@@ -16,7 +16,10 @@
 
 ;; Ease of use
 (add-hook 'markdown-mode-hook 'flyspell-mode)
-(setq markdown-fontify-code-blocks-natively t)
+
+;; Causes a crash in Emacs, in function x_produce_glyph, after MacOS update!
+;; Work around: toggle interactively with C-c C-x C-f
+;;(setq markdown-fontify-code-blocks-natively t)
 
 ;; Utilities
 (defun straighten-quotes (beg end)
