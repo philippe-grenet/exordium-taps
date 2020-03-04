@@ -2,10 +2,26 @@
 
 (require 'markdown-mode)
 
-;; Renderer
+;; Renderer:
+;; markdown rendering or impatient-markdown-mode:
 (when exordium-osx
-  (setq markdown-command "/Users/pgrenet/Tools/markup/bin/github-markup"
-        markdown-command-needs-filename t))
+  ;; (setq markdown-command "/Users/pgrenet/Tools/markup/bin/github-markup"
+  ;;       markdown-command-needs-filename t)
+  (setq markdown-command "/usr/local/bin/multimarkdown"))
+
+;; flymd
+;; (require 'flymd)
+
+;; (defun my-flymd-browser-function (url)
+;;   (let ((process-environment (browse-url-process-environment)))
+;;     (apply 'start-process
+;;            (concat "google-chrome " url) nil
+;;            "/usr/bin/open"
+;;            (list "google-chrome" "--new-window" "--allow-file-access-from-files" url))))
+
+;; (setq flymd-browser-open-function 'my-flymd-browser-function)
+
+
 
 ;; Snippets
 (add-hook 'markdown-mode-hook

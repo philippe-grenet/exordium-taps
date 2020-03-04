@@ -68,6 +68,9 @@ or comment block. See also `repunctuate-sentences'."
 (global-set-key [(end)] #'move-end-of-line)
 (global-set-key [(home)] #'move-beginning-of-line)
 
+;; Emojis on mac
+(global-set-key (kbd "C-M-s-<SPC>") #'mark-sexp)
+
 ;; F8 for Unicode
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)

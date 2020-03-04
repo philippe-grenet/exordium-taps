@@ -14,7 +14,8 @@
   (interactive)
   (delete-other-windows)
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
-  (set-frame-width (selected-frame) 166))
+  (set-frame-width (selected-frame) 166)
+  (treemacs))
 
 (defun frame-show-two-windows ()
   "Show two windows with the top 2 buffers"

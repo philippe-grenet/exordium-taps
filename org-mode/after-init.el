@@ -15,27 +15,31 @@
   (with-tomorrow-colors
    (tomorrow-mode-name)
    (setq org-todo-keyword-faces
-         `(("TODO"     . (:foreground ,red
-                          :weight bold :box nil))
-           ("DONE"     . (:foreground ,green
-                          :weight bold :box nil))
-           ("WORK"     . (:foreground ,yellow
-                          :weight bold :box nil))
-           ("WAIT"     . (:foreground ,orange
-                          :weight bold :box nil))
-           ("STOP"     . (:foreground ,comment
-                          :weight bold :box nil))
+         `(("TODO"      . (:foreground ,red
+                           :weight bold :box nil))
+           ("DONE"      . (:foreground ,green
+                           :weight bold :box nil))
+           ("WORK"      . (:foreground ,yellow
+                           :weight bold :box nil))
+           ("WAIT"      . (:foreground ,orange
+                           :weight bold :box nil))
+           ("STOP"      . (:foreground ,comment
+                           :weight bold :box nil))
            ;; for hire:
-           ("HIRED"    . (:background ,blue :foreground ,background
-                          :weight bold :box nil))
-           ("GOOD"     . (:background ,green :foreground ,background
-                          :weight bold :box nil))
-           ("MEDIUM"   . (:background ,orange :foreground ,background
-                          :weight bold :box nil))
-           ("REJECTED" . (:background ,red :foreground ,background
-                          :weight bold :box nil))
-           ("WITHDREW" . (:background ,red :foreground ,background
-                          :weight bold :box nil))))))
+           ("HOLD"      . (:background ,comment :foreground ,background
+                           :weight bold :box nil))
+           ("SCHEDULED" . (:foreground ,blue
+                           :weight bold :box nil))
+           ("MEDIUM"    . (:background ,orange :foreground ,background
+                           :weight bold :box nil))
+           ("GOOD"      . (:background ,green :foreground ,background
+                           :weight bold :box nil))
+           ("REJECTED"  . (:background ,red :foreground ,background
+                           :weight bold :box nil))
+           ("WITHDREW"  . (:background ,purple :foreground ,background
+                           :weight bold :box nil))
+           ("HIRED"     . (:background ,aqua :foreground ,background
+                           :weight bold :box nil))))))
 
 ;;; Task list -----------------------------------------------------------------
 
@@ -49,7 +53,7 @@
 
 (defun open-candidates ()
   (interactive)
-  (find-file "~/Documents/hire.org/notes/candidates.org"))
+  (find-file "~/Documents/hire.org/pace.org"))
 
 (global-set-key [(shift f12)] #'open-candidates)
 
