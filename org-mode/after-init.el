@@ -25,6 +25,11 @@
                            :weight bold :box nil))
            ("STOP"      . (:foreground ,comment
                            :weight bold :box nil))
+
+           ;; for project plan
+           ("REVIEW"    . (:foreground ,orange
+                           :weight bold :box nil))
+
            ;; for hire:
            ("HOLD"      . (:background ,comment :foreground ,background
                            :weight bold :box nil))
