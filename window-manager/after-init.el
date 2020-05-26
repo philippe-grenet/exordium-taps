@@ -7,7 +7,8 @@
   (interactive)
   (delete-other-windows)
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
-  (set-frame-width (selected-frame) 130))
+  (set-frame-width (selected-frame) 130)
+  (set-frame-height (selected-frame) 88))
 
 (defun frame-show-one-window-xl ()
   "Show a single window extra-large"

@@ -49,6 +49,7 @@
 
 ;; Support for tables (this will be in Elpa one day)
 (load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
+(define-key markdown-mode-map (kbd "s-<tab>") 'markdown-cycle)
 
 ;; Use the Mac's built in dictionary
 (when exordium-osx
