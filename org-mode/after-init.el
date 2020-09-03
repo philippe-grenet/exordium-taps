@@ -27,7 +27,17 @@
                            :weight bold :box nil))
 
            ;; for project plan
+           ("SOON"      . (:foreground ,red
+                           :weight bold :box nil))
+           ("LATER"     . (:foreground ,yellow
+                           :weight bold :box nil))
+           ("MAYBE"     . (:foreground ,comment
+                           :weight bold :box nil))
            ("REVIEW"    . (:foreground ,orange
+                           :weight bold :box nil))
+           ("Q3"        . (:foreground ,red
+                           :weight bold :box nil))
+           ("Q4"        . (:foreground ,yellow
                            :weight bold :box nil))
 
            ;; for hire:
@@ -50,17 +60,24 @@
 
 (define-key org-mode-map (kbd "C-c t") #'exordium-org-move-to-today)
 
-(defun open-todos ()
-  (interactive)
-  (find-file "~/Documents/org/todo.org"))
+;; (defun open-todos ()
+;;   (interactive)
+;;   (find-file "~/Documents/org/todo.org"))
+
+(defconst available-todos '(("todo"       . "~/Documents/org/todo.org")
+                            ("catchup"    . "~/Documents/org/catchup.org")
+                            ("meetings"   . "~/Documents/org/pace-meetings.md")
+                            ("roadmap"    . "~/Documents/org/pacehocs-roadmap.org")
+                            ("candidates" . "~/Documents/hire.org/pace.org")
+                            ("pmap"       . "~/Documents/org/pmap-spark.md")))
+
+(defun open-todos (file)
+  (interactive
+   (list
+    (completing-read "Open: " available-todos)))
+  (find-file (cdr (assoc file available-todos))))
 
 (global-set-key [(f12)] #'open-todos)
-
-(defun open-candidates ()
-  (interactive)
-  (find-file "~/Documents/hire.org/pace.org"))
-
-(global-set-key [(shift f12)] #'open-candidates)
 
 ;;; Capture task --------------------------------------------------------------
 ;;; See http://orgmode.org/manual/Capture-templates.html#Capture-templates

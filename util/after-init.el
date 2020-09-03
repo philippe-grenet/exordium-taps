@@ -93,6 +93,12 @@ or comment block. See also `repunctuate-sentences'."
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (setq ediff-split-window-function 'split-window-horizontally)
 
+(setq magit-diff-refine-hunk t)
+
+(add-hook 'magit-status-mode-hook
+          (lambda ()
+            (setq truncate-lines nil)))
+
 (setq interpreter-mode-alist (append interpreter-mode-alist '(("ksh93" . shell-script-mode))))
 
 
