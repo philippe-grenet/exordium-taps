@@ -69,7 +69,9 @@
                             ("meetings"   . "~/Documents/org/pace-meetings.md")
                             ("roadmap"    . "~/Documents/org/pacehocs-roadmap.org")
                             ("candidates" . "~/Documents/hire.org/pace.org")
-                            ("pmap"       . "~/Documents/org/pmap-spark.md")))
+                            ("pmap"       . "~/Documents/org/pmap-spark.md")
+                            ("bdgt"       . "~/Documents/org/bdgt.org")
+                            ("tech-notes" . "~/Documents/org/tech-notes.md")))
 
 (defun open-todos (file)
   (interactive
