@@ -21,7 +21,7 @@
 
 ;; (setq flymd-browser-open-function 'my-flymd-browser-function)
 
-
+(setq markdown-max-image-size '(800 . 800))
 
 ;; Snippets
 (add-hook 'markdown-mode-hook

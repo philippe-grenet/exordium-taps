@@ -73,11 +73,18 @@
                             ("bdgt"       . "~/Documents/org/bdgt.org")
                             ("tech-notes" . "~/Documents/org/tech-notes.md")))
 
+(defvar available-notes (mapcar #'(lambda (file)
+                                    (cons (file-name-sans-extension (file-name-nondirectory file))
+                                          file))
+                                (directory-files "~/Documents/org/notes/" :match-regexp "^.*\.md")))
+
+(defvar all-todos (append available-todos available-notes))
+
 (defun open-todos (file)
   (interactive
    (list
-    (completing-read "Open: " available-todos)))
-  (find-file (cdr (assoc file available-todos))))
+    (completing-read "Open: " all-todos)))
+  (find-file (cdr (assoc file all-todos))))
 
 (global-set-key [(f12)] #'open-todos)
 
