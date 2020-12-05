@@ -60,25 +60,27 @@
 
 (define-key org-mode-map (kbd "C-c t") #'exordium-org-move-to-today)
 
-;; (defun open-todos ()
-;;   (interactive)
-;;   (find-file "~/Documents/org/todo.org"))
-
 (defconst available-todos '(("todo"       . "~/Documents/org/todo.org")
                             ("catchup"    . "~/Documents/org/catchup.org")
-                            ("meetings"   . "~/Documents/org/pace-meetings.md")
+                            ("meetings"   . "~/Documents/org/meetings.md")
                             ("roadmap"    . "~/Documents/org/pacehocs-roadmap.org")
                             ("candidates" . "~/Documents/hire.org/pace.org")
                             ("pmap"       . "~/Documents/org/pmap-spark.md")
                             ("bdgt"       . "~/Documents/org/bdgt.org")
                             ("tech-notes" . "~/Documents/org/tech-notes.md")))
 
-(defvar available-notes (mapcar #'(lambda (file)
-                                    (cons (file-name-sans-extension (file-name-nondirectory file))
-                                          file))
-                                (directory-files "~/Documents/org/notes/" :match-regexp "^.*\.md")))
+(require 'cl-lib)
+(cl-flet ((document-name-and-path (file)
+            (cons (file-name-sans-extension (file-name-nondirectory file))
+                  file)))
+  (defconst available-notes (append (mapcar #'document-name-and-path
+                                            (directory-files "~/Documents/org/notes/" :match-regexp "^.*\.md"))
+                                    (mapcar #'document-name-and-path
+                                            (directory-files "~/Documents/org/notes/" :match-regexp "^.*\.org")))))
 
-(defvar all-todos (append available-todos available-notes))
+(defconst all-todos (append available-todos
+                            (sort available-notes #'(lambda (a b)
+                                                      (string< (car a) (car b))))))
 
 (defun open-todos (file)
   (interactive
