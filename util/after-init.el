@@ -78,6 +78,7 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "<f8> c") (kbd "✓"))
 (define-key key-translation-map (kbd "<f8> l") (kbd "❤"))
 (define-key key-translation-map (kbd "<f8> u") (kbd "☂"))
+(define-key key-translation-map (kbd "<f8> b") (kbd "▌"))
 
 ;; https://www.key-shortcut.com/en/writing-systems/35-symbols/arrows
 (define-key key-translation-map (kbd "<f8> <right>") (kbd "→"))
