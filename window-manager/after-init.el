@@ -45,6 +45,15 @@
 (global-set-key [(f10)] #'frame-show-two-windows)
 (global-set-key [(shift f10)] #'frame-show-component)
 
+;; Distraction-free mode
+(require 'darkroom)
+(defun distraction-free-mode ()
+  (interactive)
+  (darkroom-mode 'toggle)
+  (toggle-frame-fullscreen))
+
+(global-set-key[(shift f11)] #'distraction-free-mode)
+
 ;;; Split windows
 
 (defun num-windows ()
