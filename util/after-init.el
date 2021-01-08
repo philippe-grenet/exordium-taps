@@ -68,29 +68,32 @@ or comment block. See also `repunctuate-sentences'."
 (global-set-key [(end)] #'move-end-of-line)
 (global-set-key [(home)] #'move-beginning-of-line)
 
-;; Emojis on mac
+;; Emojis on mac: add shift to Meta-Ctrl-Space for selection
 (global-set-key (kbd "C-M-s-<SPC>") #'mark-sexp)
 
-;; F8 for Unicode
+;; Super(Option)-q for Unicode characters
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
-(define-key key-translation-map (kbd "<f8> s") (kbd "★"))
-(define-key key-translation-map (kbd "<f8> c") (kbd "✓"))
-(define-key key-translation-map (kbd "<f8> l") (kbd "❤"))
-(define-key key-translation-map (kbd "<f8> u") (kbd "☂"))
-(define-key key-translation-map (kbd "<f8> b") (kbd "▌"))
+(define-key key-translation-map (kbd "s-q s") (kbd "★"))
+(define-key key-translation-map (kbd "s-q c") (kbd "✓"))
+(define-key key-translation-map (kbd "s-q l") (kbd "❤"))
+(define-key key-translation-map (kbd "s-q u") (kbd "☂"))
+(define-key key-translation-map (kbd "s-q b") (kbd "▌"))
+(define-key key-translation-map (kbd "s-q n") (kbd "□")) ; necessary
+(define-key key-translation-map (kbd "s-q p") (kbd "♢")) ; possible
+(define-key key-translation-map (kbd "s-q a") (kbd "∀")) ; all
 
 ;; https://www.key-shortcut.com/en/writing-systems/35-symbols/arrows
-(define-key key-translation-map (kbd "<f8> <right>") (kbd "→"))
-(define-key key-translation-map (kbd "<f8> <left>") (kbd "←"))
-(define-key key-translation-map (kbd "<f8> <up>") (kbd "⬆"))
-(define-key key-translation-map (kbd "<f8> <down>") (kbd "⬇"))
+(define-key key-translation-map (kbd "s-q <right>") (kbd "→"))
+(define-key key-translation-map (kbd "s-q <left>") (kbd "←"))
+(define-key key-translation-map (kbd "s-q <up>") (kbd "⬆"))
+(define-key key-translation-map (kbd "s-q <down>") (kbd "⬇"))
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
 
 
-;; Miscellaneous
+;; Git
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (setq ediff-split-window-function 'split-window-horizontally)
 
@@ -101,6 +104,14 @@ or comment block. See also `repunctuate-sentences'."
             (setq truncate-lines nil)))
 
 (setq interpreter-mode-alist (append interpreter-mode-alist '(("ksh93" . shell-script-mode))))
+
+
+;; Treemacs
+;; (defun treemacs-current ()
+;;   "Open treemacs for the current buffer"
+;;   (interactive)
+;;   (treemacs)
+;;   (treemacs-display-current-project-exclusively))
 
 
 ;; Atomic chrome
