@@ -56,6 +56,9 @@
            ("HIRED"     . (:background ,aqua :foreground ,background
                            :weight bold :box nil))))))
 
+(setq org-ellipsis "⤵")
+;;(setq org-ellipsis "…")
+
 ;;; Task list -----------------------------------------------------------------
 
 (define-key org-mode-map (kbd "C-c t") #'exordium-org-move-to-today)
