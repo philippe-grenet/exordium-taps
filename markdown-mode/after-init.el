@@ -3,9 +3,9 @@
 (require 'markdown-mode)
 
 (add-hook 'markdown-mode-hook 'flyspell-mode)
+(setq markdown-hide-urls t)
 (setq markdown-max-image-size '(800 . 800))
 (setq markdown-fontify-code-blocks-natively t)
-(setq markdown-hide-urls t)
 (setq markdown-make-gfm-checkboxes-buttons t)
 
 

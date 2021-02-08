@@ -82,6 +82,7 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "s-q n") (kbd "□")) ; necessary
 (define-key key-translation-map (kbd "s-q p") (kbd "♢")) ; possible
 (define-key key-translation-map (kbd "s-q a") (kbd "∀")) ; all
+(define-key key-translation-map (kbd "s-q e") (kbd "∃")) ; there exists
 
 ;; https://www.key-shortcut.com/en/writing-systems/35-symbols/arrows
 (define-key key-translation-map (kbd "s-q <right>") (kbd "→"))
