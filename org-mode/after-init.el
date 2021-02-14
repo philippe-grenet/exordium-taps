@@ -2,7 +2,7 @@
 
 (require 'org)
 
-;;; Colors --------------------------------------------------------------------
+;;; Look ----------------------------------------------------------------------
 
 (when (eq exordium-theme 'tomorrow-night)
   (setq org-priority-faces
@@ -56,40 +56,49 @@
            ("HIRED"     . (:background ,aqua :foreground ,background
                            :weight bold :box nil))))))
 
-(setq org-ellipsis "⤵")
-;;(setq org-ellipsis "…")
+(setq org-ellipsis "⤵")  ;; or "…"
 
 ;;; Task list -----------------------------------------------------------------
 
-(define-key org-mode-map (kbd "C-c t") #'exordium-org-move-to-today)
-
-(defconst available-todos '(("todo"       . "~/Documents/org/todo.org")
-                            ("catchup"    . "~/Documents/org/catchup.org")
-                            ("meetings"   . "~/Documents/org/meetings.md")
-                            ("roadmap"    . "~/Documents/org/pacehocs-roadmap.org")
-                            ("candidates" . "~/Documents/hire.org/pace.org")
-                            ("pmap"       . "~/Documents/org/pmap-spark.md")
-                            ("bdgt"       . "~/Documents/org/bdgt.org")
-                            ("tech-notes" . "~/Documents/org/tech-notes.md")))
-
 (require 'cl-lib)
-(cl-flet ((document-name-and-path (file)
-            (cons (file-name-sans-extension (file-name-nondirectory file))
-                  file)))
-  (defconst available-notes (append (mapcar #'document-name-and-path
-                                            (directory-files "~/Documents/org/notes/" :match-regexp "^.*\.md"))
-                                    (mapcar #'document-name-and-path
-                                            (directory-files "~/Documents/org/notes/" :match-regexp "^.*\.org")))))
 
-(defconst all-todos (append available-todos
-                            (sort available-notes #'(lambda (a b)
-                                                      (string< (car a) (car b))))))
+(defconst top-level-notes '(("todo"     . "~/Documents/org/todo.org")
+                            ("catchup"  . "~/Documents/org/catchup.org")
+                            ("meetings" . "~/Documents/org/meetings.md")))
+
+(defconst notes-directories '("~/Documents/org/pace/"
+                              "~/Documents/org/bql/"
+                              "~/Documents/org/equity/"
+                              "~/Documents/org/other/"
+                              "~/Documents/org/hire"))
+
+(defun list-notes-in-directory (dir)
+  ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
+  ;; file-name includes the last sub-directory.
+  ;; The list is sorted by file-name ascending.
+  (cl-flet ((note-name-and-path (file)
+              (cons (concat (car (last (delete "" (split-string dir "/"))))
+                            "/"
+                            (file-name-sans-extension (file-name-nondirectory file)))
+                    file)))
+    (sort (append (mapcar #'note-name-and-path
+                          (directory-files dir :match-regexp "^.*\.org"))
+                  (mapcar #'note-name-and-path
+                          (directory-files dir :match-regexp "^.*\.md")))
+          #'(lambda (a b)
+              (string< (downcase (car a)) (downcase (car b)))))))
+
+(defun list-all-notes ()
+  ;; Return the full alist of notes (file-name . path)
+  (append top-level-notes
+          (mapcan #'list-notes-in-directory notes-directories)))
 
 (defun open-todos (file)
-  (interactive
+  "Open a note from the list of active notes in Documents/org"
+   (interactive
    (list
-    (completing-read "Open: " all-todos)))
-  (find-file (cdr (assoc file all-todos))))
+    (completing-read "Open: " (list-all-notes))))
+  (find-file (cdr (assoc file (list-all-notes)))))
 
 (global-set-key [(f12)] #'open-todos)
 
