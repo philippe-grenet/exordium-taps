@@ -77,7 +77,8 @@
   ;; file-name includes the last sub-directory.
   ;; The list is sorted by file-name ascending.
   (cl-flet ((note-name-and-path (file)
-              (cons (concat (car (last (delete "" (split-string dir "/"))))
+              (cons (concat (propertize (car (last (delete "" (split-string dir "/"))))
+                                        'face 'helm-ff-directory)
                             "/"
                             (file-name-sans-extension (file-name-nondirectory file)))
                     file)))
