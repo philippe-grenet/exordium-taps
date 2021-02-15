@@ -58,6 +58,9 @@
 
 (setq org-ellipsis "⤵")  ;; or "…"
 
+;; Spell check
+(add-hook 'org-mode-hook 'flyspell-prog-mode)
+
 ;;; Task list -----------------------------------------------------------------
 
 (require 'cl-lib)
