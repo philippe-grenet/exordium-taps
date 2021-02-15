@@ -2,29 +2,17 @@
 
 ;;; Frame geometry
 
-(defun frame-show-one-window ()
-  "Show a single window"
-  (interactive)
+(defun frame-show-one-or-two-windows (x)
+  "Show a single window if no argument. With C-u 1 prefix, show 2 windows"
+  (interactive "P")
+  (message (if x "Two windows" "One window"))
   (delete-other-windows)
-  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
-  (set-frame-width (selected-frame) 130)
-  (set-frame-height (selected-frame) 88))
-
-(defun frame-show-one-window-xl ()
-  "Show a single window extra-large"
-  (interactive)
-  (delete-other-windows)
-  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
-  (set-frame-width (selected-frame) 166)
-  (treemacs))
-
-(defun frame-show-two-windows ()
-  "Show two windows with the top 2 buffers"
-  (interactive)
-  (delete-other-windows)
-  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 50)))
-  (set-frame-width (selected-frame) (* 2 120))
-  (let ((win (split-window-right)))
+  (modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
+  (set-frame-width (selected-frame) (if x 260 130))
+  (set-frame-height (selected-frame) 102)
+  (when x
+    (let ((win (split-window-right)))
+      (switch-to-other-buffer))))
     (switch-to-other-buffer)))
 
 (defun frame-show-component ()
@@ -36,13 +24,11 @@
   (let ((win (split-window-right)))
     (switch-to-other-buffer))
   (cpp-switch-h-cpp t)
-  (let ((win (split-window-right)))
+  (let ((win (split-window1-right)))
     (switch-to-other-buffer))
   (balance-windows))
 
-(global-set-key [(f9)] #'frame-show-one-window)
-(global-set-key [(shift f9)] #'frame-show-one-window-xl)
-(global-set-key [(f10)] #'frame-show-two-windows)
+(global-set-key [(f10)] #'frame-show-one-or-two-windows)
 (global-set-key [(shift f10)] #'frame-show-component)
 
 ;; Distraction-free mode
