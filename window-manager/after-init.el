@@ -12,7 +12,7 @@
   (set-frame-height (selected-frame) 102)
   (when x
     (let ((win (split-window-right)))
-      (switch-to-other-buffer))))
+      (switch-to-other-buffer))
     (switch-to-other-buffer)))
 
 (defun frame-show-component ()
