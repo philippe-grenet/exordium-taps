@@ -74,21 +74,30 @@ or comment block. See also `repunctuate-sentences'."
 ;; Super(Option)-q for Unicode characters
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
-(define-key key-translation-map (kbd "s-q s") (kbd "★"))
-(define-key key-translation-map (kbd "s-q c") (kbd "✓"))
-(define-key key-translation-map (kbd "s-q l") (kbd "❤"))
-(define-key key-translation-map (kbd "s-q u") (kbd "☂"))
-(define-key key-translation-map (kbd "s-q b") (kbd "▌"))
+;; Symbols
+(define-key key-translation-map (kbd "s-q s") (kbd "★")) ; star
+(define-key key-translation-map (kbd "s-q c") (kbd "✓")) ; checkmark
+(define-key key-translation-map (kbd "s-q h") (kbd "❤")) ; heart
+(define-key key-translation-map (kbd "s-q u") (kbd "☂")) ; umbrella
+(define-key key-translation-map (kbd "s-q b") (kbd "▌")) ; block
+(define-key key-translation-map (kbd "s-q SPC") (kbd "█")) ; black space
+;; Modal logic
 (define-key key-translation-map (kbd "s-q n") (kbd "□")) ; necessary
 (define-key key-translation-map (kbd "s-q p") (kbd "♢")) ; possible
 (define-key key-translation-map (kbd "s-q a") (kbd "∀")) ; all
 (define-key key-translation-map (kbd "s-q e") (kbd "∃")) ; there exists
-
+;; Arrows
 ;; https://www.key-shortcut.com/en/writing-systems/35-symbols/arrows
-(define-key key-translation-map (kbd "s-q <right>") (kbd "→"))
-(define-key key-translation-map (kbd "s-q <left>") (kbd "←"))
+(define-key key-translation-map (kbd "s-q <right>") (kbd "⮕"))
+(define-key key-translation-map (kbd "s-q <left>") (kbd "⬅"))
 (define-key key-translation-map (kbd "s-q <up>") (kbd "⬆"))
 (define-key key-translation-map (kbd "s-q <down>") (kbd "⬇"))
+(define-key key-translation-map (kbd "C-s-q <right>") (kbd "⇒"))
+(define-key key-translation-map (kbd "C-s-q <left>") (kbd "⇐"))
+(define-key key-translation-map (kbd "s-q =") (kbd "⇔"))
+;; Math
+(define-key key-translation-map (kbd "s-q d") (kbd "Δ")) ; delta
+(define-key key-translation-map (kbd "s-q l") (kbd "λ")) ; lambda
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
@@ -108,11 +117,13 @@ or comment block. See also `repunctuate-sentences'."
 
 
 ;; Treemacs
-;; (defun treemacs-current ()
-;;   "Open treemacs for the current buffer"
-;;   (interactive)
-;;   (treemacs)
-;;   (treemacs-display-current-project-exclusively))
+
+(defun treemacs-current ()
+  "Open treemacs for the current buffer"
+  (interactive)
+  (when (eq (treemacs-current-visibility) 'none)
+    (treemacs)
+    (treemacs-display-current-project-exclusively)))
 
 
 ;; Atomic chrome

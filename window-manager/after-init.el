@@ -7,7 +7,8 @@
   (interactive "P")
   (message (if x "Two windows" "One window"))
   (delete-other-windows)
-  (modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
+  ;; doesn't work with multiple monitors, need to find a solution
+  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
   (set-frame-width (selected-frame) (if x 260 130))
   (set-frame-height (selected-frame) 102)
   (when x
