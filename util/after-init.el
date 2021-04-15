@@ -92,8 +92,8 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "s-q <left>") (kbd "⬅"))
 (define-key key-translation-map (kbd "s-q <up>") (kbd "⬆"))
 (define-key key-translation-map (kbd "s-q <down>") (kbd "⬇"))
-(define-key key-translation-map (kbd "C-s-q <right>") (kbd "⇒"))
-(define-key key-translation-map (kbd "C-s-q <left>") (kbd "⇐"))
+(define-key key-translation-map (kbd "s-q S-<right>") (kbd "⇒"))
+(define-key key-translation-map (kbd "s-q S-<left>") (kbd "⇐"))
 (define-key key-translation-map (kbd "s-q =") (kbd "⇔"))
 ;; Math
 (define-key key-translation-map (kbd "s-q d") (kbd "Δ")) ; delta
