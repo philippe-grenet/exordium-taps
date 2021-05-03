@@ -2,6 +2,9 @@
 
 (require 'org)
 
+;;; Remove the hook added by init-org-mode.el
+(remove-hook 'org-mode-hook 'turn-on-visual-line-mode)
+
 ;;; Look ----------------------------------------------------------------------
 
 (when (eq exordium-theme 'tomorrow-night)
