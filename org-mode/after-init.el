@@ -72,7 +72,7 @@
                             ("catchup"  . "~/Documents/org/catchup.org")
                             ("meetings" . "~/Documents/org/meetings.md")))
 
-(defconst notes-directories '("~/Documents/org/pace/"
+(defconst notes-directories '("~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
                               "~/Documents/org/equity/"
                               "~/Documents/org/other/"
