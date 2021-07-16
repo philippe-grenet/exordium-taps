@@ -70,6 +70,7 @@
 
 (defconst top-level-notes '(("todo"     . "~/Documents/org/todo.org")
                             ("catchup"  . "~/Documents/org/catchup.org")
+                            ("roadmap"  . "~/Documents/org/roadmap.org")
                             ("meetings" . "~/Documents/org/meetings.md")))
 
 (defconst notes-directories '("~/Documents/org/spark-platform/"
