@@ -110,6 +110,20 @@
 
 (global-set-key [(f12)] #'open-todos)
 
+;; Quick access
+
+(defun open-todo-file ()
+  (interactive)
+  (find-file "~/Documents/org/todo.org"))
+
+(global-set-key [(meta f12)] #'open-todo-file)
+
+(defun open-catchup-file ()
+  (interactive)
+  (find-file "~/Documents/org/catchup.org"))
+
+(global-set-key [(control f12)] #'open-catchup-file)
+
 ;;; Capture task --------------------------------------------------------------
 ;;; See http://orgmode.org/manual/Capture-templates.html#Capture-templates
 
