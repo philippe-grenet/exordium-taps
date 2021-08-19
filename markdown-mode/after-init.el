@@ -8,6 +8,14 @@
 (setq markdown-fontify-code-blocks-natively t)
 (setq markdown-make-gfm-checkboxes-buttons t)
 
+;; hide URLs + horizontal line with C-q C-l + 100 char lines
+(add-hook 'markdown-mode-hook
+          (lambda ()
+            (setq markdown-hide-urls t)
+            (setq page-break-line-mode t)
+            (set-fill-column 100)
+            (exordium-page-break-lines-hook)))
+
 
 ;; Renderer:
 ;; markdown rendering or impatient-markdown-mode:

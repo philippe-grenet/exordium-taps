@@ -5,6 +5,10 @@
 ;;; Remove the hook added by init-org-mode.el
 (remove-hook 'org-mode-hook 'turn-on-visual-line-mode)
 
+(add-hook 'org-mode-hook
+          (lambda ()
+            (set-fill-column 100)))
+
 ;;; Look ----------------------------------------------------------------------
 
 (when (eq exordium-theme 'tomorrow-night)
@@ -27,6 +31,10 @@
            ("WAIT"      . (:foreground ,orange
                            :weight bold :box nil))
            ("STOP"      . (:foreground ,comment
+                           :weight bold :box nil))
+
+           ;; for catch up
+           ("NEXT"      . (:background ,red :foreground ,background
                            :weight bold :box nil))
 
            ;; for project plan
@@ -60,6 +68,10 @@
                            :weight bold :box nil))))))
 
 (setq org-ellipsis "⤵")  ;; or "…"
+
+;; org-fontify-todo-headline -> TODO => face org-headline-todo
+;;(setq org-not-done-regexp "STOP")
+;;(setq org-fontify-todo-headline t)
 
 ;; Spell check
 (add-hook 'org-mode-hook 'flyspell-prog-mode)
@@ -122,7 +134,7 @@
   (interactive)
   (find-file "~/Documents/org/catchup.org"))
 
-(global-set-key [(control f12)] #'open-catchup-file)
+(global-set-key [(shift meta f12)] #'open-catchup-file)
 
 ;;; Capture task --------------------------------------------------------------
 ;;; See http://orgmode.org/manual/Capture-templates.html#Capture-templates
