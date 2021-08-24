@@ -2,15 +2,18 @@
 
 ;;; Frame geometry
 
+(defconst pg/window-width 120)
+(defconst pg/frame-height 101)
+
 (defun frame-show-one-or-two-windows (x)
   "Show a single window if no argument. With C-u 1 prefix, show 2 windows"
   (interactive "P")
-  (message (if x "Two windows" "One window"))
+  (message (if x "Showing two windows" "Showing one window"))
   (delete-other-windows)
   ;; doesn't work with multiple monitors, need to find a solution
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
-  (set-frame-width (selected-frame) (if x 260 130))
-  (set-frame-height (selected-frame) 102)
+  (set-frame-width (selected-frame) (if x (* 2 pg/window-width) pg/window-width))
+  (set-frame-height (selected-frame) pg/frame-height)
   (when x
     (let ((win (split-window-right)))
       (switch-to-other-buffer))
