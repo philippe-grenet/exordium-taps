@@ -22,50 +22,30 @@
   (with-tomorrow-colors
    (tomorrow-mode-name)
    (setq org-todo-keyword-faces
-         `(("TODO"      . (:foreground ,red
-                           :weight bold :box nil))
-           ("DONE"      . (:foreground ,green
-                           :weight bold :box nil))
-           ("WORK"      . (:foreground ,yellow
-                           :weight bold :box nil))
-           ("WAIT"      . (:foreground ,orange
-                           :weight bold :box nil))
-           ("STOP"      . (:foreground ,comment
-                           :weight bold :box nil))
+         `(("TODO"      . (:foreground ,red :weight bold :box nil))
+           ("DONE"      . (:foreground ,green :weight bold :box nil))
+           ("WORK"      . (:foreground ,yellow :weight bold :box nil))
+           ("WAIT"      . (:foreground ,orange :weight bold :box nil))
+           ("STOP"      . (:foreground ,comment :weight bold :box nil))
 
-           ;; for catch up
-           ("NEXT"      . (:background ,red :foreground ,background
-                           :weight bold :box nil))
+           ;; for catch up:
+           ("NEXT"      . (:background ,red :foreground ,background :weight bold :box nil))
 
-           ;; for project plan
-           ("SOON"      . (:foreground ,red
-                           :weight bold :box nil))
-           ("LATER"     . (:foreground ,yellow
-                           :weight bold :box nil))
-           ("MAYBE"     . (:foreground ,comment
-                           :weight bold :box nil))
-           ("REVIEW"    . (:foreground ,orange
-                           :weight bold :box nil))
-           ("Q3"        . (:foreground ,red
-                           :weight bold :box nil))
-           ("Q4"        . (:foreground ,yellow
-                           :weight bold :box nil))
+           ;; for BDGT:
+           ("SUBMITTED" . (:foreground ,orange :weight bold :box nil))
+           ("APPROVED"  . (:foreground ,yellow :weight bold :box nil))
+           ("PARTIAL"   . (:background ,yellow :foreground ,background :weight bold :box nil))
+           ("COMPLETE"  . (:background ,green :foreground ,background :weight bold :box nil))
+           ("CANCELED"  . (:background ,comment :foreground ,background :weight bold :box nil))
 
            ;; for hire:
-           ("HOLD"      . (:background ,comment :foreground ,background
-                           :weight bold :box nil))
-           ("SCHEDULED" . (:foreground ,blue
-                           :weight bold :box nil))
-           ("MEDIUM"    . (:background ,orange :foreground ,background
-                           :weight bold :box nil))
-           ("GOOD"      . (:background ,green :foreground ,background
-                           :weight bold :box nil))
-           ("REJECTED"  . (:background ,red :foreground ,background
-                           :weight bold :box nil))
-           ("WITHDREW"  . (:background ,purple :foreground ,background
-                           :weight bold :box nil))
-           ("HIRED"     . (:background ,aqua :foreground ,background
-                           :weight bold :box nil))))))
+           ("HOLD"      . (:background ,comment :foreground ,background :weight bold :box nil))
+           ("SCHEDULED" . (:foreground ,blue :weight bold :box nil))
+           ("MEDIUM"    . (:background ,orange :foreground ,background :weight bold :box nil))
+           ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
+           ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
+           ("WITHDREW"  . (:background ,purple :foreground ,background :weight bold :box nil))
+           ("HIRED"     . (:background ,aqua :foreground ,background :weight bold :box nil))))))
 
 (setq org-ellipsis "⤵")  ;; or "…"
 
