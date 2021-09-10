@@ -35,6 +35,8 @@
 (global-set-key [(f10)] #'frame-show-one-or-two-windows)
 (global-set-key [(shift f10)] #'frame-show-component)
 
+
+
 ;; Distraction-free mode
 (require 'darkroom)
 (defun distraction-free-mode ()
@@ -44,6 +46,8 @@
 
 (global-set-key[(shift f11)] #'distraction-free-mode)
 
+
+
 ;;; Split windows
 
 (defun num-windows ()
@@ -76,14 +80,38 @@ i.e. change right window to bottom, or change bottom window to right."
                   (split-window-horizontally))
                 (set-window-buffer (windmove-find-other-window neighbour-dir) other-buf))))))))
 
-(defun resplit-vertically ()
-  "Switch window split from horizontal to vertical, resizing the frame as well"
-  (interactive)
-  (if (not (= 2 (num-windows)))
-      (error "I don't see 2 windows")
-    (frame-show-two-windows)
-    (toggle-window-split)))
+;; (defun resplit-vertically ()
+;;   "Switch window split from horizontal to vertical, resizing the frame as well"
+;;   (interactive)
+;;   (if (not (= 2 (num-windows)))
+;;       (error "I don't see 2 windows")
+;;     (frame-show-two-windows)
+;;     (toggle-window-split)))
 
+(defun split-window-func-with-other-buffer (split-function)
+  (let ((s-f split-function))
+    (lambda ()
+      (interactive)
+      (funcall s-f)
+      (set-window-buffer (next-window) (other-buffer)))))
+
+(defun split-window-horizontally-instead ()
+  (interactive)
+  (save-excursion
+    (delete-other-windows)
+    (funcall (split-window-func-with-other-buffer 'split-window-horizontally))))
+
+(defun split-window-vertically-instead ()
+  (interactive)
+  (save-excursion
+    (delete-other-windows)
+    (funcall (split-window-func-with-other-buffer 'split-window-vertically))))
+
+(global-set-key "\C-c|" 'split-window-horizontally-instead)
+(global-set-key "\C-c_" 'split-window-vertically-instead)
+
+
+
 ;;; Buffers
 
 (defun kill-other-buffers ()
