@@ -107,8 +107,8 @@ i.e. change right window to bottom, or change bottom window to right."
     (delete-other-windows)
     (funcall (split-window-func-with-other-buffer 'split-window-vertically))))
 
-(global-set-key "\C-c|" 'split-window-horizontally-instead)
-(global-set-key "\C-c_" 'split-window-vertically-instead)
+(global-set-key "\C-c3" 'split-window-horizontally-instead)
+(global-set-key "\C-c2" 'split-window-vertically-instead)
 
 
 
