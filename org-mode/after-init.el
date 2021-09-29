@@ -2,6 +2,8 @@
 
 (require 'org)
 
+(setq org-hide-leading-stars t)
+
 ;;; Remove the hook added by init-org-mode.el
 (remove-hook 'org-mode-hook 'turn-on-visual-line-mode)
 
@@ -18,6 +20,16 @@
           (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
 
   (setq org-cycle-separator-lines -1)
+
+  (with-tomorrow-colors
+   (tomorrow-mode-name)
+   (setq org-emphasis-alist
+         `(("*" (:foreground ,red))                         ; ("*" bold)
+           ("/" (:foreground ,green))                       ; ("/" italic)
+           ("_" (:background ,red :foreground ,background)) ; ("_" underline)
+           ("=" org-verbatim verbatim)
+           ("~" org-code verbatim)
+           ("+" (:strike-through t)))))
 
   (with-tomorrow-colors
    (tomorrow-mode-name)
@@ -166,4 +178,3 @@
                  (org-agenda-overriding-header "High-priority items:")))
           (agenda "")
           (alltodo "")))))
-(add-to-list 'org-emphasis-alist '("*" (:foreground "#de935f")))

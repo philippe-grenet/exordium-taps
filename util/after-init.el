@@ -1,5 +1,34 @@
 ;;; Utility functions
 
+;; Visual bell
+(setq ring-bell-function
+      (lambda ()
+        (let ((orig-fg (face-foreground 'mode-line)))
+          (set-face-foreground 'mode-line "#cc6666")
+          (run-with-idle-timer 0.1 nil
+                               (lambda (fg) (set-face-foreground 'mode-line fg))
+                               orig-fg))))
+
+;; Disable backtick pair
+(defun exordium-electric-mode-add-back-tick ()
+  nil)
+
+;; C-u M-q unfill-paragraph
+(defun fill-unfill-paragraph (arg)
+  (interactive "P")
+  (if arg
+      (unfill-paragraph)
+    (fill-paragraph)))
+(define-key global-map (kbd "M-q") 'fill-unfill-paragraph)
+
+;; Copy todos to beorg
+(defun sync-todos ()
+  "Copy todo.org to icloud/beorg"
+  (interactive)
+  (copy-file "/Users/pgrenet/Documents/org/todo.org"
+             "/Users/pgrenet/Library/Mobile Documents/com~apple~CloudDocs/org/"
+             t))
+
 (defalias 'repunctuate 'bde-repunctuate)
 (defun depunctuate ()
   "Put ONE space at the end of sentences in the selected region
@@ -63,6 +92,20 @@ or comment block. See also `repunctuate-sentences'."
 (global-set-key (kbd "C-M-<up>") 'gcm-scroll-up)
 
 
+;; Helm
+(setq helm-autoresize-max-height 35
+      helm-autoresize-min-height 35)
+(helm-autoresize-mode t)
+
+;; C-x b replacement for switch-to-buffer
+(define-key global-map (kbd "C-x b") 'helm-buffers-list)
+
+;; (setq helm-boring-buffer-regexp-list '("\\*helm.+\\*"
+;;                                        "\\*Messages\\*"
+;;                                        "\\*Compile-Log\\*"
+;;                                        "\\*Minibuf.+\\*"))
+
+
 ;; Keys
 (global-set-key [(f6)] #'exordium-highlight-symbol)
 (global-set-key [(end)] #'move-end-of-line)
@@ -114,6 +157,14 @@ or comment block. See also `repunctuate-sentences'."
             (setq truncate-lines nil)))
 
 (setq interpreter-mode-alist (append interpreter-mode-alist '(("ksh93" . shell-script-mode))))
+
+;; gfm-mode by default
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+
+;; 2-way diff in ediff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-split-window-function 'split-window-horizontally)
+(setq magit-ediff-dwim-show-on-hunks t)
 
 
 ;; Treemacs
