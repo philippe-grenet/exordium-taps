@@ -1,6 +1,7 @@
 ;;;; Local extensions to Exordium: Window manager
 
 ;;; Frame geometry
+(require 'treemacs)
 
 (defconst pg/window-width 120)
 (defconst pg/frame-height 104)
@@ -12,7 +13,8 @@
   (delete-other-windows)
   ;; doesn't work with multiple monitors, need to find a solution
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
-  (set-frame-width (selected-frame) (if x (* 2 pg/window-width) pg/window-width))
+  (set-frame-width (selected-frame) (+ (if x (* 2 pg/window-width) pg/window-width)
+                                       (if (eq (treemacs-current-visibility) 'visible) 20 0)))
   (set-frame-height (selected-frame) pg/frame-height)
   (when x
     (let ((win (split-window-right)))
