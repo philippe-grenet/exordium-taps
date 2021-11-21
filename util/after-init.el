@@ -141,6 +141,7 @@ or comment block. See also `repunctuate-sentences'."
 ;; Math
 (define-key key-translation-map (kbd "s-q d") (kbd "Δ")) ; delta
 (define-key key-translation-map (kbd "s-q l") (kbd "λ")) ; lambda
+(define-key key-translation-map (kbd "s-q 0") (kbd "∅")) ; empty set
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
