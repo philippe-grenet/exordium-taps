@@ -81,6 +81,7 @@
                               "~/Documents/org/bql/"
                               "~/Documents/org/equity/"
                               "~/Documents/org/other/"
+                              "~/Documents/org/tech/"
                               "~/Documents/org/hire"))
 
 (defun list-notes-in-directory (dir)
@@ -88,11 +89,13 @@
   ;; file-name includes the last sub-directory.
   ;; The list is sorted by file-name ascending.
   (cl-flet ((note-name-and-path (file)
-              (cons (concat (propertize (car (last (delete "" (split-string dir "/"))))
-                                        'face 'helm-ff-directory)
-                            "/"
-                            (file-name-sans-extension (file-name-nondirectory file)))
-                    file)))
+              (let* ((file-name (file-name-nondirectory file))
+                     (file-ext  (file-name-extension file t)))
+                (cons (concat (propertize (car (last (delete "" (split-string dir "/"))))
+                                          'face 'helm-ff-directory)
+                              "/" file-name
+                              (propertize file-ext 'face 'helm-ff-file-extension))
+                      file))))
     (sort (append (mapcar #'note-name-and-path
                           (directory-files dir :match-regexp "^.*\.org"))
                   (mapcar #'note-name-and-path
