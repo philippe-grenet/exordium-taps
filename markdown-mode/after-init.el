@@ -14,7 +14,8 @@
             (setq markdown-hide-urls t)
             (setq page-break-line-mode t)
             (set-fill-column 100)
-            (exordium-page-break-lines-hook)))
+            (exordium-page-break-lines-hook)
+            (markdown-toggle-inline-images)))
 
 
 ;; Renderer:
