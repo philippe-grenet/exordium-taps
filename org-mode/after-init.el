@@ -94,7 +94,9 @@
                 (cons (concat (propertize (car (last (delete "" (split-string dir "/"))))
                                           'face 'helm-ff-directory)
                               "/" file-name
-                              (propertize file-ext 'face 'helm-ff-file-extension))
+                              (propertize file-ext 'face (if (string= file-ext ".org")
+                                                             'helm-ff-truename
+                                                           'helm-ff-file-extension)))
                       file))))
     (sort (append (mapcar #'note-name-and-path
                           (directory-files dir :match-regexp "^.*\.org"))
