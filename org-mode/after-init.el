@@ -72,10 +72,18 @@
 
 (require 'cl-lib)
 
-(defconst top-level-notes '(("todo"     . "~/Documents/org/todo.org")
-                            ("catchup"  . "~/Documents/org/catchup.org")
-                            ("roadmap"  . "~/Documents/org/roadmap.org")
-                            ("meetings" . "~/Documents/org/meetings.md")))
+(defun colorize-note-extension (file-name)
+  (let ((file-ext (file-name-extension file-name t)))
+    (concat (file-name-base file-name)
+            (propertize file-ext 'face (if (string= file-ext ".org")
+                                           'helm-ff-truename
+                                         'helm-ff-file-extension)))))
+
+
+(defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
+                            (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
+                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
+                            (,(colorize-note-extension "meetings.md") . "~/Documents/org/meetings.md")))
 
 (defconst notes-directories '("~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
