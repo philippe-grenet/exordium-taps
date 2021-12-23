@@ -11,7 +11,8 @@
           (lambda ()
             (set-fill-column 100)))
 
-;;; Look ----------------------------------------------------------------------
+
+;;; Look
 
 (when (eq exordium-theme 'tomorrow-night)
   (setq org-priority-faces
@@ -68,7 +69,8 @@
 ;; Spell check
 (add-hook 'org-mode-hook 'flyspell-prog-mode)
 
-;;; Task list -----------------------------------------------------------------
+
+;;; Task list
 
 (require 'cl-lib)
 
@@ -85,7 +87,8 @@
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
                             (,(colorize-note-extension "meetings.md") . "~/Documents/org/meetings.md")))
 
-(defconst notes-directories '("~/Documents/org/spark-platform/"
+(defconst notes-directories '("~/Documents/org/parquet/"
+                              "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
                               "~/Documents/org/equity/"
                               "~/Documents/org/other/"
@@ -141,7 +144,8 @@
 
 (global-set-key [(shift meta f12)] #'open-catchup-file)
 
-;;; Capture task --------------------------------------------------------------
+
+;;; Capture task
 ;;; See http://orgmode.org/manual/Capture-templates.html#Capture-templates
 
 (setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
@@ -166,7 +170,7 @@
 
 (define-key global-map [(ctrl f12)] #'org-capture)
 
-;;; Move task -----------------------------------------------------------------
+;;; Move task
 
 (defun exordium-org-move-to-today ()
   "Move the current subtree to the end of Tasks/Today"
@@ -181,7 +185,8 @@
 
 (define-key org-mode-map [(ctrl c) (t)] #'exordium-org-move-to-today)
 
-;;; Org agenda ----------------------------------------------------------------
+
+;;; Org agenda
 
 (setq org-agenda-files '("/Users/pgrenet/Documents/org/"))
 (setq org-agenda-custom-commands
@@ -191,3 +196,56 @@
                  (org-agenda-overriding-header "High-priority items:")))
           (agenda "")
           (alltodo "")))))
+
+
+;;; Calfw mode
+;;; https://github.com/kiwanami/emacs-calfw
+
+(require 'calfw)
+(require 'calfw-org)
+
+;;(defalias 'open-calendar 'cfw:open-org-calendar)
+(defun open-todos-calendar-view ()
+  (interactive)
+  (split-window-vertically)
+  ;; Fix the bug where it takes a little too much width
+  (let ((w (frame-width (selected-frame))))
+    (set-frame-width (selected-frame) (- w 1))
+    (cfw:open-org-calendar)
+    (set-frame-width (selected-frame) w)))
+
+(with-eval-after-load 'org
+  (bind-key [(f9)] #'open-todos-calendar-view org-mode-map))
+
+(setq cfw:fchar-junction ?╋
+      cfw:fchar-vertical-line ?┃
+      cfw:fchar-horizontal-line ?━
+      cfw:fchar-left-junction ?┣
+      cfw:fchar-right-junction ?┫
+      cfw:fchar-top-junction ?┯
+      cfw:fchar-top-left-corner ?┏
+      cfw:fchar-top-right-corner ?┓)
+
+(setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+
+(require 'color-theme-tomorrow)
+(with-tomorrow-colors 'night
+ (custom-set-faces
+  `(cfw:face-title ((t (:foreground ,aqua :weight bold :height 2.0 :inherit variable-pitch))))
+  `(cfw:face-header ((t (:foreground ,yellow :weight bold))))
+  `(cfw:face-sunday ((t :foreground ,orange :background ,background :weight bold)))
+  `(cfw:face-saturday ((t :foreground ,orange :background ,background :weight bold)))
+  `(cfw:face-holiday ((t :background ,orange :foreground ,background :weight bold)))
+  `(cfw:face-grid ((t :foreground ,selection)))
+  `(cfw:face-default-content ((t :foreground ,purple)))
+  `(cfw:face-periods ((t :foreground "cyan")))
+  `(cfw:face-day-title ((t :background "grey10")))
+  `(cfw:face-default-day ((t :weight bold :inherit cfw:face-day-title)))
+  `(cfw:face-annotation ((t :foreground "RosyBrown" :inherit cfw:face-day-title)))
+  `(cfw:face-disable ((t :foreground "DarkGray" :inherit cfw:face-day-title)))
+  `(cfw:face-today-title ((t :foreground ,background :background ,green :weight bold)))
+  `(cfw:face-today ((t :background: ,green :weight bold)))
+  `(cfw:face-select ((t :background "#2f2f2f")))
+  `(cfw:face-toolbar ((t :foreground ,foreground :background ,selection)))
+  `(cfw:face-toolbar-button-off ((t :foreground ,aqua :background ,selection :weight bold)))
+  `(cfw:face-toolbar-button-on ((t :foreground ,foreground :background ,selection :weight bold)))))
