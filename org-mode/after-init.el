@@ -203,19 +203,26 @@
 
 (require 'calfw)
 (require 'calfw-org)
-
 ;;(defalias 'open-calendar 'cfw:open-org-calendar)
+
 (defun open-todos-calendar-view ()
   (interactive)
   (split-window-vertically)
   ;; Fix the bug where it takes a little too much width
   (let ((w (frame-width (selected-frame))))
-    (set-frame-width (selected-frame) (- w 1))
+    (set-frame-width (selected-frame) (- w 4))
     (cfw:open-org-calendar)
     (set-frame-width (selected-frame) w)))
 
+(defun close-todos-calendar-view ()
+  (interactive)
+  (kill-this-buffer)
+  (delete-other-windows))
+
 (with-eval-after-load 'org
   (bind-key [(f9)] #'open-todos-calendar-view org-mode-map))
+(with-eval-after-load 'calfw
+  (bind-key [(f9)] #'close-todos-calendar-view cfw:calendar-mode-map))
 
 (setq cfw:fchar-junction ?╋
       cfw:fchar-vertical-line ?┃
@@ -231,7 +238,7 @@
 (require 'color-theme-tomorrow)
 (with-tomorrow-colors 'night
  (custom-set-faces
-  `(cfw:face-title ((t (:foreground ,aqua :weight bold :height 2.0 :inherit variable-pitch))))
+  `(cfw:face-title ((t (:foreground ,green :weight bold :height 2.0))))
   `(cfw:face-header ((t (:foreground ,yellow :weight bold))))
   `(cfw:face-sunday ((t :foreground ,orange :background ,background :weight bold)))
   `(cfw:face-saturday ((t :foreground ,orange :background ,background :weight bold)))
