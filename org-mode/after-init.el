@@ -211,9 +211,8 @@
   ;; Fix the bug where it takes a little too much width
   (let ((w (frame-width (selected-frame))))
     (set-frame-width (selected-frame) (- w 4))
-    (cfw:open-calendar-buffer :contents-sources (list
-                                                 ;; orgmode source
-                                                 (cfw:org-create-source "#8abeb7")))
+    (cfw:open-org-calendar)
+    ;;(cfw:open-calendar-buffer :contents-sources (list (cfw:org-create-source "#8abeb7")))
     (set-frame-width (selected-frame) w)))
 
 (defun close-todos-calendar-view ()
