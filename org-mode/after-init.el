@@ -90,6 +90,7 @@
 (defconst notes-directories '("~/Documents/org/parquet/"
                               "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
+                              "~/Documents/org/bqnt/"
                               "~/Documents/org/equity/"
                               "~/Documents/org/other/"
                               "~/Documents/org/tech/"
