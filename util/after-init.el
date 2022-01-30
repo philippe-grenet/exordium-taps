@@ -138,10 +138,17 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "s-q S-<right>") (kbd "⇒"))
 (define-key key-translation-map (kbd "s-q S-<left>") (kbd "⇐"))
 (define-key key-translation-map (kbd "s-q =") (kbd "⇔"))
-;; Math
-(define-key key-translation-map (kbd "s-q d") (kbd "Δ")) ; delta
-(define-key key-translation-map (kbd "s-q l") (kbd "λ")) ; lambda
+;; Greeks
+(define-key key-translation-map (kbd "s-q A") (kbd "α")) ; alpha
+(define-key key-translation-map (kbd "s-q B") (kbd "β")) ; beta
+(define-key key-translation-map (kbd "s-q D") (kbd "Δ")) ; delta
+(define-key key-translation-map (kbd "s-q C") (kbd "ε")) ; epsilon
+(define-key key-translation-map (kbd "s-q L") (kbd "λ")) ; lambda
+(define-key key-translation-map (kbd "s-q S") (kbd "Σ")) ; sigma
+;; Set theory
 (define-key key-translation-map (kbd "s-q 0") (kbd "∅")) ; empty set
+(define-key key-translation-map (kbd "s-q i") (kbd "∩")) ; empty set
+(define-key key-translation-map (kbd "s-q u") (kbd "∪")) ; empty set
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
