@@ -52,8 +52,7 @@
            ("CANCELED"  . (:background ,comment :foreground ,background :weight bold :box nil))
 
            ;; for hire:
-           ("HOLD"      . (:background ,comment :foreground ,background :weight bold :box nil))
-           ("SCHEDULED" . (:foreground ,blue :weight bold :box nil))
+           ("BAD"       . (:foreground ,red :weight bold :box nil))
            ("MEDIUM"    . (:background ,orange :foreground ,background :weight bold :box nil))
            ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
            ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
@@ -68,6 +67,10 @@
 
 ;; Spell check
 (add-hook 'org-mode-hook 'flyspell-prog-mode)
+
+;; Images
+;; Use:  #+ATTR_HTML: :width 300px
+(setq org-image-actual-width nil)
 
 
 ;;; Task list
