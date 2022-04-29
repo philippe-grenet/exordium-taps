@@ -52,7 +52,7 @@
            ("CANCELED"  . (:background ,comment :foreground ,background :weight bold :box nil))
 
            ;; for hire:
-           ("BAD"       . (:foreground ,red :weight bold :box nil))
+           ("BAD"       . (:background ,red :foreground ,background :weight bold :box nil))
            ("MEDIUM"    . (:background ,orange :foreground ,background :weight bold :box nil))
            ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
            ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
@@ -71,6 +71,52 @@
 ;; Images
 ;; Use:  #+ATTR_HTML: :width 300px
 (setq org-image-actual-width nil)
+
+
+
+;;; svg-tag-mode: https://github.com/rougier/svg-tag-mode/
+
+(require 'svg-tag-mode)
+
+(defun svg-progress-percent (value)
+  (svg-image (svg-lib-concat
+              (svg-lib-progress-bar (/ (string-to-number value) 100.0)
+                                nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+              (svg-lib-tag (concat value "%")
+                           nil :stroke 0 :margin 0)) :ascent 'center))
+
+(defun svg-progress-count (value)
+  (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+         (count (float (car seq)))
+         (total (float (cadr seq))))
+  (svg-image (svg-lib-concat
+              (svg-lib-progress-bar (/ count total) nil
+                                    :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+              (svg-lib-tag value nil
+                           :stroke 0 :margin 0)) :ascent 'center)))
+(setq svg-tag-tags
+      ;; Status: :TODO:
+      '(("\\(:[A-Z]+:\\)" . ((lambda (tag)
+                               (svg-tag-make tag
+                                              :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
+                                                          ((string= tag ":DONE:") 'font-lock-negation-char-face)
+                                                          ((string= tag ":WORK:") 'font-lock-type-face)
+                                                          ((string= tag ":WAIT:") 'font-lock-function-name-face)
+                                                          (t 'font-lock-comment-face))
+                                              :inverse t
+                                              :beg 1 :end -1))))
+        ;; Pills with 1 or 2 characters: (1)
+        ("\([0-9a-zA-Z]\)" . ((lambda (tag)
+                                (svg-tag-make tag :beg 1 :end -1 :radius 12))))
+        ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
+                                           (svg-tag-make tag :beg 1 :end -1 :radius 8))))
+        ;; Progress: [1/3] or [42%]
+        ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+                                            (svg-progress-percent (substring tag 1 -2)))))
+        ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+                                          (svg-progress-count (substring tag 1 -1)))))))
+
+(add-hook 'org-mode-hook 'svg-tag-mode)
 
 
 ;;; Task list
