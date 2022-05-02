@@ -97,14 +97,22 @@
 (setq svg-tag-tags
       ;; Status: :TODO:
       '(("\\(:[A-Z]+:\\)" . ((lambda (tag)
-                               (svg-tag-make tag
-                                              :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
-                                                          ((string= tag ":DONE:") 'font-lock-negation-char-face)
-                                                          ((string= tag ":WORK:") 'font-lock-type-face)
-                                                          ((string= tag ":WAIT:") 'font-lock-function-name-face)
-                                                          (t 'font-lock-comment-face))
-                                              :inverse t
-                                              :beg 1 :end -1))))
+                               (let ((inverse t))
+                                 (svg-tag-make tag
+                                               :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
+                                                           ((string= tag ":DONE:") 'font-lock-string-face)
+                                                           ((string= tag ":WORK:") 'font-lock-type-face)
+                                                           ((string= tag ":WAIT:") 'font-lock-function-name-face)
+                                                           ((string= tag ":STOP:") 'font-lock-comment-face)
+                                                           ((string= tag ":NO:") 'font-lock-warning-face)
+                                                           ((string= tag ":YES:") 'font-lock-string-face)
+                                                           ((string= tag ":DECLINED:") 'warning)
+                                                           ((string= tag ":HIRED:") 'font-lock-string-face)
+                                                           (t
+                                                            (setq inverse nil)
+                                                            'font-lock-comment-face))
+                                               :inverse inverse
+                                               :beg 1 :end -1)))))
         ;; Pills with 1 or 2 characters: (1)
         ("\([0-9a-zA-Z]\)" . ((lambda (tag)
                                 (svg-tag-make tag :beg 1 :end -1 :radius 12))))
@@ -117,6 +125,15 @@
                                           (svg-progress-count (substring tag 1 -1)))))))
 
 (add-hook 'org-mode-hook 'svg-tag-mode)
+
+
+;;; Symbols, see https://emacsredux.com/blog/2014/08/25/a-peek-at-emacs-24-dot-4-prettify-symbols-mode/
+
+(defconst my-prettify-symbol-alist '(("=>" . ?⇒)
+                                     ("->" . ?⮕)))
+(add-hook 'org-mode-hook (lambda ()
+                           (setq prettify-symbols-alist my-prettify-symbol-alist)))
+(global-prettify-symbols-mode +1)
 
 
 ;;; Task list
