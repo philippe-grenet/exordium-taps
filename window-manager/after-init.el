@@ -4,7 +4,7 @@
 (require 'treemacs)
 
 (defconst pg/window-width 120)
-(defconst pg/frame-height 104)
+(defconst pg/frame-height 120)
 
 (defun frame-show-one-or-two-windows (x)
   "Show a single window if no argument. With C-u 1 prefix, show 2 windows"

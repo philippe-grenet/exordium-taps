@@ -3,6 +3,7 @@
 (require 'org)
 
 (setq org-hide-leading-stars t)
+(setq org-fontify-quote-and-verse-blocks t)
 
 ;;; Remove the hook added by init-org-mode.el
 (remove-hook 'org-mode-hook 'turn-on-visual-line-mode)
@@ -69,7 +70,7 @@
 (add-hook 'org-mode-hook 'flyspell-prog-mode)
 
 ;; Images
-;; Use:  #+ATTR_HTML: :width 300px
+;; Use:  #+attr_html: :width 800px
 (setq org-image-actual-width nil)
 
 
@@ -94,9 +95,15 @@
                                     :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
               (svg-lib-tag value nil
                            :stroke 0 :margin 0)) :ascent 'center)))
+
+(defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+(defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+(defconst day-re "[A-Za-z]\\{3\\}")
+(defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
+
 (setq svg-tag-tags
       ;; Status: :TODO:
-      '(("\\(:[A-Z]+:\\)" . ((lambda (tag)
+      `(("\\(:[A-Z]+:\\)" . ((lambda (tag)
                                (let ((inverse t))
                                  (svg-tag-make tag
                                                :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
@@ -105,19 +112,43 @@
                                                            ((string= tag ":WAIT:") 'font-lock-function-name-face)
                                                            ((string= tag ":STOP:") 'font-lock-comment-face)
                                                            ((string= tag ":NO:") 'font-lock-warning-face)
-                                                           ((string= tag ":YES:") 'font-lock-string-face)
-                                                           ((string= tag ":DECLINED:") 'warning)
+                                                           ((string= tag ":MEDIUM:") 'warning)
+                                                           ((string= tag ":GOOD:") 'font-lock-string-face)
+                                                           ((string= tag ":DECLINED:") 'font-lock-warning-face)
                                                            ((string= tag ":HIRED:") 'font-lock-string-face)
                                                            (t
                                                             (setq inverse nil)
                                                             'font-lock-comment-face))
                                                :inverse inverse
                                                :beg 1 :end -1)))))
+        ;;
         ;; Pills with 1 or 2 characters: (1)
         ("\([0-9a-zA-Z]\)" . ((lambda (tag)
                                 (svg-tag-make tag :beg 1 :end -1 :radius 12))))
         ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
                                            (svg-tag-make tag :beg 1 :end -1 :radius 8))))
+        ;;
+        ;; Active date (with or without day name, with or without time)
+        (,(format "\\(<%s>\\)" date-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :end -1 :margin 0))))
+        (,(format "\\(<%s \\)%s>" date-re day-time-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
+        (,(format "<%s \\(%s>\\)" date-re day-time-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
+        ;; Inactive date  (with or without day name, with or without time)
+        (,(format "\\(\\[%s\\]\\)" date-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
+        (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
+        (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
+        ;;
         ;; Progress: [1/3] or [42%]
         ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
                                             (svg-progress-percent (substring tag 1 -2)))))
@@ -151,6 +182,7 @@
 (defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
+                            (,(colorize-note-extension "notes.org")   . "~/Documents/org/notes.org")
                             (,(colorize-note-extension "meetings.md") . "~/Documents/org/meetings.md")))
 
 (defconst notes-directories '("~/Documents/org/parquet/"
