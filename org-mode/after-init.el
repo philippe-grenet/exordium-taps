@@ -122,11 +122,11 @@
                                                :inverse inverse
                                                :beg 1 :end -1)))))
         ;;
-        ;; Pills with 1 or 2 characters: (1)
+        ;; Pills with 1 letter or one or 2 numbers: (A) (10)
         ("\([0-9a-zA-Z]\)" . ((lambda (tag)
                                 (svg-tag-make tag :beg 1 :end -1 :radius 12))))
-        ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
-                                           (svg-tag-make tag :beg 1 :end -1 :radius 8))))
+        ("\([0-9][0-9]\)" . ((lambda (tag)
+                               (svg-tag-make tag :beg 1 :end -1 :radius 8))))
         ;;
         ;; Active date (with or without day name, with or without time)
         (,(format "\\(<%s>\\)" date-re) .
@@ -157,14 +157,6 @@
 
 (add-hook 'org-mode-hook 'svg-tag-mode)
 
-
-;;; Symbols, see https://emacsredux.com/blog/2014/08/25/a-peek-at-emacs-24-dot-4-prettify-symbols-mode/
-
-(defconst my-prettify-symbol-alist '(("=>" . ?⇒)
-                                     ("->" . ?⮕)))
-(add-hook 'org-mode-hook (lambda ()
-                           (setq prettify-symbols-alist my-prettify-symbol-alist)))
-(global-prettify-symbols-mode +1)
 
 
 ;;; Task list

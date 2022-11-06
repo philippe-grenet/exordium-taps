@@ -145,6 +145,7 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "s-q C") (kbd "ε")) ; epsilon
 (define-key key-translation-map (kbd "s-q L") (kbd "λ")) ; lambda
 (define-key key-translation-map (kbd "s-q S") (kbd "Σ")) ; sigma
+(define-key key-translation-map (kbd "s-q m") (kbd "ɸ")) ; phi
 ;; Set theory
 (define-key key-translation-map (kbd "s-q 0") (kbd "∅")) ; empty set
 (define-key key-translation-map (kbd "s-q i") (kbd "∩")) ; empty set
@@ -152,6 +153,17 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
+
+
+;;; Symbols, see https://emacsredux.com/blog/2014/08/25/a-peek-at-emacs-24-dot-4-prettify-symbols-mode/
+
+(defconst my-prettify-symbol-alist '(("=>" . ?⇒)
+                                     ("->" . ?⮕)))
+(add-hook 'org-mode-hook (lambda ()
+                           (setq prettify-symbols-alist my-prettify-symbol-alist)))
+(add-hook 'markdown-mode-hook (lambda ()
+                           (setq prettify-symbols-alist my-prettify-symbol-alist)))
+(global-prettify-symbols-mode +1)
 
 
 ;; Git
