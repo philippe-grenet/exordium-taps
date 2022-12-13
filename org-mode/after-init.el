@@ -183,8 +183,7 @@
                               "~/Documents/org/bqnt/"
                               "~/Documents/org/equity/"
                               "~/Documents/org/other/"
-                              "~/Documents/org/tech/"
-                              "~/Documents/org/hire"))
+                              "~/Documents/org/tech/"))
 
 (defun list-notes-in-directory (dir)
   ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
