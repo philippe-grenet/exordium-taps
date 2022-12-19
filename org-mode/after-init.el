@@ -102,25 +102,37 @@
 (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
 
 (setq svg-tag-tags
-      ;; Status: :TODO:
-      `(("\\(:[A-Z]+:\\)" . ((lambda (tag)
-                               (let ((inverse t))
-                                 (svg-tag-make tag
-                                               :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
-                                                           ((string= tag ":DONE:") 'font-lock-string-face)
-                                                           ((string= tag ":WORK:") 'font-lock-type-face)
-                                                           ((string= tag ":WAIT:") 'font-lock-function-name-face)
-                                                           ((string= tag ":STOP:") 'font-lock-comment-face)
-                                                           ((string= tag ":NO:") 'font-lock-warning-face)
-                                                           ((string= tag ":MEDIUM:") 'warning)
-                                                           ((string= tag ":GOOD:") 'font-lock-string-face)
-                                                           ((string= tag ":DECLINED:") 'font-lock-warning-face)
-                                                           ((string= tag ":HIRED:") 'font-lock-string-face)
-                                                           (t
-                                                            (setq inverse nil)
-                                                            'font-lock-comment-face))
-                                               :inverse inverse
-                                               :beg 1 :end -1)))))
+      `(
+        ;; Plain TODO statuses
+        ("\\(TODO\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+        ("\\(DONE\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
+        ("\\(WORK\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-type-face :inverse t))))
+        ("\\(STOP\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
+        ("\\(WAIT\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
+        ;; Status: :TODO:
+        ;; ("\\(:[A-Z]+:\\)" . ((lambda (tag)
+        ;;                        (let ((inverse t))
+        ;;                          (svg-tag-make tag
+        ;;                                        :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
+        ;;                                                    ((string= tag ":DONE:") 'font-lock-string-face)
+        ;;                                                    ((string= tag ":WORK:") 'font-lock-type-face)
+        ;;                                                    ((string= tag ":WAIT:") 'font-lock-function-name-face)
+        ;;                                                    ((string= tag ":STOP:") 'font-lock-comment-face)
+        ;;                                                    ((string= tag ":NO:") 'font-lock-warning-face)
+        ;;                                                    ((string= tag ":MEDIUM:") 'warning)
+        ;;                                                    ((string= tag ":GOOD:") 'font-lock-string-face)
+        ;;                                                    ((string= tag ":DECLINED:") 'font-lock-warning-face)
+        ;;                                                    ((string= tag ":HIRED:") 'font-lock-string-face)
+        ;;                                                    (t
+        ;;                                                     (setq inverse nil)
+        ;;                                                     'font-lock-comment-face))
+        ;;                                        :inverse inverse
+        ;;                                        :beg 1 :end -1)))))
         ;;
         ;; Pills with 1 letter or one or 2 numbers: (A) (10)
         ("\([0-9a-zA-Z]\)" . ((lambda (tag)
@@ -347,3 +359,15 @@
   `(cfw:face-toolbar ((t :foreground ,foreground :background ,selection)))
   `(cfw:face-toolbar-button-off ((t :foreground ,aqua :background ,selection :weight bold)))
   `(cfw:face-toolbar-button-on ((t :foreground ,foreground :background ,selection :weight bold)))))
+
+
+;; Sync todos to Google Drive for PlainOrg
+
+(defun org-sync ()
+  "Copy todos and catch up notes to Google Drive."
+  (interactive)
+  (copy-file "~/Documents/org/todo.org" "/Volumes/GoogleDrive/My Drive/todo.org" t)
+  (copy-file "~/Documents/org/catchup.org" "/Volumes/GoogleDrive/My Drive/catchup.org" t)
+  (message "todo.org and catchup.org synced"))
+
+;;; after-init.el ends here
