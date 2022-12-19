@@ -114,25 +114,11 @@
                            (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
-        ;; Status: :TODO:
-        ;; ("\\(:[A-Z]+:\\)" . ((lambda (tag)
-        ;;                        (let ((inverse t))
-        ;;                          (svg-tag-make tag
-        ;;                                        :face (cond ((string= tag ":TODO:") 'font-lock-warning-face)
-        ;;                                                    ((string= tag ":DONE:") 'font-lock-string-face)
-        ;;                                                    ((string= tag ":WORK:") 'font-lock-type-face)
-        ;;                                                    ((string= tag ":WAIT:") 'font-lock-function-name-face)
-        ;;                                                    ((string= tag ":STOP:") 'font-lock-comment-face)
-        ;;                                                    ((string= tag ":NO:") 'font-lock-warning-face)
-        ;;                                                    ((string= tag ":MEDIUM:") 'warning)
-        ;;                                                    ((string= tag ":GOOD:") 'font-lock-string-face)
-        ;;                                                    ((string= tag ":DECLINED:") 'font-lock-warning-face)
-        ;;                                                    ((string= tag ":HIRED:") 'font-lock-string-face)
-        ;;                                                    (t
-        ;;                                                     (setq inverse nil)
-        ;;                                                     'font-lock-comment-face))
-        ;;                                        :inverse inverse
-        ;;                                        :beg 1 :end -1)))))
+        ;; Rectangles with letters between columns :Something:
+        ("\\(:[A-Za-z]+:\\)" . ((lambda (tag)
+                                  (svg-tag-make tag
+                                                :face 'font-lock-type-face
+                                                :beg 1 :end -1 :inverse nil))))
         ;;
         ;; Pills with 1 letter or one or 2 numbers: (A) (10)
         ("\([0-9a-zA-Z]\)" . ((lambda (tag)
