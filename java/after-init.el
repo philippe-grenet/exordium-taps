@@ -29,3 +29,7 @@
   (dap-auto-configure-mode))
 
 ;; Keys: see https://emacs-lsp.github.io/lsp-mode/page/keybindings/
+
+(define-key java-mode-map (kbd "M-.") #'lsp-find-definition)
+
+;;; after-init.el ends here
