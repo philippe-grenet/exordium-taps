@@ -21,14 +21,6 @@
     (fill-paragraph)))
 (define-key global-map (kbd "M-q") 'fill-unfill-paragraph)
 
-;; Copy todos to beorg
-(defun sync-todos ()
-  "Copy todo.org to icloud/beorg"
-  (interactive)
-  (copy-file "/Users/pgrenet/Documents/org/todo.org"
-             "/Users/pgrenet/Library/Mobile Documents/com~apple~CloudDocs/org/"
-             t))
-
 (defalias 'repunctuate 'bde-repunctuate)
 (defun depunctuate ()
   "Put ONE space at the end of sentences in the selected region
@@ -166,6 +158,13 @@ or comment block. See also `repunctuate-sentences'."
 (global-prettify-symbols-mode +1)
 
 
+;;; Company word autocomplete
+
+;; Prevent automatic downcase of completions
+(setq company-dabbrev-downcase nil
+      company-dabbrev-ignore-case nil)
+
+
 ;; Git
 
 ;; Git Gutter Fringe
@@ -268,6 +267,13 @@ or comment block. See also `repunctuate-sentences'."
 ;;   ("M-<prior>" . centaur-tabs-backward)
 ;;   ("M-<next>" . centaur-tabs-forward))
 
+
+
+;; Multiple cursors
+;; (use-package multiple-cursors
+;;   :bind (("C->"     . mc/mark-next-like-this)
+;;          ("C-<"     . mc/mark-previous-like-this)
+;;          ("C-c C-<" . mc/mark-all-like-this)))
 
 
 ;; Atomic chrome

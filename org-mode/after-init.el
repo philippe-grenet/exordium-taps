@@ -115,10 +115,10 @@
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ;; Rectangles with plain words: [Something] or :Something:
-        ("\\(\\[[A-Za-z]+\\]\\)" . ((lambda (tag)
-                                      (svg-tag-make tag
-                                                    :face 'font-lock-type-face
-                                                    :beg 1 :end -1 :inverse nil))))
+        ;; ("\\(\\[[A-Za-z]+\\]\\)" . ((lambda (tag)
+        ;;                               (svg-tag-make tag
+        ;;                                             :face 'font-lock-type-face
+        ;;                                             :beg 1 :end -1 :inverse nil))))
         ("\\(:[A-Za-z]+:\\)" . ((lambda (tag)
                                   (svg-tag-make tag
                                                 :face 'font-lock-comment-face
@@ -179,7 +179,7 @@
                             (,(colorize-note-extension "notes.org")   . "~/Documents/org/notes.org")
                             (,(colorize-note-extension "meetings.md") . "~/Documents/org/meetings.md")))
 
-(defconst notes-directories '("~/Documents/org/parquet/"
+(defconst notes-directories '("~/Documents/org/arr/"
                               "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
                               "~/Documents/org/bqnt/"
@@ -356,8 +356,10 @@
 (defun org-sync ()
   "Copy todos and catch up notes to Google Drive."
   (interactive)
-  (copy-file "~/Documents/org/todo.org" "/Volumes/GoogleDrive/My Drive/todo.org" t)
-  (copy-file "~/Documents/org/catchup.org" "/Volumes/GoogleDrive/My Drive/catchup.org" t)
+  (copy-file "~/Documents/org/todo.org"
+             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/todo.org" t)
+  (copy-file "~/Documents/org/catchup.org"
+             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive//catchup.org" t)
   (message "todo.org and catchup.org synced"))
 
 ;;; after-init.el ends here
