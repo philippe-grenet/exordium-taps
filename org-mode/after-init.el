@@ -357,9 +357,9 @@
   "Copy todos and catch up notes to Google Drive."
   (interactive)
   (copy-file "~/Documents/org/todo.org"
-             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/todo.org" t)
+             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/todo.org" t)
   (copy-file "~/Documents/org/catchup.org"
-             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive//catchup.org" t)
+             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/catchup.org" t)
   (message "todo.org and catchup.org synced"))
 
 ;;; after-init.el ends here
