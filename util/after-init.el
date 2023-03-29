@@ -167,7 +167,7 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; Git
 
-;; Git Gutter Fringe
+;; Git Gutter
 (if (fboundp 'fringe-mode) (fringe-mode '8))
 ;; places the git gutter outside the margins.
 (setq-default fringes-outside-margins t)
@@ -178,6 +178,9 @@ or comment block. See also `repunctuate-sentences'."
   nil nil '(center repeated))
 (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240]
   nil nil 'bottom)
+
+;; Make git gutter refresh after save
+(add-hook 'after-save-hook #'git-gutter:update-all-windows)
 
 ;; Diffs
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
