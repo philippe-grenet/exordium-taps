@@ -1,3 +1,10 @@
+;;;; package -- Summary
+;;;; Commentary:
+;;; after-init.el --- Initialize LSP mode
+;;;; Code:
+
+
+;; JAVA
 ;; See https://github.com/emacs-lsp/lsp-java
 
 (require 'helm)
@@ -28,11 +35,14 @@
   :config
   (dap-auto-configure-mode))
 
-;; Keys: see https://emacs-lsp.github.io/lsp-mode/page/keybindings/
 
-(define-key java-mode-map (kbd "M-.") #'lsp-find-definition)
-(define-key java-mode-map (kbd "M-,") #'lsp-find-references)
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+
+
+;; Keys: see https://emacs-lsp.github.io/lsp-mode/page/keybindings/
+
+(define-key lsp-mode-map (kbd "M-.") #'lsp-find-definition)
+(define-key lsp-mode-map (kbd "M-,") #'lsp-find-references)
 
 ;;; after-init.el ends here

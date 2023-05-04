@@ -6,6 +6,8 @@
 (defconst pg/window-width 120)
 (defconst pg/frame-height 120)
 
+(add-to-list 'default-frame-alist `(width . ,pg/window-width))
+
 (defun frame-show-one-or-two-windows (x)
   "Show a single window if no argument. With C-u 1 prefix, show 2 windows"
   (interactive "P")
