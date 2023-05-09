@@ -212,6 +212,8 @@ or comment block. See also `repunctuate-sentences'."
     (treemacs)
     (treemacs-display-current-project-exclusively)))
 
+(global-set-key (kbd "C-c t") #'treemacs-select-window)
+
 
 ;; Tabs
 ;; See https://github.com/ema2159/centaur-tabs
