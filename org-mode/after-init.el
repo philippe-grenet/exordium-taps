@@ -13,6 +13,12 @@
             (set-fill-column 100)))
 
 
+;;; Keys
+
+(define-key org-mode-map [(super down)] #'org-forward-heading-same-level)
+(define-key org-mode-map [(super up)]   #'org-backward-heading-same-level)
+
+
 ;;; Look
 
 (when (eq exordium-theme 'tomorrow-night)
@@ -112,6 +118,8 @@
                            (svg-tag-make tag :face 'font-lock-type-face :inverse t))))
         ("\\(STOP\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
+        ("\\(READY\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ;; Rectangles with plain words: [Something] or :Something:
