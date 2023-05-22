@@ -251,22 +251,15 @@
 (setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
 
 (setq org-capture-templates
-      '(("t" "Today" entry
-         (file+headline org-default-notes-file "Today")
-         "*** TODO %?"
-         :kill-buffer)
-        ("w" "Week" entry
-         (file+headline org-default-notes-file "Week")
-         "*** TODO %?"
-         :kill-buffer)
-        ("n" "Next" entry
-         (file+headline org-default-notes-file "Next")
-         "*** TODO %?"
-         :kill-buffer)
-        ("m" "Team meeting" entry
-         (file+headline org-default-notes-file "Team meeting")
-         "*** %?"
-         :kill-buffer)))
+      '(("i" "📥 Inbox" entry
+         (file+headline "~/Documents/org/todo.org" "📥 Inbox")
+         "** %?\n  %i\n"
+         :empty-lines-after 1)
+        ("t" "☕️ Today" entry
+         (file+headline "~/Documents/org/todo.org" "☕️ Today")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 1)))
 
 (define-key global-map [(ctrl f12)] #'org-capture)
 
