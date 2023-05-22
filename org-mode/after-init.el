@@ -259,7 +259,22 @@
          (file+headline "~/Documents/org/todo.org" "☕️ Today")
          "** TODO %?\n  %i\n"
          :prepend t
-         :empty-lines-after 1)))
+         :empty-lines-after 1)
+        ("a" "Anthony" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Anthony")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("g" "Abhishek" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("m" "Mike" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Mike")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)))
 
 (define-key global-map [(ctrl f12)] #'org-capture)
 
