@@ -236,13 +236,13 @@
   (interactive)
   (find-file "~/Documents/org/todo.org"))
 
-(global-set-key [(meta f12)] #'open-todo-file)
+(global-set-key [(shift f12)] #'open-todo-file)
 
 (defun open-catchup-file ()
   (interactive)
   (find-file "~/Documents/org/catchup.org"))
 
-(global-set-key [(shift meta f12)] #'open-catchup-file)
+(global-set-key [(control f12)] #'open-catchup-file)
 
 
 ;;; Capture task
@@ -276,7 +276,7 @@
          :prepend t
          :empty-lines-after 0)))
 
-(define-key global-map [(ctrl f12)] #'org-capture)
+(define-key global-map [(meta f12)] #'org-capture)
 
 ;;; Move task
 
