@@ -92,6 +92,9 @@ or comment block. See also `repunctuate-sentences'."
 ;; C-x b replacement for switch-to-buffer
 (define-key global-map (kbd "C-x b") 'helm-buffers-list)
 
+;; C-x f is better than C-x h
+(define-key global-map (kbd "C-c f") 'helm-projectile)
+
 ;; (setq helm-boring-buffer-regexp-list '("\\*helm.+\\*"
 ;;                                        "\\*Messages\\*"
 ;;                                        "\\*Compile-Log\\*"
