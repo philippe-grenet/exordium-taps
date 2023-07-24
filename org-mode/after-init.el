@@ -1,4 +1,5 @@
 ;;;; Local extensions to Exordium: Org mode
+;;; Code:
 
 (require 'org)
 
@@ -38,6 +39,10 @@
            ("=" org-verbatim verbatim)
            ("~" org-code verbatim)
            ("+" (:strike-through t)))))
+
+  (with-tomorrow-colors
+   (tomorrow-mode-name)
+   (set-face-attribute 'org-headline-done nil :foreground comment))
 
   (with-tomorrow-colors
    (tomorrow-mode-name)
@@ -183,11 +188,11 @@
 
 (defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
-                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
-                            (,(colorize-note-extension "notes.org")   . "~/Documents/org/notes.org")
-                            (,(colorize-note-extension "meetings.md") . "~/Documents/org/meetings.md")))
+                            (,(colorize-note-extension "status.org")   . "~/Documents/org/status.org")
+                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
 
-(defconst notes-directories '("~/Documents/org/arr/"
+(defconst notes-directories '("~/Documents/org/notes/"
+                              "~/Documents/org/arr/"
                               "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
                               "~/Documents/org/bqnt/"
@@ -217,13 +222,13 @@
               (string< (downcase (car a)) (downcase (car b)))))))
 
 (defun list-all-notes ()
-  ;; Return the full alist of notes (file-name . path)
+  "Return the full alist of notes (file-name . path)."
   (append top-level-notes
           (mapcan #'list-notes-in-directory notes-directories)))
 
 (defun open-todos (file)
-  "Open a note from the list of active notes in Documents/org"
-   (interactive
+  "Open a note as FILE from the list of active notes in Documents/org."
+  (interactive
    (list
     (completing-read "Open: " (list-all-notes))))
   (find-file (cdr (assoc file (list-all-notes)))))
@@ -233,12 +238,14 @@
 ;; Quick access
 
 (defun open-todo-file ()
+  "Open my todo.org file."
   (interactive)
   (find-file "~/Documents/org/todo.org"))
 
 (global-set-key [(shift f12)] #'open-todo-file)
 
 (defun open-catchup-file ()
+  "Open my catch up file."
   (interactive)
   (find-file "~/Documents/org/catchup.org"))
 
@@ -247,6 +254,8 @@
 
 ;;; Capture task
 ;;; See http://orgmode.org/manual/Capture-templates.html#Capture-templates
+
+;;(setq org-src-window-setup 'slit-window-right) ; does not work
 
 (setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
 
@@ -274,14 +283,25 @@
          (file+headline "~/Documents/org/catchup.org" "⭐️ Mike")
          "** TODO %?\n  %i\n"
          :prepend t
+         :empty-lines-after 0)
+        ("c" "Conway" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Conway")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("s" "Sathya" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
+         "** TODO %?\n  %i\n"
+         :prepend t
          :empty-lines-after 0)))
 
 (define-key global-map [(meta f12)] #'org-capture)
+(define-key global-map [(f13)] #'org-capture)
 
 ;;; Move task
 
 (defun exordium-org-move-to-today ()
-  "Move the current subtree to the end of Tasks/Today"
+  "Move the current subtree to the end of Tasks/Today."
   (interactive)
   (org-cut-subtree)
   (beginning-of-buffer)
@@ -314,6 +334,7 @@
 ;;(defalias 'open-calendar 'cfw:open-org-calendar)
 
 (defun open-todos-calendar-view ()
+  "Open the calendar view."
   (interactive)
   (split-window-vertically)
   ;; Fix the bug where it takes a little too much width
@@ -324,6 +345,7 @@
     (set-frame-width (selected-frame) w)))
 
 (defun close-todos-calendar-view ()
+  "Close the calendar view."
   (interactive)
   (kill-this-buffer)
   (delete-other-windows))

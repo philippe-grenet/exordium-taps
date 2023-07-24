@@ -153,7 +153,10 @@ or comment block. See also `repunctuate-sentences'."
 ;;; Symbols, see https://emacsredux.com/blog/2014/08/25/a-peek-at-emacs-24-dot-4-prettify-symbols-mode/
 
 (defconst my-prettify-symbol-alist '(("=>" . ?⇒)
-                                     ("->" . ?⮕)))
+                                     ("->" . ?⮕)
+                                     ("<=" . ?⇐)
+                                     ("<-" . ?⬅)
+                                     ("<->" . ?⬌)))
 (add-hook 'org-mode-hook (lambda ()
                            (setq prettify-symbols-alist my-prettify-symbol-alist)))
 (add-hook 'markdown-mode-hook (lambda ()

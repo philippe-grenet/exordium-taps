@@ -23,7 +23,7 @@
 (when exordium-osx
   ;; (setq markdown-command "/Users/pgrenet/Tools/markup/bin/github-markup"
   ;;       markdown-command-needs-filename t)
-  (setq markdown-command "/usr/local/bin/multimarkdown"))
+  (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
 
 ;; Utilities
 (defun straighten-quotes (beg end)
