@@ -262,7 +262,7 @@
 (setq org-capture-templates
       '(("i" "📥 Inbox" entry
          (file+headline "~/Documents/org/todo.org" "📥 Inbox")
-         "** %?\n  %i\n"
+         "** TODO %?\n  %i\n"
          :empty-lines-after 1)
         ("t" "☕️ Today" entry
          (file+headline "~/Documents/org/todo.org" "☕️ Today")
@@ -291,6 +291,11 @@
          :empty-lines-after 0)
         ("s" "Sathya" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("m" "Amey" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Amey")
          "** TODO %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)))
