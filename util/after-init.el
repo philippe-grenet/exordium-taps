@@ -112,13 +112,6 @@ or comment block. See also `repunctuate-sentences'."
 ;; Super(Option)-q for Unicode characters
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
-;; Symbols
-(define-key key-translation-map (kbd "s-q s") (kbd "★")) ; star
-(define-key key-translation-map (kbd "s-q c") (kbd "✓")) ; checkmark
-(define-key key-translation-map (kbd "s-q h") (kbd "❤")) ; heart
-(define-key key-translation-map (kbd "s-q u") (kbd "☂")) ; umbrella
-(define-key key-translation-map (kbd "s-q b") (kbd "▌")) ; block
-(define-key key-translation-map (kbd "s-q SPC") (kbd "█")) ; black space
 ;; Modal logic
 (define-key key-translation-map (kbd "s-q n") (kbd "□")) ; necessary
 (define-key key-translation-map (kbd "s-q p") (kbd "♢")) ; possible
@@ -134,17 +127,21 @@ or comment block. See also `repunctuate-sentences'."
 (define-key key-translation-map (kbd "s-q S-<left>") (kbd "⇐"))
 (define-key key-translation-map (kbd "s-q =") (kbd "⇔"))
 ;; Greeks
-(define-key key-translation-map (kbd "s-q A") (kbd "α")) ; alpha
-(define-key key-translation-map (kbd "s-q B") (kbd "β")) ; beta
-(define-key key-translation-map (kbd "s-q D") (kbd "Δ")) ; delta
-(define-key key-translation-map (kbd "s-q C") (kbd "ε")) ; epsilon
-(define-key key-translation-map (kbd "s-q L") (kbd "λ")) ; lambda
-(define-key key-translation-map (kbd "s-q S") (kbd "Σ")) ; sigma
+(define-key key-translation-map (kbd "s-q g a") (kbd "α")) ; alpha
+(define-key key-translation-map (kbd "s-q g b") (kbd "β")) ; beta
+(define-key key-translation-map (kbd "s-q g dd") (kbd "Δ")) ; delta
+(define-key key-translation-map (kbd "s-q g e") (kbd "ε")) ; epsilon
+(define-key key-translation-map (kbd "s-q g l") (kbd "λ")) ; lambda
+(define-key key-translation-map (kbd "s-q g s") (kbd "Σ")) ; sigma
 (define-key key-translation-map (kbd "s-q m") (kbd "ɸ")) ; phi
 ;; Set theory
 (define-key key-translation-map (kbd "s-q 0") (kbd "∅")) ; empty set
 (define-key key-translation-map (kbd "s-q i") (kbd "∩")) ; empty set
 (define-key key-translation-map (kbd "s-q u") (kbd "∪")) ; empty set
+;; Flags
+(define-key key-translation-map (kbd "s-q f g") (kbd "🟩")) ; green
+(define-key key-translation-map (kbd "s-q f a") (kbd "🟧")) ; amber
+(define-key key-translation-map (kbd "s-q f r") (kbd "🟥")) ; red
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
