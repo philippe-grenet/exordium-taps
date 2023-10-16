@@ -264,59 +264,59 @@
          (file+headline "~/Documents/org/todo.org" "📥 Inbox")
          "** TODO %?\n  %i\n"
          :empty-lines-after 1)
-        ("t" "☕️ Today" entry
-         (file+headline "~/Documents/org/todo.org" "☕️ Today")
-         "** TODO %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 1)
-        ("s" "Shabbir" entry
+        ("S" "Shabbir" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Shabbir")
-         "** TODO %?\n  %i\n"
+         "** TODO Shabbir %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("a" "Anthony" entry
+        ("A" "Anthony" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Anthony")
-         "** TODO %?\n  %i\n"
+         "** TODO AC %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("b" "Abhishek" entry
+        ("k" "Abhishek" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
-         "** TODO %?\n  %i\n"
+         "** TODO AG %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("m" "Mike" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Mike")
-         "** TODO %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
-        ("c" "Conway" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Conway")
-         "** TODO %?\n  %i\n"
+         "** TODO Mike %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("s" "Sathya" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
-         "** TODO %?\n  %i\n"
+         "** TODO Sathya %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("m" "Amey" entry
+        ("c" "Conway" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Conway")
+         "** TODO Conway %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("t" "Tom" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Tom")
+         "** TODO Tom %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("a" "Amey" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Amey")
-         "** TODO %?\n  %i\n"
+         "** TODO Amey %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("g" "Gino" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Gino")
-         "** TODO %?\n  %i\n"
+         "** TODO Gino %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("r" "Rishi" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Rishi")
-         "** TODO %?\n  %i\n"
+         "** TODO Rishi %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("p" "Pranil" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Pranil")
-         "** TODO %?\n  %i\n"
+         "** TODO Pranil %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)))
 
