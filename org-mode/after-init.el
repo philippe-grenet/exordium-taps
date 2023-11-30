@@ -279,11 +279,6 @@
          "** TODO AG %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("m" "Mike" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Mike")
-         "** TODO Mike %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
         ("s" "Sathya" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
          "** TODO Sathya %?\n  %i\n"
@@ -304,17 +299,17 @@
          "** TODO Amey %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
+        ("m" "Mike" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Mike")
+         "** TODO Mike %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
         ("g" "Gino" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Gino")
          "** TODO Gino %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("r" "Rishi" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Rishi")
-         "** TODO Rishi %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
-        ("p" "Pranil" entry
+        ("p" "Prash" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Pranil")
          "** TODO Pranil %?\n  %i\n"
          :prepend t
