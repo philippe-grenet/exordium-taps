@@ -334,6 +334,10 @@
 (define-key org-mode-map [(ctrl c) (t)] #'exordium-org-move-to-today)
 
 
+;;; Archive
+(setq org-archive-location "%s_archive::datetree/")
+
+
 ;;; Org agenda
 
 (setq org-agenda-files '("/Users/pgrenet/Documents/org/"))
