@@ -127,16 +127,13 @@
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
-        ;; Rectangles with plain words: [Something] or :Something:
-        ;; ("\\(\\[[A-Za-z]+\\]\\)" . ((lambda (tag)
-        ;;                               (svg-tag-make tag
-        ;;                                             :face 'font-lock-type-face
-        ;;                                             :beg 1 :end -1 :inverse nil))))
+        ("\\(CRITICAL\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+        ;; Rectangles with plain words: :Something:
         ("\\(:[A-Za-z]+:\\)" . ((lambda (tag)
                                   (svg-tag-make tag
-                                                :face 'font-lock-comment-face
+                                                :face 'font-lock-type-face
                                                 :beg 1 :end -1 :inverse nil))))
-        ;;
         ;; Pills with 1 letter or one or 2 numbers: (A) (10)
         ("\([0-9a-zA-Z]\)" . ((lambda (tag)
                                 (svg-tag-make tag :beg 1 :end -1 :radius 12))))
