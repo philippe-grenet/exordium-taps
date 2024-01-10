@@ -69,7 +69,7 @@
            ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
            ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
            ("WITHDREW"  . (:background ,purple :foreground ,background :weight bold :box nil))
-           ("HIRED"     . (:background ,aqua :foreground ,background :weight bold :box nil))))))
+           ("HIRED"     . (:background ,green :foreground ,background :weight bold :box nil))))))
 
 (setq org-ellipsis "⤵")  ;; or "…"
 
