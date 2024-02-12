@@ -8,20 +8,32 @@
 
 (add-to-list 'default-frame-alist `(width . ,pg/window-width))
 
-(defun frame-show-one-or-two-windows (x)
-  "Show a single window if no argument. With C-u 1 prefix, show 2 windows"
-  (interactive "P")
-  (message (if x "Showing two windows" "Showing one window"))
+(defun frame-show-one-window ()
+  "Show a single window"
+  (interactive)
   (delete-other-windows)
   ;; doesn't work with multiple monitors, need to find a solution
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
-  (set-frame-width (selected-frame) (+ (if x (* 2 pg/window-width) pg/window-width)
+  (set-frame-width (selected-frame) (+ pg/window-width
                                        (if (eq (treemacs-current-visibility) 'visible) 20 0)))
+  (set-frame-height (selected-frame) pg/frame-height))
+
+(global-set-key [(f10)] #'frame-show-one-window)
+
+(defun frame-show-two-windows ()
+  "Show two windows"
+  (interactive)
+  (delete-other-windows)
+  ;; doesn't work with multiple monitors, need to find a solution
+  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
+  (set-frame-width (selected-frame) (+ (* 2 pg/window-width)
+                                         (if (eq (treemacs-current-visibility) 'visible) 20 0)))
   (set-frame-height (selected-frame) pg/frame-height)
-  (when x
-    (let ((win (split-window-right)))
-      (switch-to-other-buffer))
-    (switch-to-other-buffer)))
+  (let ((win (split-window-right)))
+    (switch-to-other-buffer))
+  (switch-to-other-buffer))
+
+(global-set-key [(shift f10)] #'frame-show-two-windows)
 
 (defun frame-show-component ()
   "Show all 3 files for a C++ component"
@@ -36,8 +48,7 @@
     (switch-to-other-buffer))
   (balance-windows))
 
-(global-set-key [(f10)] #'frame-show-one-or-two-windows)
-(global-set-key [(shift f10)] #'frame-show-component)
+(global-set-key [(meta f10)] #'frame-show-component)
 
 
 
