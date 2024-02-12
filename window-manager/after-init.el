@@ -30,8 +30,7 @@
                                          (if (eq (treemacs-current-visibility) 'visible) 20 0)))
   (set-frame-height (selected-frame) pg/frame-height)
   (let ((win (split-window-right)))
-    (switch-to-other-buffer))
-  (switch-to-other-buffer))
+    (switch-to-other-buffer)))
 
 (global-set-key [(shift f10)] #'frame-show-two-windows)
 
