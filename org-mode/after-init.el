@@ -128,7 +128,9 @@
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(CRITICAL\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+                               (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+        ("\\(REQUEST\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ;; Rectangles with plain words: {:Something:}
         ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
                                    (svg-tag-make tag
@@ -190,7 +192,7 @@
 
 (defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
-                            (,(colorize-note-extension "status.org")   . "~/Documents/org/status.org")
+                            (,(colorize-note-extension "datasets.org")   . "~/Documents/org/datasets.org")
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
 
 (defconst notes-directories '("~/Documents/org/notes/"
@@ -292,7 +294,8 @@
          :prepend t
          :empty-lines-after 0)
         ("t" "Tom" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Tom")
+         (file+headline "~/Documents/org/catchup.org"
+                        "⭐️ Tom ([[https://docs.google.com/document/d/102GWuRqH-sYFMNw9DPKu9npDsGoZXNFW0-mKDWbuRJk/edit#heading=h.2cjiyf4l29p1][topics]])")
          "** TODO Tom %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)

@@ -146,6 +146,14 @@ or comment block. See also `repunctuate-sentences'."
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
 
+;; insert date
+(defun exordium-insert-today ()
+  "Insert today's date as mm/dd/yyyy."
+  (interactive)
+  (insert (format-time-string "%m/%d/%Y")))
+
+(global-set-key (kbd "C-c C-.") #'exordium-insert-today)
+
 
 ;;; Symbols, see https://emacsredux.com/blog/2014/08/25/a-peek-at-emacs-24-dot-4-prettify-symbols-mode/
 
