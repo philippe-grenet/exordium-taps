@@ -92,6 +92,13 @@ or comment block. See also `repunctuate-sentences'."
 ;; C-x b replacement for switch-to-buffer
 (define-key global-map (kbd "C-x b") 'helm-buffers-list)
 
+;; ;; Change the order of buffers in switch-to-buffer: show non-system buffers first
+;; (defun pg-around-helm-buffers-sort-transformer (candidates source)
+;;   candidates)
+
+;; (advice-add 'helm-buffers-sort-transformer
+;;             :override #'pg-around-helm-buffers-sort-transformer)
+
 ;; C-x f is better than C-x h
 (define-key global-map (kbd "C-c f") 'helm-projectile)
 
