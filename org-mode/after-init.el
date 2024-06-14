@@ -314,7 +314,7 @@
          "** TODO Pranil %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("a" "Abhishek, Amey, Alex")
+        ("a" "\tAbhishek, Amey, Alex")
         ("ab" "\tAbhishek" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
          "** TODO AG %?\n  %i\n"
