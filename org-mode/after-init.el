@@ -264,61 +264,73 @@
 (setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
 
 (setq org-capture-templates
-      '(("i" "📥 Inbox" entry
+      '(("i" "📥\tInbox" entry
          (file+headline "~/Documents/org/todo.org" "📥 Inbox")
          "** TODO %?\n  %i\n"
          :empty-lines-after 1)
-        ("S" "Shabbir" entry
+        ("T" "☕️\tToday" entry
+         (file+headline "~/Documents/org/todo.org" "☕️ Today")
+         "** TODO %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("S" "\tShabbir" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Shabbir")
          "** TODO Shabbir %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("A" "Anthony" entry
+        ("A" "\tAnthony" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Anthony")
          "** TODO AC %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("k" "Abhishek" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
-         "** TODO AG %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
-        ("s" "Sathya" entry
+        ("s" "\tSathya" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
          "** TODO Sathya %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("c" "Conway" entry
+        ("c" "\tConway" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Conway")
          "** TODO Conway %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("t" "Tom" entry
+        ("t" "\tTom" entry
          (file+headline "~/Documents/org/catchup.org"
                         "⭐️ Tom ([[https://docs.google.com/document/d/102GWuRqH-sYFMNw9DPKu9npDsGoZXNFW0-mKDWbuRJk/edit#heading=h.2cjiyf4l29p1][topics]])")
          "** TODO Tom %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("a" "Amey" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Amey")
-         "** TODO Amey %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
-        ("m" "Mike" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Mike")
-         "** TODO Mike %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
-        ("g" "Gino" entry
+        ("g" "\tGino" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Gino")
          "** TODO Gino %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("p" "Prash" entry
+        ("r" "\tRishi" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Rishi")
+         "** TODO Rishi %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("p" "\tPranil" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Pranil")
          "** TODO Pranil %?\n  %i\n"
          :prepend t
-         :empty-lines-after 0)))
+         :empty-lines-after 0)
+        ("a" "Abhishek, Amey, Alex")
+        ("ab" "\tAbhishek" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
+         "** TODO AG %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("am" "\tAmey" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Amey")
+         "** TODO Amey %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("al" "\tAlex" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Alex")
+         "** TODO Alex %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ))
 
 (define-key global-map [(meta f12)] #'org-capture)
 (define-key global-map [(f13)] #'org-capture)
