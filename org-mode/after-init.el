@@ -129,7 +129,7 @@
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(CRITICAL\\)" . ((lambda (tag)
                                (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
-        ("\\(REQUEST\\)" . ((lambda (tag)
+        ("\\(DEPENDENCY\\)" . ((lambda (tag)
                                (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ;; Rectangles with plain words: {:Something:}
         ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
