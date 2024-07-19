@@ -315,7 +315,7 @@
          :prepend t
          :empty-lines-after 0)
         ("a" "\tAbhishek, Amey, Alex")
-        ("ab" "\tAbhishek" entry
+        ("ag" "\tAbhishek" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
          "** TODO AG %?\n  %i\n"
          :prepend t

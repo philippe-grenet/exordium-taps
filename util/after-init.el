@@ -290,6 +290,9 @@ or comment block. See also `repunctuate-sentences'."
 ;;   ("M-<prior>" . centaur-tabs-backward)
 ;;   ("M-<next>" . centaur-tabs-forward))
 
+
+(setq-default indicate-empty-lines t)
+
 
 
 ;; Multiple cursors
