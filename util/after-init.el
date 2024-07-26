@@ -119,36 +119,86 @@ or comment block. See also `repunctuate-sentences'."
 ;; Super(Option)-q for Unicode characters
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
-;; Modal logic
-(define-key key-translation-map (kbd "s-q n") (kbd "□")) ; necessary
-(define-key key-translation-map (kbd "s-q p") (kbd "♢")) ; possible
-(define-key key-translation-map (kbd "s-q a") (kbd "∀")) ; all
-(define-key key-translation-map (kbd "s-q e") (kbd "∃")) ; there exists
+
+;; Math
+(global-set-key (kbd "s-q m n") "□") ; necessary
+(global-set-key (kbd "s-q m p") "♢") ; possible
+(global-set-key (kbd "s-q m a") "∀") ; all
+(global-set-key (kbd "s-q m e") "∃") ; there exists
+(global-set-key (kbd "s-q m I") "∞")
+
+(global-set-key (kbd "s-q m 0") "∅") ; empty set
+(global-set-key (kbd "s-q m i") "∩") ; intersection
+(global-set-key (kbd "s-q m u") "∪") ; union
+(global-set-key (kbd "s-q m [") "⊂")
+(global-set-key (kbd "s-q m ]") "⊃")
+
 ;; Arrows
 ;; https://www.key-shortcut.com/en/writing-systems/35-symbols/arrows
-(define-key key-translation-map (kbd "s-q <right>") (kbd "⮕"))
-(define-key key-translation-map (kbd "s-q <left>") (kbd "⬅"))
-(define-key key-translation-map (kbd "s-q <up>") (kbd "⬆"))
-(define-key key-translation-map (kbd "s-q <down>") (kbd "⬇"))
-(define-key key-translation-map (kbd "s-q S-<right>") (kbd "⇒"))
-(define-key key-translation-map (kbd "s-q S-<left>") (kbd "⇐"))
-(define-key key-translation-map (kbd "s-q =") (kbd "⇔"))
+;; (define-key key-translation-map (kbd "s-q <right>") (kbd "⮕"))
+;; (define-key key-translation-map (kbd "s-q <left>") (kbd "⬅"))
+;; (define-key key-translation-map (kbd "s-q <up>") (kbd "⬆"))
+;; (define-key key-translation-map (kbd "s-q <down>") (kbd "⬇"))
+;; (define-key key-translation-map (kbd "s-q S-<right>") (kbd "⇒"))
+;; (define-key key-translation-map (kbd "s-q S-<left>") (kbd "⇐"))
+;; (define-key key-translation-map (kbd "s-q =") (kbd "⇔"))
+
 ;; Greeks
-(define-key key-translation-map (kbd "s-q g a") (kbd "α")) ; alpha
-(define-key key-translation-map (kbd "s-q g b") (kbd "β")) ; beta
-(define-key key-translation-map (kbd "s-q g dd") (kbd "Δ")) ; delta
-(define-key key-translation-map (kbd "s-q g e") (kbd "ε")) ; epsilon
-(define-key key-translation-map (kbd "s-q g l") (kbd "λ")) ; lambda
-(define-key key-translation-map (kbd "s-q g s") (kbd "Σ")) ; sigma
-(define-key key-translation-map (kbd "s-q m") (kbd "ɸ")) ; phi
-;; Set theory
-(define-key key-translation-map (kbd "s-q 0") (kbd "∅")) ; empty set
-(define-key key-translation-map (kbd "s-q i") (kbd "∩")) ; empty set
-(define-key key-translation-map (kbd "s-q u") (kbd "∪")) ; empty set
+(global-set-key (kbd "s-q g a") "α")
+(global-set-key (kbd "s-q g b") "β")
+(global-set-key (kbd "s-q g g") "γ")
+(global-set-key (kbd "s-q g d") "δ")
+(global-set-key (kbd "s-q g e") "ε")
+(global-set-key (kbd "s-q g z") "ζ")
+(global-set-key (kbd "s-q g h") "η")
+(global-set-key (kbd "s-q g q") "θ")
+(global-set-key (kbd "s-q g i") "ι")
+(global-set-key (kbd "s-q g k") "κ")
+(global-set-key (kbd "s-q g l") "λ")
+(global-set-key (kbd "s-q g m") "μ")
+(global-set-key (kbd "s-q g n") "ν")
+(global-set-key (kbd "s-q g x") "ξ")
+(global-set-key (kbd "s-q g o") "ο")
+(global-set-key (kbd "s-q g p") "π")
+(global-set-key (kbd "s-q g r") "ρ")
+(global-set-key (kbd "s-q g s") "σ")
+(global-set-key (kbd "s-q g t") "τ")
+(global-set-key (kbd "s-q g u") "υ")
+(global-set-key (kbd "s-q g f") "ϕ")
+(global-set-key (kbd "s-q g j") "φ")
+(global-set-key (kbd "s-q g c") "χ")
+(global-set-key (kbd "s-q g y") "ψ")
+(global-set-key (kbd "s-q g w") "ω")
+(global-set-key (kbd "s-q g A") "Α")
+(global-set-key (kbd "s-q g B") "Β")
+(global-set-key (kbd "s-q g G") "Γ")
+(global-set-key (kbd "s-q g D") "Δ")
+(global-set-key (kbd "s-q g E") "Ε")
+(global-set-key (kbd "s-q g Z") "Ζ")
+(global-set-key (kbd "s-q g H") "Η")
+(global-set-key (kbd "s-q g Q") "Θ")
+(global-set-key (kbd "s-q g I") "Ι")
+(global-set-key (kbd "s-q g K") "Κ")
+(global-set-key (kbd "s-q g L") "Λ")
+(global-set-key (kbd "s-q g M") "Μ")
+(global-set-key (kbd "s-q g N") "Ν")
+(global-set-key (kbd "s-q g X") "Ξ")
+(global-set-key (kbd "s-q g O") "Ο")
+(global-set-key (kbd "s-q g P") "Π")
+(global-set-key (kbd "s-q g R") "Ρ")
+(global-set-key (kbd "s-q g S") "Σ")
+(global-set-key (kbd "s-q g T") "Τ")
+(global-set-key (kbd "s-q g U") "Υ")
+(global-set-key (kbd "s-q g F") "Φ")
+(global-set-key (kbd "s-q g J") "Φ")
+(global-set-key (kbd "s-q g C") "Χ")
+(global-set-key (kbd "s-q g Y") "Ψ")
+(global-set-key (kbd "s-q g W") "Ω")
+
 ;; Flags
-(define-key key-translation-map (kbd "s-q f g") (kbd "🟩")) ; green
-(define-key key-translation-map (kbd "s-q f a") (kbd "🟧")) ; amber
-(define-key key-translation-map (kbd "s-q f r") (kbd "🟥")) ; red
+(global-set-key (kbd "s-q f g") "🟩") ; green
+(global-set-key (kbd "s-q f a") "🟧") ; amber
+(global-set-key (kbd "s-q f r") "🟥") ; red
 
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
