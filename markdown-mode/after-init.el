@@ -3,7 +3,7 @@
 (require 'markdown-mode)
 
 (add-hook 'markdown-mode-hook 'flyspell-mode)
-(setq markdown-hide-urls t)
+(setq markdown-hide-urls nil)
 (setq markdown-max-image-size '(800 . 800))
 (setq markdown-fontify-code-blocks-natively t)
 (setq markdown-make-gfm-checkboxes-buttons t)
@@ -11,9 +11,9 @@
 ;; hide URLs + horizontal line with C-q C-l + 100 char lines
 (add-hook 'markdown-mode-hook
           (lambda ()
-            (setq markdown-hide-urls t)
+            (setq markdown-hide-urls nil)
             (setq page-break-line-mode t)
-            (set-fill-column 100)
+            (setq fill-column 88)  ; for Tutti
             (exordium-page-break-lines-hook)
             (markdown-toggle-inline-images)))
 
