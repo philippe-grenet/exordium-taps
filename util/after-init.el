@@ -1,5 +1,7 @@
 ;;; Utility functions
 
+(setq-default indicate-empty-lines t)
+
 ;; Visual bell
 (setq ring-bell-function
       (lambda ()
@@ -341,8 +343,28 @@ or comment block. See also `repunctuate-sentences'."
 ;;   ("M-<next>" . centaur-tabs-forward))
 
 
-(setq-default indicate-empty-lines t)
 
+;; On the Spaces screen, click the copy-to-clipboard button while hovering over the SSH icon
+;; on the active workspace you want to access.
+;;
+;; In emacs, use M-x open-devx-space-ssh
+;; When prompted for the ssh string, paste it in from the clipboard and press enter.
+
+;; DevX Spaces
+(defun open-devx-space-ssh ()
+  (interactive)
+  (setq ssh-string (read-string "Spaces ssh string: " nil nil ""))
+  (save-match-data
+    (and (string-match "ssh -t\s\\([-a-z0-9]+\\).* -it \\([a-z0-9]+\\) bash\"" ssh-string)
+         (setq spaces-host (match-string 1 ssh-string)
+               docker-id (match-string 2 ssh-string))))
+  (setq space (format "/ssh:%s.bloomberg.com|docker:%s:.."
+                      spaces-host
+                      docker-id))
+  (message space)
+  (dired space))
+
+;;(global-set-key (kbd "C-c SPC") 'bb-open-devx-space-ssh)
 
 
 ;; Multiple cursors
