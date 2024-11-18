@@ -16,8 +16,23 @@
 
 ;;; Keys
 
+;; Move through the same level with Super-Up or Down
 (define-key org-mode-map [(super down)] #'org-forward-heading-same-level)
 (define-key org-mode-map [(super up)]   #'org-backward-heading-same-level)
+
+;; Mark a task as DONE with C-c c ("close")
+(defun my-org-todo-toggle ()
+  "Mark the task as DONE if it wasn't, mark it as TODO otherwise."
+  (interactive)
+  (let ((state (org-get-todo-state))
+        post-command-hook)
+    (if (or (string= state "TODO") (string= state "WORK") (string= state "WAIT") (string= state "READY"))
+        (org-todo "DONE")
+      (org-todo "TODO"))
+    (run-hooks 'post-command-hook)
+    (org-fold-subtree t)))
+
+(define-key org-mode-map (kbd "C-c c") 'my-org-todo-toggle)
 
 
 ;;; Look
@@ -440,5 +455,8 @@
   (copy-file "~/Documents/org/catchup.org"
              "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/catchup.org" t)
   (message "todo.org and catchup.org synced"))
+
+;; Schedule the function every hour. See also run-with-timer and cancel-timer.
+(run-at-time "00:00" 3600 'org-sync)
 
 ;;; after-init.el ends here
