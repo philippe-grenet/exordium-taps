@@ -234,6 +234,16 @@ or comment block. See also `repunctuate-sentences'."
 (setq company-dabbrev-downcase nil
       company-dabbrev-ignore-case nil)
 
+;; By default RET inserts the selected candidate (company-complete-selection)
+;; and TAB inserts the common part of all completion candidates (company-complete-common).
+;; RET isn't great when your word is finished, but has possible completions, and you just want to
+;; go to the next line. => Let's just use TAB to complete. That also works like zsh.
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "RET") nil)
+  (define-key company-active-map [return] nil)
+  (define-key company-active-map [tab] 'company-complete-selection)
+  (define-key company-active-map (kbd "TAB") 'company-complete-selection))
+
 
 ;; Git
 
