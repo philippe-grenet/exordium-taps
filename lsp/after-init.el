@@ -18,8 +18,8 @@
       treemacs-is-never-other-window t)
 (treemacs-filewatch-mode 0)  ; to many files descriptors otherwise
 
-(require 'lsp-java)
-(add-hook 'java-mode-hook #'lsp)
+;;(require 'lsp-java)
+;;(add-hook 'java-mode-hook #'lsp)
 
 (use-package lsp-ui)
 (use-package lsp-mode
