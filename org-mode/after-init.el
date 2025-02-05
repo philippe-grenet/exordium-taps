@@ -38,10 +38,10 @@
 ;;; Look
 
 (when (eq exordium-theme 'tomorrow-night)
-  (setq org-priority-faces
-        '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
-          (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
-          (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
+  ;; (setq org-priority-faces
+  ;;       '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
+  ;;         (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
+  ;;         (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
 
   (setq org-cycle-separator-lines -1)
 
@@ -146,6 +146,23 @@
                                (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
         ("\\(DEPENDENCY\\)" . ((lambda (tag)
                                (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
+        ("\\(PROCEED\\)" . ((lambda (tag)
+                              (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
+        ("\\(REJECT\\)" . ((lambda (tag)
+                             (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+        ;; Priorities
+        ("\\(\\[#A\\]\\)" . ((lambda (tag)
+                             (svg-tag-make tag
+                                           :face 'font-lock-warning-face :inverse t
+                                           :beg 1 :end -1))))
+        ("\\(\\[#B\\]\\)" . ((lambda (tag)
+                             (svg-tag-make tag
+                                           :face 'font-lock-type-face :inverse t
+                                           :beg 1 :end -1))))
+        ("\\(\\[#C\\]\\)" . ((lambda (tag)
+                             (svg-tag-make tag
+                                           :face 'font-function-name-face :inverse t
+                                           :beg 1 :end -1))))
         ;; Rectangles with plain words: {:Something:}
         ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
                                    (svg-tag-make tag
