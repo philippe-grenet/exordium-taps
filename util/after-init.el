@@ -112,6 +112,7 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; Keys
 (global-set-key [(f6)] #'exordium-highlight-symbol)
+(global-set-key [(f7)] #'flyspell-auto-correct-previous-word)
 (global-set-key [(end)] #'move-end-of-line)
 (global-set-key [(home)] #'move-beginning-of-line)
 
@@ -390,3 +391,18 @@ or comment block. See also `repunctuate-sentences'."
       atomic-chrome-buffer-open-style 'full)
 (with-demoted-errors "Can't start atomic-chrome: %S"
   (atomic-chrome-start-server))
+
+
+;; Ultra scroll
+
+;; Not in Elpa yet. Installation:
+;;(package-vc-install '(ultra-scroll :vc-backend Git :url  "https://github.com/jdtsmith/ultra-scroll"))
+
+;; Activation:
+(use-package ultra-scroll
+  ;:load-path "~/code/emacs/ultra-scroll" ; if you git clone'd instead of package-vc-install
+  :init
+  (setq scroll-conservatively 101 ; important!
+        scroll-margin 0)
+  :config
+  (ultra-scroll-mode 1))
