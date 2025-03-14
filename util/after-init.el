@@ -111,7 +111,7 @@ or comment block. See also `repunctuate-sentences'."
 
 
 ;; Keys
-(global-set-key [(f6)] #'exordium-highlight-symbol)
+(global-set-key [(f6)] #'symbol-overlay-put)
 (global-set-key [(f7)] #'flyspell-auto-correct-previous-word)
 (global-set-key [(end)] #'move-end-of-line)
 (global-set-key [(home)] #'move-beginning-of-line)
