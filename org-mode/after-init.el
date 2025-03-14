@@ -13,6 +13,10 @@
           (lambda ()
             (set-fill-column 100)))
 
+;; Enable 'eval' in a file's local variables. This prevents Emacs for asking
+;; for confirmation each time such as file is loaded.
+(setq org-confirm-babel-evaluate nil)
+
 
 ;;; Keys
 
