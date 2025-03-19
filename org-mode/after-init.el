@@ -214,6 +214,17 @@
 
 
 
+;;; Custom startup options
+
+(defvar my-org-mode-showlines nil)
+(add-to-list 'org-startup-options '("showlines" my-org-mode-showlines t))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (when my-org-mode-showlines
+              (face-remap-add-relative 'org-level-1
+                                       (with-tomorrow-colors 'night `(:overline ,green))))))
+
+
 ;;; Task list
 
 (require 'cl-lib)
