@@ -216,11 +216,11 @@
 
 ;;; Custom startup options
 
-(defvar my-org-mode-showlines nil)
-(add-to-list 'org-startup-options '("showlines" my-org-mode-showlines t))
+(defvar my-org-mode-overline nil)
+(add-to-list 'org-startup-options '("overline" my-org-mode-overline t))
 (add-hook 'org-mode-hook
           (lambda ()
-            (when my-org-mode-showlines
+            (when my-org-mode-overline
               (face-remap-add-relative 'org-level-1
                                        (with-tomorrow-colors 'night `(:overline ,green))))))
 
