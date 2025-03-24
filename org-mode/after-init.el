@@ -243,10 +243,13 @@
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
 
 (defconst notes-directories '("~/Documents/org/notes/"
-                              "~/Documents/org/arr/"
-                              "~/Documents/org/spark-platform/"
+                              ;;"~/Documents/org/arr/"
+                              ;; "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
+                              "~/Documents/org/dna/"
                               "~/Documents/org/bqnt/"
+                              "~/Documents/org/planning/"
+                              "~/Documents/org/management/"
                               "~/Documents/org/equity/"
                               "~/Documents/org/other/"
                               "~/Documents/org/tech/"))
