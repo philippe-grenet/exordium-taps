@@ -333,6 +333,12 @@
          "** TODO AC %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
+        ("M" "\tManish" entry
+         (file+headline "~/Documents/org/catchup.org"
+                        "⭐️ Manish ([[https://docs.google.com/document/d/1ObXxx36mXhHcKsnYiKc5jMAfDyDeFzIqQdR2dS7sI9E/edit?tab=t.0#heading=h.px0s0g92opc8][topics]])")
+         "** TODO Manish %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
         ("s" "\tSathya" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
          "** TODO Sathya %?\n  %i\n"
