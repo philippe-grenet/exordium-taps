@@ -360,6 +360,11 @@
          "** TODO Gino %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
+        ("y" "\tYogesh" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Yogesh")
+         "** TODO Yogesh %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
         ("r" "\tRishi" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Rishi")
          "** TODO Rishi %?\n  %i\n"
