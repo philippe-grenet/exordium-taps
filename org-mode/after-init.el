@@ -329,7 +329,8 @@
          :prepend t
          :empty-lines-after 0)
         ("A" "\tAnthony" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Anthony")
+         (file+headline "~/Documents/org/catchup.org"
+                        "⭐️ Anthony ([[https://docs.google.com/document/d/11epTeSzu5tgxVOf19rn88C41d6JvLyKN4YTpERd6ZW0/edit?tab=t.0][topics]])")
          "** TODO AC %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
