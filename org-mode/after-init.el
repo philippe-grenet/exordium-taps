@@ -38,6 +38,18 @@
 
 (define-key org-mode-map (kbd "C-c c") 'my-org-todo-toggle)
 
+;; Link a Jira epic (assuming the URL is in hte clipboard)
+(defun my-org-paste-epic-link ()
+  "Paste a Jira epic link in short form."
+  (interactive)
+  (let* ((url      (current-kill 0 t))
+         (filename (url-filename (url-generic-parse-url url))))
+    (insert "[[" url "][")
+    (insert (substring filename (+ 1 (string-match "-" filename))))
+    (insert "]]")))
+
+(define-key org-mode-map (kbd "C-c l") 'my-org-paste-epic-link)
+
 
 ;;; Look
 
