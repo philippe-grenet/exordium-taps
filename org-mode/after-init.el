@@ -20,9 +20,10 @@
 
 ;;; Keys
 
-;; Move through the same level with Super-Up or Down
+;; Move through the tree with Super + Arrow
 (define-key org-mode-map [(super down)] #'org-forward-heading-same-level)
 (define-key org-mode-map [(super up)]   #'org-backward-heading-same-level)
+(define-key org-mode-map [(super left)] #'outline-up-heading)
 
 ;; Mark a task as DONE with C-c c ("close")
 (defun my-org-todo-toggle ()
@@ -111,7 +112,7 @@
 ;; Spell check
 (add-hook 'org-mode-hook 'flyspell-prog-mode)
 
-;; Images
+;; Default width for images
 ;; Use:  #+attr_html: :width 800px
 (setq org-image-actual-width nil)
 
@@ -502,6 +503,19 @@
   `(cfw:face-toolbar ((t :foreground ,foreground :background ,selection)))
   `(cfw:face-toolbar-button-off ((t :foreground ,aqua :background ,selection :weight bold)))
   `(cfw:face-toolbar-button-on ((t :foreground ,foreground :background ,selection :weight bold)))))
+
+
+;; Org modern indent
+
+;; org-modern-indent uses org-indent, and expects it to be enabled to achieve
+;; its formatting. To activate org-indent-mode by default in all org files, set
+;; org-startup-indented=t.
+(setq org-startup-indented t)
+
+(load "~/.emacs.d/taps/org-mode/org-modern-indent.el")
+
+;; Enable it for all files
+(add-hook 'org-mode-hook #'org-modern-indent-mode)
 
 
 ;; Sync todos to Google Drive for PlainOrg

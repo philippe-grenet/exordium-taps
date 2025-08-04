@@ -39,6 +39,7 @@ the window."
     (((background light)) :strike-through "gray70")
     (t :strike-through "gray30"))
   "Face used for horizontal ruler.")
+
 (defun org-modern--block-name ()
   "Prettify block according to `org-modern-block-name'."
   (let* ((beg-ind (match-beginning 1))
@@ -208,8 +209,8 @@ the window."
     (add-hook 'pre-redisplay-functions #'org-modern--pre-redisplay nil 'local)
     (add-hook 'org-after-promote-entry-hook #'org-modern--unfontify-line nil 'local)
     (add-hook 'org-after-demote-entry-hook #'org-modern--unfontify-line nil 'local)
-    (when (eq org-modern-star 'fold)
-      (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
+    ;; (when (eq org-modern-star 'fold)
+    ;;   (add-hook 'org-cycle-hook #'org-modern--cycle nil 'local))
     (org-modern--update-label-face)
     (org-modern--update-fringe-bitmaps))
    (t
