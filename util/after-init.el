@@ -110,6 +110,18 @@ or comment block. See also `repunctuate-sentences'."
 ;;                                        "\\*Minibuf.+\\*"))
 
 
+;; Flyspell
+(defun my/flyspell-correct-word-mouse (event)
+  "Correct the word at mouse EVENT using flyspell."
+  (interactive "e")
+  (mouse-set-point event)
+  (let ((flyspell-auto-correct-binding nil))
+    (flyspell-correct-word-before-point)))
+
+;; Bind to mouse-3 globally or in specific modes
+(global-set-key [mouse-3] #'my/flyspell-correct-word-mouse)
+
+
 ;; Keys
 (global-set-key [(f6)] #'symbol-overlay-put)
 (global-set-key [(f7)] #'flyspell-auto-correct-previous-word)
