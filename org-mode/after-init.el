@@ -430,6 +430,33 @@
 (setq org-archive-location "%s_archive::datetree/")
 
 
+;;; Backticks for code snippets
+
+;; Highlight single backticks as inline code in Org buffers
+(defun my/org-add-markdown-inline-code ()
+  "Highlight `inline code` in org-mode like Markdown."
+  (font-lock-add-keywords
+   nil
+   '(("\\(^\\|[^\\]\\)\\(`\\([^`\n]+\\)`\\)"
+      (2 'org-code t)))))
+
+(add-hook 'org-mode-hook #'my/org-add-markdown-inline-code)
+
+;; Make exporters handle backticks
+;; By default, Org’s exporters won’t interpret backticks as inline code.
+;; We can add a custom link-like syntax parser for `code` before export.
+(defun my/org-md-inline-code-filter (text backend info)
+  "Convert `code` to ~code~ for Org exporters."
+  (when (org-export-derived-backend-p backend 'html 'latex 'ascii 'md)
+    (replace-regexp-in-string
+     "\\(^\\|[^\\]\\)`\\([^`\n]+\\)`"
+     "\\1~\\2~"
+     text t nil)))
+
+(add-to-list 'org-export-filter-plain-text-functions
+             #'my/org-md-inline-code-filter)
+
+
 ;;; Org agenda
 
 (setq org-agenda-files '("/Users/pgrenet/Documents/org/"))
