@@ -358,9 +358,9 @@
          "** TODO Sathya %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("c" "\tConway" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Conway")
-         "** TODO Conway %?\n  %i\n"
+        ("d" "\David" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 DR")
+         "** TODO DR %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("t" "\tTom" entry
