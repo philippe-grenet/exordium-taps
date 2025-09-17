@@ -418,3 +418,10 @@ or comment block. See also `repunctuate-sentences'."
         scroll-margin 0)
   :config
   (ultra-scroll-mode 1))
+
+
+;; Vterm
+(use-package vterm
+  :ensure t)
+
+;;; after-init ends here
