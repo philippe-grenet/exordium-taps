@@ -121,6 +121,20 @@ or comment block. See also `repunctuate-sentences'."
 ;; Bind to mouse-3 globally or in specific modes
 (global-set-key [mouse-3] #'my/flyspell-correct-word-mouse)
 
+;; Ignore uppercase words
+;; (defun my/flyspell-ignore-uppercase-word (word)
+;;   "Return nil if WORD is entirely uppercase, t otherwise."
+;;   (not (string-match-p "^[[:upper:]]+$" word)))
+
+;; (add-hook 'prog-mode-hook
+;;           (lambda ()
+;;             (setq-local flyspell-generic-check-word-predicate 'my/flyspell-ignore-uppercase-word)))
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (setq-local flyspell-generic-check-word-predicate 'my/flyspell-ignore-uppercase-word)))
+
+
+
 
 ;; Keys
 (global-set-key [(f6)] #'symbol-overlay-put)

@@ -259,6 +259,7 @@
                               ;;"~/Documents/org/arr/"
                               ;; "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
+                              "~/Documents/org/ap/"
                               "~/Documents/org/dna/"
                               "~/Documents/org/bqnt/"
                               "~/Documents/org/planning/"
