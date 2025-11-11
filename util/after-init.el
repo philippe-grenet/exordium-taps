@@ -261,6 +261,11 @@ or comment block. See also `repunctuate-sentences'."
 (setq company-dabbrev-downcase nil
       company-dabbrev-ignore-case nil)
 
+;; Start completing only after 3 characters
+;; Don't try to complete numbers
+(setq company-minimum-prefix-length 3
+      company-dabbrev-char-regexp "\\(?:[[:alpha:]]\\|\\s_\\)")
+
 ;; By default RET inserts the selected candidate (company-complete-selection)
 ;; and TAB inserts the common part of all completion candidates (company-complete-common).
 ;; RET isn't great when your word is finished, but has possible completions, and you just want to
