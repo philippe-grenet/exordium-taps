@@ -443,4 +443,9 @@ or comment block. See also `repunctuate-sentences'."
 (use-package vterm
   :ensure t)
 
+
+;; BQL mode
+(load "~/.emacs.d/taps/util/bql-mode.el")
+
+
 ;;; after-init ends here
