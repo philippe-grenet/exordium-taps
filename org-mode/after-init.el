@@ -338,19 +338,19 @@
          :prepend t
          :empty-lines-after 0)
         ("S" "\tShabbir" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Shabbir")
+         (file+headline "~/Documents/org/catchup.org" "✨ Shabbir")
          "** TODO Shabbir %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("A" "\tAnthony" entry
          (file+headline "~/Documents/org/catchup.org"
-                        "⭐️ Anthony ([[https://docs.google.com/document/d/11epTeSzu5tgxVOf19rn88C41d6JvLyKN4YTpERd6ZW0/edit?tab=t.0][topics]])")
+                        "✨ Anthony ([[https://docs.google.com/document/d/11epTeSzu5tgxVOf19rn88C41d6JvLyKN4YTpERd6ZW0/edit?tab=t.0][topics]])")
          "** TODO AC %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("M" "\tManish" entry
          (file+headline "~/Documents/org/catchup.org"
-                        "⭐️ Manish ([[https://docs.google.com/document/d/1ObXxx36mXhHcKsnYiKc5jMAfDyDeFzIqQdR2dS7sI9E/edit?tab=t.0#heading=h.px0s0g92opc8][topics]])")
+                        "✨ Manish ([[https://docs.google.com/document/d/1ObXxx36mXhHcKsnYiKc5jMAfDyDeFzIqQdR2dS7sI9E/edit?tab=t.0#heading=h.px0s0g92opc8][topics]])")
          "** TODO Manish %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
@@ -371,7 +371,7 @@
          :prepend t
          :empty-lines-after 0)
         ("g" "\tGino" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Gino")
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Gino")
          "** TODO Gino %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
