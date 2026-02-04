@@ -159,6 +159,12 @@
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
+        ("\\(REVIEW\\)" . ((lambda (tag)
+                            (svg-tag-make tag :face 'font-lock-variable-name-face :inverse t))))
+        ("\\(QUESTIONED\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
+        ("\\(POSTPONED\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
         ("\\(CRITICAL\\)" . ((lambda (tag)
                                (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
         ("\\(DEPENDENCY\\)" . ((lambda (tag)
@@ -253,7 +259,8 @@
 (defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
                             (,(colorize-note-extension "datasets.org")   . "~/Documents/org/datasets.org")
-                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
+                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
+                            (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
 
 (defconst notes-directories '("~/Documents/org/notes/"
                               ;;"~/Documents/org/arr/"
@@ -410,6 +417,7 @@
 
 (define-key global-map [(meta f12)] #'org-capture)
 (define-key global-map [(f13)] #'org-capture)
+(define-key global-map [(delete)] #'org-capture)
 
 ;;; Move task
 
