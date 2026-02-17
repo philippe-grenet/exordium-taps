@@ -315,18 +315,6 @@ or comment block. See also `repunctuate-sentences'."
 (setq magit-ediff-dwim-show-on-hunks t)
 
 
-;; Treemacs
-
-(defun treemacs-current ()
-  "Open treemacs for the current buffer"
-  (interactive)
-  (when (eq (treemacs-current-visibility) 'none)
-    (treemacs)
-    (treemacs-display-current-project-exclusively)))
-
-(global-set-key (kbd "C-c t") #'treemacs-select-window)
-
-
 ;; Tabs
 ;; See https://github.com/ema2159/centaur-tabs
 

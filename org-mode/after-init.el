@@ -1,4 +1,5 @@
-;;;; Local extensions to Exordium: Org mode
+;;;; Package --- summary : Local extensions to Exordium: Org Mode
+;;; Commentary:
 ;;; Code:
 
 (require 'org)
@@ -20,26 +21,26 @@
 
 ;;; Keys
 
-;; Move through the tree with Super + Arrow
+;; Super + Arrow: navigate through the tree (same level and up heading)
 (define-key org-mode-map [(super down)] #'org-forward-heading-same-level)
 (define-key org-mode-map [(super up)]   #'org-backward-heading-same-level)
 (define-key org-mode-map [(super left)] #'outline-up-heading)
 
-;; Mark a task as DONE with C-c c ("close")
+;; C-c o d: Mark a task as DONE
 (defun my-org-todo-toggle ()
   "Mark the task as DONE if it wasn't, mark it as TODO otherwise."
   (interactive)
   (let ((state (org-get-todo-state))
         post-command-hook)
-    (if (or (string= state "TODO") (string= state "WORK") (string= state "WAIT") (string= state "READY"))
+    (if (not (string= state "DONE"))
         (org-todo "DONE")
       (org-todo "TODO"))
     (run-hooks 'post-command-hook)
     (org-fold-subtree t)))
 
-(define-key org-mode-map (kbd "C-c c") 'my-org-todo-toggle)
+(define-key org-mode-map (kbd "C-c o d") 'my-org-todo-toggle)
 
-;; Link a Jira epic (assuming the URL is in hte clipboard)
+;; C-c o l: Paste link a Jira epic (assuming the URL is in hte clipboard)
 (defun my-org-paste-epic-link ()
   "Paste a Jira epic link in short form."
   (interactive)
@@ -49,19 +50,122 @@
     (insert (substring filename (+ 1 (string-match "-" filename))))
     (insert "]]")))
 
-(define-key org-mode-map (kbd "C-c l") 'my-org-paste-epic-link)
+(define-key org-mode-map (kbd "C-c o l") 'my-org-paste-epic-link)
+
+(defun my-org-refile-to-today (arg)
+  "Refile current headline to specific file and heading."
+  (interactive "P")
+  (let* ((target-file "~/Documents/org/todo.org")
+         (target-headline "☕️ Today")
+         ;; Find the position of the headline in the target file
+         (pos (save-excursion
+                (find-file target-file)
+                (org-find-exact-headline-in-buffer target-headline)))
+         ;; Move to the beginning by default. Prefix with C-u to add at the end
+         (org-reverse-note-order (not arg)))
+    ;; org-refile arguments:
+    ;; 1. prefix-arg: nil
+    ;; 2. default-buffer: nil
+    ;; 3. rfloc: (headline-name target-file nil pos)
+    (org-refile nil nil (list target-headline target-file nil pos))))
+
+(defun my-org-refile-to-week (arg)
+  "Refile current headline to specific file and heading."
+  (interactive "P")
+  (let* ((target-file "~/Documents/org/todo.org")
+         (target-headline "Week")
+         ;; Find the position of the headline in the target file
+         (pos (save-excursion
+                (find-file target-file)
+                (org-find-exact-headline-in-buffer target-headline)))
+         ;; Move to the beginning by default. Prefix with C-u to add at the end
+         (org-reverse-note-order (not arg)))
+    ;; org-refile arguments:
+    ;; 1. prefix-arg: nil
+    ;; 2. default-buffer: nil
+    ;; 3. rfloc: (headline-name target-file nil pos)
+    (org-refile nil nil (list target-headline target-file nil pos))))
+
+(defun my-org-refile-to-backlog (arg)
+  "Refile current headline to specific file and heading."
+  (interactive "P")
+  (let* ((target-file "~/Documents/org/todo.org")
+         (target-headline "Backlog")
+         ;; Find the position of the headline in the target file
+         (pos (save-excursion
+                (find-file target-file)
+                (org-find-exact-headline-in-buffer target-headline)))
+         ;; Move to the beginning by default. Prefix with C-u to add at the end
+         (org-reverse-note-order (not arg)))
+    ;; org-refile arguments:
+    ;; 1. prefix-arg: nil
+    ;; 2. default-buffer: nil
+    ;; 3. rfloc: (headline-name target-file nil pos)
+    (org-refile nil nil (list target-headline target-file nil pos))))
+
+(define-key org-mode-map (kbd "C-c o t") #'my-org-refile-to-today)
+(define-key org-mode-map (kbd "C-c o w") #'my-org-refile-to-week)
+(define-key org-mode-map (kbd "C-c o b") #'my-org-refile-to-backlog)
 
 
 ;;; Look
 
-(when (eq exordium-theme 'tomorrow-night)
-  ;; (setq org-priority-faces
-  ;;       '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
-  ;;         (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
-  ;;         (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
+;; (when (eq exordium-theme 'tomorrow-night)
+;;   ;; (setq org-priority-faces
+;;   ;;       '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
+;;   ;;         (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
+;;   ;;         (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
 
-  (setq org-cycle-separator-lines -1)
+;;   (setq org-cycle-separator-lines -1)
 
+;;   (with-tomorrow-colors
+;;    (tomorrow-mode-name)
+;;    (setq org-emphasis-alist
+;;          `(("*" (:foreground ,red))                         ; ("*" bold)
+;;            ("/" (:foreground ,green))                       ; ("/" italic)
+;;            ("_" (:background ,red :foreground ,background)) ; ("_" underline)
+;;            ("=" org-verbatim verbatim)
+;;            ("~" org-code verbatim)
+;;            ("+" (:strike-through t)))))
+
+;;   (with-tomorrow-colors
+;;    (tomorrow-mode-name)
+;;    (set-face-attribute 'org-headline-done nil :foreground comment))
+
+;;   (with-tomorrow-colors
+;;    (tomorrow-mode-name)
+;;    (setq org-todo-keyword-faces
+;;          `(("TODO"      . (:foreground ,red :weight bold :box nil))
+;;            ("DONE"      . (:foreground ,green :weight bold :box nil))
+;;            ("WORK"      . (:foreground ,yellow :weight bold :box nil))
+;;            ("WAIT"      . (:foreground ,orange :weight bold :box nil))
+;;            ("STOP"      . (:foreground ,comment :weight bold :box nil))
+
+;;            ;; for catch up:
+;;            ("NEXT"      . (:background ,red :foreground ,background :weight bold :box nil))
+
+;;            ;; for BDGT:
+;;            ("SUBMITTED" . (:foreground ,orange :weight bold :box nil))
+;;            ("APPROVED"  . (:foreground ,yellow :weight bold :box nil))
+;;            ("PARTIAL"   . (:background ,yellow :foreground ,background :weight bold :box nil))
+;;            ("COMPLETE"  . (:background ,green :foreground ,background :weight bold :box nil))
+;;            ("CANCELED"  . (:background ,comment :foreground ,background :weight bold :box nil))
+
+;;            ;; for hire:
+;;            ("BAD"       . (:background ,red :foreground ,background :weight bold :box nil))
+;;            ("MEDIUM"    . (:background ,orange :foreground ,background :weight bold :box nil))
+;;            ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
+;;            ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
+;;            ("WITHDREW"  . (:background ,purple :foreground ,background :weight bold :box nil))
+;;            ("HIRED"     . (:background ,green :foreground ,background :weight bold :box nil))))))
+
+;;(require 'init-themes)
+(when (member exordium-theme '(tomorrow-night))
+  (require 'color-theme-tomorrow)
+  (setq org-priority-faces
+        '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
+         (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
+         (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
   (with-tomorrow-colors
    (tomorrow-mode-name)
    (setq org-emphasis-alist
@@ -71,37 +175,18 @@
            ("=" org-verbatim verbatim)
            ("~" org-code verbatim)
            ("+" (:strike-through t)))))
-
   (with-tomorrow-colors
    (tomorrow-mode-name)
-   (set-face-attribute 'org-headline-done nil :foreground comment))
+   (set-face-attribute 'org-headline-done nil :foreground comment)))
 
-  (with-tomorrow-colors
-   (tomorrow-mode-name)
-   (setq org-todo-keyword-faces
-         `(("TODO"      . (:foreground ,red :weight bold :box nil))
-           ("DONE"      . (:foreground ,green :weight bold :box nil))
-           ("WORK"      . (:foreground ,yellow :weight bold :box nil))
-           ("WAIT"      . (:foreground ,orange :weight bold :box nil))
-           ("STOP"      . (:foreground ,comment :weight bold :box nil))
+(when (member exordium-theme '(catppuccin-mocha))
+  (require 'color-theme-catppuccin)
+  (with-catppuccin-colors
+   exordium-catppuccin-flavor
+   (set-face-attribute 'org-headline-done nil :foreground overlay0)))
 
-           ;; for catch up:
-           ("NEXT"      . (:background ,red :foreground ,background :weight bold :box nil))
-
-           ;; for BDGT:
-           ("SUBMITTED" . (:foreground ,orange :weight bold :box nil))
-           ("APPROVED"  . (:foreground ,yellow :weight bold :box nil))
-           ("PARTIAL"   . (:background ,yellow :foreground ,background :weight bold :box nil))
-           ("COMPLETE"  . (:background ,green :foreground ,background :weight bold :box nil))
-           ("CANCELED"  . (:background ,comment :foreground ,background :weight bold :box nil))
-
-           ;; for hire:
-           ("BAD"       . (:background ,red :foreground ,background :weight bold :box nil))
-           ("MEDIUM"    . (:background ,orange :foreground ,background :weight bold :box nil))
-           ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
-           ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
-           ("WITHDREW"  . (:background ,purple :foreground ,background :weight bold :box nil))
-           ("HIRED"     . (:background ,green :foreground ,background :weight bold :box nil))))))
+;; Put one line before each header-1
+(setq org-cycle-separator-lines -1)
 
 (setq org-ellipsis "⤵")  ;; or "…"
 
@@ -233,15 +318,22 @@
 
 
 
-;;; Custom startup options
+;;; Overline startup option
 
 (defvar my-org-mode-overline nil)
 (add-to-list 'org-startup-options '("overline" my-org-mode-overline t))
-(add-hook 'org-mode-hook
-          (lambda ()
-            (when my-org-mode-overline
-              (face-remap-add-relative 'org-level-1
-                                       (with-tomorrow-colors 'night `(:overline ,green))))))
+(when (eq exordium-theme 'tomorrow-night)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (when my-org-mode-overline
+                (face-remap-add-relative 'org-level-1
+                                         (with-tomorrow-colors 'night `(:overline ,green)))))))
+(when (eq exordium-theme 'catppuccin-mocha)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (when my-org-mode-overline
+                (face-remap-add-relative 'org-level-1
+                                         (with-catppuccin-colors 'mocha `(:overline ,blue)))))))
 
 
 ;;; Task list
@@ -419,21 +511,6 @@
 (define-key global-map [(f13)] #'org-capture)
 (define-key global-map [(delete)] #'org-capture)
 
-;;; Move task
-
-(defun exordium-org-move-to-today ()
-  "Move the current subtree to the end of Tasks/Today."
-  (interactive)
-  (org-cut-subtree)
-  (beginning-of-buffer)
-  (org-forward-heading-same-level 1)
-  (outline-next-visible-heading 1)
-  (org-forward-heading-same-level 1)
-  (backward-char 1)
-  (org-paste-subtree))
-
-(define-key org-mode-map [(ctrl c) (t)] #'exordium-org-move-to-today)
-
 
 ;;; Archive
 (setq org-archive-location "%s_archive::datetree/")
@@ -518,27 +595,37 @@
 
 (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
 
-(require 'color-theme-tomorrow)
-(with-tomorrow-colors 'night
- (custom-set-faces
-  `(cfw:face-title ((t (:foreground ,green :weight bold :height 2.0))))
-  `(cfw:face-header ((t (:foreground ,yellow :weight bold))))
-  `(cfw:face-sunday ((t :foreground ,orange :background ,background :weight bold)))
-  `(cfw:face-saturday ((t :foreground ,orange :background ,background :weight bold)))
-  `(cfw:face-holiday ((t :background ,orange :foreground ,background :weight bold)))
-  `(cfw:face-grid ((t :foreground ,selection)))
-  `(cfw:face-default-content ((t :foreground ,purple)))
-  `(cfw:face-periods ((t :foreground "cyan")))
-  `(cfw:face-day-title ((t :background "grey10")))
-  `(cfw:face-default-day ((t :weight bold :inherit cfw:face-day-title)))
-  `(cfw:face-annotation ((t :foreground "RosyBrown" :inherit cfw:face-day-title)))
-  `(cfw:face-disable ((t :foreground "DarkGray" :inherit cfw:face-day-title)))
-  `(cfw:face-today-title ((t :foreground ,background :background ,green :weight bold)))
-  `(cfw:face-today ((t :background: ,green :weight bold)))
-  `(cfw:face-select ((t :background "#2f2f2f")))
-  `(cfw:face-toolbar ((t :foreground ,foreground :background ,selection)))
-  `(cfw:face-toolbar-button-off ((t :foreground ,aqua :background ,selection :weight bold)))
-  `(cfw:face-toolbar-button-on ((t :foreground ,foreground :background ,selection :weight bold)))))
+;; (when (eq exordium-theme 'tomorrow-night)
+;;   (with-tomorrow-colors 'night
+;;     (custom-set-faces
+;;      `(cfw:face-title ((t (:foreground ,green :weight bold :height 2.0))))
+;;      `(cfw:face-header ((t (:foreground ,yellow :weight bold))))
+;;      `(cfw:face-sunday ((t :foreground ,orange :background ,background :weight bold)))
+;;      `(cfw:face-saturday ((t :foreground ,orange :background ,background :weight bold)))
+;;      `(cfw:face-holiday ((t :background ,orange :foreground ,background :weight bold)))
+;;      `(cfw:face-grid ((t :foreground ,selection)))
+;;      `(cfw:face-default-content ((t :foreground ,purple)))
+;;      `(cfw:face-periods ((t :foreground "cyan")))
+;;      `(cfw:face-day-title ((t :background "grey10")))
+;;      `(cfw:face-default-day ((t :weight bold :inherit cfw:face-day-title)))
+;;      `(cfw:face-annotation ((t :foreground "RosyBrown" :inherit cfw:face-day-title)))
+;;      `(cfw:face-disable ((t :foreground "DarkGray" :inherit cfw:face-day-title)))
+;;      `(cfw:face-today-title ((t :foreground ,background :background ,green :weight bold)))
+;;      `(cfw:face-today ((t :background: ,green :weight bold)))
+;;      `(cfw:face-select ((t :background "#2f2f2f")))
+;;      `(cfw:face-toolbar ((t :foreground ,foreground :background ,selection)))
+;;      `(cfw:face-toolbar-button-off ((t :foreground ,aqua :background ,selection :weight bold)))
+;;      `(cfw:face-toolbar-button-on ((t :foreground ,foreground :background ,selection :weight bold))))))
+
+(when (member exordium-theme '(catppuccin-mocha))
+  (require 'color-theme-catppuccin)
+  (with-catppuccin-colors
+   exordium-catppuccin-flavor
+   (set-face-attribute 'cfw:face-title nil :foreground blue)
+   (set-face-attribute 'cfw:face-today nil :background lavender)
+   (set-face-attribute 'cfw:face-today-title nil :background blue)
+   (set-face-attribute 'cfw:face-annotation nil :foreground red)
+   (set-face-attribute 'cfw:face-toolbar-button-off nil :foreground green)))
 
 
 ;; Org modern indent
@@ -568,4 +655,6 @@
 ;; Schedule the function every hour. See also run-with-timer and cancel-timer.
 (run-at-time "00:00" 3600 'org-sync)
 
-;;; after-init.el ends here
+;; Local Variables:
+;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
+;; End:

@@ -11,13 +11,6 @@
 (setq helm-split-window-default-side 'below
       helm-split-window-inside-p t)
 
-(require 'treemacs)
-(setq treemacs-wrap-around nil
-      treemacs-width 65
-      treemacs-text-scale -0.3
-      treemacs-is-never-other-window t)
-(treemacs-filewatch-mode 0)  ; to many files descriptors otherwise
-
 ;;(require 'lsp-java)
 ;;(add-hook 'java-mode-hook #'lsp)
 
