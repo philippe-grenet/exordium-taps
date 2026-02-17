@@ -52,6 +52,9 @@
 
 (define-key org-mode-map (kbd "C-c o l") 'my-org-paste-epic-link)
 
+;; C-c o d/w/b: refile to Today, Week or Backlog.
+;; Move task to the beginning of the section.
+;; With argument C-u, move task to the end of the section.
 (defun my-org-refile-to-today (arg)
   "Refile current headline to specific file and heading."
   (interactive "P")
@@ -106,6 +109,15 @@
 (define-key org-mode-map (kbd "C-c o t") #'my-org-refile-to-today)
 (define-key org-mode-map (kbd "C-c o w") #'my-org-refile-to-week)
 (define-key org-mode-map (kbd "C-c o b") #'my-org-refile-to-backlog)
+
+;;; C-c o i: insert image
+(defun my-org-insert-image ()
+  (interactive)
+  (insert "#+attr_html: :width 800px\n")
+  (insert "[[./img/.png]]\n")
+  (backward-char 7))
+
+(define-key org-mode-map (kbd "C-c o i") #'my-org-insert-image)
 
 
 ;;; Look
