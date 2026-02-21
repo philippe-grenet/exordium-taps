@@ -1,6 +1,7 @@
 ;;; Utility functions
 
 (setq-default indicate-empty-lines t)
+(setq native-comp-async-report-warnings-errors nil)
 
 ;; Visual bell
 (setq ring-bell-function
