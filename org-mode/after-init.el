@@ -119,6 +119,18 @@
 
 (define-key org-mode-map (kbd "C-c o i") #'my-org-insert-image)
 
+;;; C-c o m: insert Mermaid class diagram
+(defun my-org-insert-image ()
+  (interactive)
+  (insert "#+attr_org: :width 600\n")
+  (insert "#+begin_src mermaid :file diagrams/example.png :theme dark :background-color transparent\n")
+  (insert "classDiagram\n")
+  (insert "    note \"see https://mermaid.js.org/syntax/classDiagram.html\"\n")
+  (insert "#+end_src\n")
+  (backward-char 73))
+
+(define-key org-mode-map (kbd "C-c o m") #'my-org-insert-image)
+
 
 ;;; Look
 
