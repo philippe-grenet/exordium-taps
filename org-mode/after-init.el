@@ -252,9 +252,11 @@
                            (svg-tag-make tag :face 'font-lock-type-face :inverse t))))
         ("\\(STOP\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-        ("\\(READY\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(WAIT\\)" . ((lambda (tag)
+                           (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
+        ("\\(BLOCKED\\)" . ((lambda (tag)
+                             (svg-tag-make tag :face 'font-lock-constant-face :inverse t))))
+        ("\\(READY\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(REVIEW\\)" . ((lambda (tag)
                             (svg-tag-make tag :face 'font-lock-variable-name-face :inverse t))))
@@ -262,10 +264,6 @@
                                (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
         ("\\(POSTPONED\\)" . ((lambda (tag)
                                (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-        ("\\(CRITICAL\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
-        ("\\(DEPENDENCY\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(PROCEED\\)" . ((lambda (tag)
                               (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
         ("\\(REJECT\\)" . ((lambda (tag)
@@ -371,7 +369,7 @@
                               ;; "~/Documents/org/spark-platform/"
                               "~/Documents/org/bql/"
                               "~/Documents/org/ap/"
-                              "~/Documents/org/dna/"
+                              "~/Documents/org/architecture/"
                               "~/Documents/org/bqnt/"
                               "~/Documents/org/planning/"
                               "~/Documents/org/management/"
@@ -651,6 +649,30 @@
 
 ;; Enable it for all files
 (add-hook 'org-mode-hook #'org-modern-indent-mode)
+
+
+;; Mermaid
+;; Mermaid syntax files (.mmd)
+(use-package mermaid-mode
+  :ensure t
+  :mode "\\.mmd\\'")
+
+;; Org-Babel Mermaid
+;; Mermaid config schema documentation: https://mermaid.js.org/config/schema-docs/config.html
+(use-package ob-mermaid
+  :ensure t
+  :after org
+  :config
+  ;; Point to the Mermaid CLI binary
+  (setq ob-mermaid-cli-path (or (executable-find "mmdc")
+                                "/opt/homebrew/bin/mmdc"))
+  (setenv "PUPPETEER_EXECUTABLE_PATH" "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+  ;; Enable Mermaid in Org-Babel
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((mermaid . t)))
+  ;; Auto-refresh inline images after executing a block
+  (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images))
 
 
 ;; Sync todos to Google Drive for PlainOrg
