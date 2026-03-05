@@ -267,7 +267,7 @@
         ("\\(WAIT\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(BLOCKED\\)" . ((lambda (tag)
-                             (svg-tag-make tag :face 'font-lock-constant-face :inverse t))))
+                             (svg-tag-make tag :face 'dired-flagged :inverse t))))
         ("\\(READY\\)" . ((lambda (tag)
                            (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
         ("\\(REVIEW\\)" . ((lambda (tag)
@@ -298,16 +298,16 @@
                                    (svg-tag-make tag
                                                  :face 'font-lock-type-face
                                                  :beg 2 :end -2 :inverse nil))))
-        ;; Rectangles with plain words: {Something}
-        ("\\({[A-Za-z]+}\\)" . ((lambda (tag)
-                                  (svg-tag-make tag
-                                                :face 'font-lock-comment-face
-                                                :beg 1 :end -1 :inverse nil))))
-        ;; Pills with 1 letter or one or 2 numbers: (A) (10)
-        ("\([0-9a-zA-Z]\)" . ((lambda (tag)
-                                (svg-tag-make tag :beg 1 :end -1 :radius 12))))
-        ("\([0-9][0-9]\)" . ((lambda (tag)
-                               (svg-tag-make tag :beg 1 :end -1 :radius 8))))
+        ;; Rectangles with plain words: {{Something}}
+        ("\\({{[A-Za-z]+}}\\)" . ((lambda (tag)
+                                   (svg-tag-make tag
+                                                 :face 'font-lock-comment-face
+                                                 :beg 1 :end -1 :inverse nil))))
+        ;; Pills with 1 letter or one or 2 numbers: ((A)) ((10))
+        ("\(\([0-9a-zA-Z]\)\)" . ((lambda (tag)
+                                   (svg-tag-make tag :beg 1 :end -1 :radius 12))))
+        ("\(\([0-9][0-9]\)\)" . ((lambda (tag)
+                                  (svg-tag-make tag :beg 1 :end -1 :radius 8))))
         ;;
         ;; Active date (with or without day name, with or without time)
         (,(format "\\(<%s>\\)" date-re) .
@@ -376,17 +376,12 @@
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
                             (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
 
-(defconst notes-directories '("~/Documents/org/notes/"
-                              ;;"~/Documents/org/arr/"
-                              ;; "~/Documents/org/spark-platform/"
-                              "~/Documents/org/bql/"
+(defconst notes-directories '("~/Documents/org/bql/"
                               "~/Documents/org/ap/"
                               "~/Documents/org/architecture/"
-                              "~/Documents/org/bqnt/"
+                              "~/Documents/org/notes/"
                               "~/Documents/org/planning/"
                               "~/Documents/org/management/"
-                              "~/Documents/org/equity/"
-                              "~/Documents/org/other/"
                               "~/Documents/org/tech/"))
 
 (defun list-notes-in-directory (dir)
@@ -480,11 +475,6 @@
          "** TODO Sathya %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("d" "\David" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 DR")
-         "** TODO DR %?\n  %i\n"
-         :prepend t
-         :empty-lines-after 0)
         ("t" "\tTom" entry
          (file+headline "~/Documents/org/catchup.org"
                         "⭐️ Tom ([[https://docs.google.com/document/d/102GWuRqH-sYFMNw9DPKu9npDsGoZXNFW0-mKDWbuRJk/edit#heading=h.2cjiyf4l29p1][topics]])")
@@ -511,7 +501,7 @@
          "** TODO Pranil %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("a" "\tAbhishek, Amey, Alex")
+        ("a" "\tAbhishek, Amey, Alicija, Alex")
         ("ag" "\tAbhishek" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
          "** TODO AG %?\n  %i\n"
@@ -522,9 +512,14 @@
          "** TODO Amey %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
-        ("al" "\tAlex" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Alex")
-         "** TODO Alex %?\n  %i\n"
+        ("al" "\tAlicija" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Alicija")
+         "** TODO Alicija %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("as" "\tAlex" entry
+         (file+headline "~/Documents/org/catchup.org" "⭐️ Alex")
+q         "** TODO Alex %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ))
