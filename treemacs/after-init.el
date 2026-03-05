@@ -13,7 +13,7 @@
 (treemacs-git-mode 'extended)
 (treemacs-load-theme 'all-the-icons)
 
-(global-set-key (kbd "C-c t") #'treemacs-select-window)
+(global-set-key (kbd "C-c t t") #'treemacs-select-window)
 
 (defun toggle-treemacs-visibility ()
   "Show or hide treemacs and resize the frame as needed."
@@ -31,6 +31,8 @@
   (when (eq (treemacs-current-visibility) 'none)
     (treemacs)
     (treemacs-add-and-display-current-project-exclusively)))
+
+(global-set-key (kbd "C-c t s") #'treemacs-switch-workspace)
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
