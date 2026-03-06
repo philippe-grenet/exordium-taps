@@ -6,7 +6,7 @@
 (require 'treemacs-all-the-icons)
 
 (setq treemacs-wrap-around nil
-      treemacs-width 50
+      treemacs-width 65
       ;;treemacs-text-scale -0.3
       treemacs-is-never-other-window nil)
 (treemacs-filewatch-mode 0)  ; to many files descriptors otherwise
@@ -20,7 +20,7 @@
   (interactive)
   (treemacs)
   (if (eq (treemacs-current-visibility) 'visible)
-      (set-frame-width (selected-frame) 170)
+      (set-frame-width (selected-frame) 185)
     (set-frame-width (selected-frame) 120)))
 
 (global-set-key (kbd "<f5>") #'toggle-treemacs-visibility)
