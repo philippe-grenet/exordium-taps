@@ -47,6 +47,139 @@
   (define-key markdown-mode-map (kbd "s-$") 'osx-dictionary))
 
 
+;;; Minimal Markdown -> Org converter (pure Elisp), in-place on region.
+;;; Usage:
+;;;   Select region (Markdown), then M-x markdown-to-org
+
+(require 'cl-lib)
+
+(defun markdown-to-org (beg end)
+  "Rewrite Markdown in region BEG..END into Org format.
+Replaces the region text in-place."
+  (interactive "r")
+  (unless (use-region-p)
+    (user-error "No active region"))
+  (let* ((md  (buffer-substring-no-properties beg end))
+         (org (markdown-to-org--string md)))
+    (save-excursion
+      (goto-char beg)
+      (delete-region beg end)
+      (insert org))))
+
+(defun markdown-to-org--string (s)
+  "Convert Markdown string S to Org string."
+  (let* ((s        (replace-regexp-in-string "\r\n" "\n" s)) ; normalize newlines
+         (lines    (split-string s "\n" nil))
+         (in-fence nil)
+         (out      '()))
+    (cl-labels
+        ((pushline (x)
+           (push x out))
+         (trim (x)
+           (string-trim x))
+         (fence-start-p (l)
+           (string-match-p "^[ \t]*```" l))
+         (fence-lang (l)
+           (when (string-match "^[ \t]*```[ \t]*\\([^ \t]*\\)" l)
+             (let ((lang (match-string 1 l)))
+               (and lang (not (string-empty-p lang)) lang))))
+         (heading->org (l)
+           (when (string-match
+                  "^[ \t]*\\(#\\{1,6\\}\\)[ \t]+\\(.*\\)$"
+                  l)
+             (let* ((n     (length (match-string 1 l)))
+                    (title (string-trim (match-string 2 l))))
+               (if (= n 1)
+                   (concat "#+title: " title)
+                 (concat (make-string (1- n) ?*) " " title)))))
+         (hr->org (l)
+           (when (string-match-p "^[ \t]*\\(-\\{3,\\}\\|\\*\\{3,\\}\\|_\\{3,\\}\\)[ \t]*$" l)
+             "-----"))
+         (blockquote->org (l)
+           (when (string-match "^[ \t]*> ?\\(.*\\)$" l)
+             ;; Lightweight quote style; change to begin_quote/end_quote if desired.
+             (concat ": " (match-string 1 l))))
+         (ul-item-p (l)
+           (string-match "^[ \t]*[-+*][ \t]+\\(.*\\)$" l))
+         (ol-item-p (l)
+           (string-match "^[ \t]*[0-9]+\\.[ \t]+\\(.*\\)$" l))
+         (ul-item->org (l)
+           (when (ul-item-p l) (concat "- " (match-string 1 l))))
+         (ol-item->org (l)
+           (when (ol-item-p l) (concat "1. " (match-string 1 l))))
+         (strip-backslash-escapes (x)
+           (replace-regexp-in-string "\\\\\\([`*_{}\\[\\]()#+.!-]\\)" "\\1" x))
+         (convert-links (x)
+           ;; [text](url) -> [[url][text]], ![alt](url) -> [[url]]
+           (let ((start 0))
+             (while (string-match "\\(\\(?:!\\)?\\)\\[\\([^]\n]+\\)\\](\\([^)\n]+\\))" x start)
+               (let* ((bang (match-string 1 x))
+                      (text (match-string 2 x))
+                      (url  (match-string 3 x))
+                      (rep  (if (and bang (string= bang "!"))
+                                (format "[[%s]]" (string-trim url))
+                              (format "[[%s][%s]]" (string-trim url) (string-trim text)))))
+                 (setq x (replace-match rep t t x))
+                 (setq start (+ (match-beginning 0) (length rep)))))
+             x))
+         (convert-inline-code (x)
+           ;; `code` -> `code`. Normally it is ~code~ but I have special org support.
+           (let ((start 0))
+             (while (string-match "`\\([^`\n]+\\)`" x start)
+               (let* ((code (match-string 1 x))
+                      (rep (concat "`" code "`")))
+                 (setq x (replace-match rep t t x))
+                 (setq start (+ (match-beginning 0) (length rep)))))
+             x))
+         (convert-strike (x)
+           ;; ~~del~~ -> +del+
+           (replace-regexp-in-string "~~\\([^~\n]+\\)~~" "+\\1+" x))
+         (convert-emphasis (x)
+           ;; **b**/__b__ -> *b* ; *i*/_i_ -> /i/
+           ;; Simplistic; won't handle all edge cases.
+           ;; Italic first: convert *i* (but not **b**) and _i_ (but not __b__)
+           (setq x (replace-regexp-in-string "\\(^\\|[^*_]\\)\\*\\([^*\n]+\\)\\*\\([^*]\\|$\\)" "\\1/\\2/\\3" x))
+           (setq x (replace-regexp-in-string "\\(^\\|[^_]\\)_\\([^_\n]+\\)_\\([^_]\\|$\\)" "\\1/\\2/\\3" x))
+           ;; Bold: convert **b** and __b__ to *b*
+           (setq x (replace-regexp-in-string "\\*\\*\\([^*\n]+\\)\\*\\*" "*\\1*" x))
+           (setq x (replace-regexp-in-string "__\\([^_\n]+\\)__" "*\\1*" x))
+           x)
+         (convert-line (l)
+           (let ((x l))
+             (setq x (strip-backslash-escapes x))
+             (setq x (convert-links x))
+             (setq x (convert-inline-code x))
+             (setq x (convert-strike x))
+             (setq x (convert-emphasis x))
+             x)))
+      (dolist (l lines)
+        (cond
+         ((fence-start-p l)
+          (if in-fence
+              (progn (pushline "#+end_src") (setq in-fence nil))
+            (pushline (format "#+begin_src %s" (or (fence-lang l) "")))
+            (setq in-fence t)))
+         (in-fence
+          (pushline l))
+         ((heading->org l)
+          (pushline (heading->org l)))
+         ((hr->org l)
+          (pushline (hr->org l)))
+         ((blockquote->org l)
+          (pushline (convert-line (blockquote->org l))))
+         ((ul-item-p l)
+          (pushline (convert-line (ul-item->org l))))
+         ((ol-item-p l)
+          (pushline (convert-line (ol-item->org l))))
+         ((string-match-p "^[ \t]*$" l)
+          (pushline ""))
+         (t
+          (pushline (convert-line l))))))
+    (when in-fence
+      (push "#+end_src" out))
+    (mapconcat #'identity (nreverse out) "\n")))
+
+
 ;; == Snippets ==
 ;; (add-hook 'markdown-mode-hook
 ;;           '(lambda ()
