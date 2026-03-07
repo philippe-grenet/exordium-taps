@@ -122,8 +122,8 @@
 ;;; C-c o m: insert Mermaid class diagram
 (defun my-org-insert-mermaid-diagram ()
   (interactive)
-  (insert "#+attr_org: :width 600\n")
-  (insert "#+begin_src mermaid :file diagrams/example.png :theme dark :background-color transparent\n")
+  (insert "#+attr_org: :width 900\n")
+  (insert "#+begin_src mermaid :file diagrams/example.png :theme dark :background-color transparent :width 1800\n")
   (insert "classDiagram\n")
   (insert "    note \"see https://mermaid.js.org/syntax/classDiagram.html\"\n")
   (insert "#+end_src\n")
