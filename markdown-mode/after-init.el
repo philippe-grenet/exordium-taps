@@ -53,13 +53,13 @@
 
 (require 'cl-lib)
 
-(defun markdown-to-org (beg end)
-  "Rewrite Markdown in region BEG..END into Org format.
-Replaces the region text in-place."
-  (interactive "r")
-  (unless (use-region-p)
-    (user-error "No active region"))
-  (let* ((md  (buffer-substring-no-properties beg end))
+(defun markdown-to-org (&optional beg end)
+  "Rewrite Markdown from region BEG..END (or whole buffer) into Org format.
+If no region is active, converts the entire buffer in-place."
+  (interactive (when (use-region-p) (list (region-beginning) (region-end))))
+  (let* ((beg (or beg (point-min)))
+         (end (or end (point-max)))
+         (md  (buffer-substring-no-properties beg end))
          (org (markdown-to-org--string md)))
     (save-excursion
       (goto-char beg)
