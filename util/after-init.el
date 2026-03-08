@@ -143,6 +143,9 @@ or comment block. See also `repunctuate-sentences'."
 (global-set-key [(end)] #'move-end-of-line)
 (global-set-key [(home)] #'move-beginning-of-line)
 
+;; Revert buffer
+(global-set-key (kbd "C-c r") #'revert-buffer-quick)
+
 ;; Emojis on mac: add shift to Meta-Ctrl-Space for selection
 (global-set-key (kbd "C-M-s-<SPC>") #'mark-sexp)
 
