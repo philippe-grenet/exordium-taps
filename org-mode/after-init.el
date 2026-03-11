@@ -113,7 +113,7 @@
 ;;; C-c o i: insert image
 (defun my-org-insert-image ()
   (interactive)
-  (insert "#+attr_html: :width 800px\n")
+  (insert "#+attr_html: :width 900px\n")
   (insert "[[./img/.png]]\n")
   (backward-char 7))
 
@@ -501,6 +501,16 @@
          "** TODO Pranil %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
+        ("j" "\tJas" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Jas")
+         "** TODO Jas %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
+        ("m" "\tMike" entry
+         (file+headline "~/Documents/org/catchup.org" "👤 Mike")
+         "** TODO Mike %?\n  %i\n"
+         :prepend t
+         :empty-lines-after 0)
         ("a" "\tAbhishek, Amey, Alicija, Alex")
         ("ag" "\tAbhishek" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
@@ -519,7 +529,7 @@
          :empty-lines-after 0)
         ("as" "\tAlex" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Alex")
-q         "** TODO Alex %?\n  %i\n"
+         "** TODO Alex %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ))
@@ -656,6 +666,10 @@ q         "** TODO Alex %?\n  %i\n"
 
 ;; Enable it for all files
 (add-hook 'org-mode-hook #'org-modern-indent-mode)
+
+
+;; Org to markdown converter
+(load "~/.emacs.d/taps/org-mode/org-to-markdown.el")
 
 
 ;; Mermaid
