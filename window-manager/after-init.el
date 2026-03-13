@@ -62,6 +62,18 @@
 
 
 
+
+(require 'ace-window)
+
+(setq aw-keys '(49 50 51 52 53 54 55 56 57))
+
+(when (member exordium-theme '(catppuccin-mocha))
+  (require 'color-theme-catppuccin)
+  (with-catppuccin-colors
+   exordium-catppuccin-flavor
+   (set-face-attribute 'aw-leading-char-face nil :foreground red :height 4.0 :weight 'bold)))
+
+
 ;;; Split windows
 
 (defun num-windows ()
@@ -123,6 +135,10 @@ i.e. change right window to bottom, or change bottom window to right."
 
 (global-set-key "\C-c3" 'split-window-horizontally-instead)
 (global-set-key "\C-c2" 'split-window-vertically-instead)
+
+;;; Window dedication
+;; Make a window dedicated so Emacs won't reuse it for other buffers
+(global-set-key (kbd "C-c w d") #'exordium-toggle-window-dedicated)
 
 
 
