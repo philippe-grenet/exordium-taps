@@ -247,11 +247,21 @@ or comment block. See also `repunctuate-sentences'."
 
 ;;; Symbols, see https://emacsredux.com/blog/2014/08/25/a-peek-at-emacs-24-dot-4-prettify-symbols-mode/
 
+;; Force consistent font for arrows in prettify-symbols
+;; Use Hiragino Maru Gothic ProN for the arrow Unicode block (U+2B00-2BFF)
+;; to ensure all arrows render at the same size
+(set-fontset-font t '(#x2b00 . #x2bff) "Hiragino Maru Gothic ProN")
+
 (defconst my-prettify-symbol-alist '(("=>" . ?⇒)
                                      ("->" . ?⮕)
                                      ("<=" . ?⇐)
                                      ("<-" . ?⬅)
-                                     ("<->" . ?⬌)))
+                                     ("<->" . ?⬌)
+                                     ("|^" . ?⬆)
+                                     ("|v" . ?⬇)
+                                     ("||^" . ?⇑)
+                                     ("||v" . ?⇓)
+                                     ("|^v" . ?⇕)))
 (add-hook 'org-mode-hook (lambda ()
                            (setq prettify-symbols-alist my-prettify-symbol-alist)))
 (add-hook 'markdown-mode-hook (lambda ()
