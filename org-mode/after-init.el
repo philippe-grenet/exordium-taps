@@ -523,7 +523,7 @@
          :prepend t
          :empty-lines-after 0)
         ("al" "\tAlicija" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Alicija")
+         (file+headline "~/Documents/org/catchup.org" "👤 Alicija ([[https://docs.google.com/document/d/13rZFsJHeT8UjChTZMPnRT65Oq1pKILwocxjcma5mkoE/edit?tab=t.3eojide0clcg#heading=h.p6lx1dt4yzzc][topics]])")
          "** TODO Alicija %?\n  %i\n"
          :prepend t
          :empty-lines-after 0)
