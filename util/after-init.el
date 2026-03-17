@@ -238,9 +238,9 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; insert date
 (defun exordium-insert-today ()
-  "Insert today's date as mm/dd/yyyy."
+  "Insert today's date as an Org inactive timestamp [YYYY-MM-DD]."
   (interactive)
-  (insert (format-time-string "%m/%d/%Y")))
+  (insert (format-time-string "[%Y-%m-%d]")))
 
 (global-set-key (kbd "C-c C-.") #'exordium-insert-today)
 
