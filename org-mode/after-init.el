@@ -131,6 +131,41 @@
 
 (define-key org-mode-map (kbd "C-c o m") #'my-org-insert-mermaid-diagram)
 
+;; C-c o x: Tag old entries with :ARCHIVE:
+(defun my-org-mark-old-entries (months)
+  "Tag org headings older than MONTHS months with :ARCHIVE:.
+Searches for headings containing a [YYYY-MM-DD] date and adds the
+ARCHIVE tag if the entry is older than MONTHS months from today.
+Archived entries are dimmed and excluded from agenda views.
+Use `org-archive-subtree' (C-c C-x C-a) to move them to the archive file.
+Use C-u C-c C-x C-s (`org-archive-subtree-default' with C-u for batch archiving)
+to move them all to the archive file in one shot."
+  (interactive "nMark entries older than how many months? ")
+  (let* ((cutoff (time-subtract (current-time)
+                                (days-to-time (* months 30))))
+         (count 0)
+         (lines 0))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\*+\\s-+.*\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]"
+              nil t)
+        (let* ((date-str (match-string 1))
+               (entry-time (encode-time (parse-time-string
+                                         (concat date-str " 00:00:00")))))
+          (when (and (time-less-p entry-time cutoff)
+                     (not (member "ARCHIVE" (org-get-tags nil t))))
+            (let ((beg (line-beginning-position)))
+              (save-excursion
+                (org-end-of-subtree t)
+                (setq lines (+ lines (count-lines beg (point))))))
+            (org-toggle-archive-tag)
+            (setq count (1+ count))))))
+    (message "Tagged %d entries (%d lines) older than %d months with :ARCHIVE:"
+             count lines months)))
+
+(define-key org-mode-map (kbd "C-c o x") #'my-org-mark-old-entries)
+
 
 ;;; Look
 
