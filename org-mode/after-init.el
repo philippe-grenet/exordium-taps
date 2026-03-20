@@ -574,8 +574,17 @@ to move them all to the archive file in one shot."
 (define-key global-map [(delete)] #'org-capture)
 
 
-;;; Archive
+;;; File location
+
+;; Link abbreviations.
+;; For example, this allows for absolute links like [[repo:docs/guide.org][Guide]]
+(setq org-link-abbrev-alist
+      '(("org" . "~/Documents/org/")))
+
+;; Archive
 (setq org-archive-location "%s_archive::datetree/")
+
+(setf (alist-get 'file org-link-frame-setup) #'find-file)
 
 
 ;;; Backticks for code snippets
