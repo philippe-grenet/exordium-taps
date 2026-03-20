@@ -26,6 +26,10 @@
     (modify-syntax-entry ?\n ">" st)
     (modify-syntax-entry ?/ ". 124b" st)
     (modify-syntax-entry ?* ". 23" st)
+    ;; Comparison operators: ensure < and > are plain punctuation
+    ;; (prevents org-mode's paired-delimiter treatment from leaking in)
+    (modify-syntax-entry ?< "." st)
+    (modify-syntax-entry ?> "." st)
     ;; Parentheses/brackets
     (modify-syntax-entry ?\( "()" st)
     (modify-syntax-entry ?\) ")(" st)
@@ -109,8 +113,9 @@
       ;; Table/column identifiers
       ("\\b\\([A-Za-z_][A-Za-z0-9_]*\\)\\.[A-Za-z_][A-Za-z0-9_]*\\b"
        1 font-lock-type-face)
-      ;; Numbers
-      ("\\b\\([0-9]+\\(?:\\.[0-9]+\\)?\\)\\b" . font-lock-number-face)
+      ;; Numbers (use font-lock-constant-face to avoid issues with
+      ;; font-lock-number-face evaluation in org source block fontification)
+      ("\\b[0-9]+\\(?:\\.[0-9]+\\)?\\b" . font-lock-constant-face)
       ;; Strings in single or double quotes
       ("'[^']*'" . font-lock-string-face)
       ("\"[^\"]*\"" . font-lock-string-face)
@@ -118,10 +123,6 @@
       ("\\B#\\([A-Za-z_][A-Za-z0-9_]*\\)\\b" . font-lock-preprocessor-face)
       )))
 
-;; Provide a face for numbers on older Emacsen
-(unless (boundp 'font-lock-number-face)
-  (defface font-lock-number-face '((t :inherit font-lock-constant-face))
-    "Face for numbers." :group 'bql))
 
 
 ;; ---- Indentation ------------------------------------------------------------
@@ -204,7 +205,8 @@
   "Major mode for editing Bloomberg Query Language (BQL)."
   :syntax-table bql-mode-syntax-table
   (setq-local case-fold-search t)
-  (setq-local font-lock-defaults '(bql-font-lock-keywords t))
+  (setq-local font-lock-defaults
+              '(bql-font-lock-keywords t t ((?< . ".") (?> . "."))))
   (setq-local comment-start "-- ")
   (setq-local comment-end "")
   (setq-local comment-start-skip "\\(?:--+\\|/\\*+\\)\\s-*")
