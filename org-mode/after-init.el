@@ -329,6 +329,7 @@ to move them all to the archive file in one shot."
                                            :face 'font-function-name-face :inverse t
                                            :beg 1 :end -1))))
         ;; Rectangles with plain words: {:Something:}
+        ;; Consider expending to "\\({:[A-Za-z0-9]+\\(?:[ ][A-Za-z0-9]+\\)*:}\\)"
         ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
                                    (svg-tag-make tag
                                                  :face 'font-lock-type-face
@@ -753,6 +754,58 @@ to move them all to the archive file in one shot."
 
 ;; Schedule the function every hour. See also run-with-timer and cancel-timer.
 (run-at-time "00:00" 3600 'org-sync)
+
+
+;;; Per-file line number control via #+STARTUP: directive
+
+;; Declare external variables from init-prefs.el to avoid free variable warnings
+(defvar exordium-inhibit-line-numbers-modes)
+(defvar exordium-inhibit-line-numbers-star-buffers)
+(defvar exordium-inhibit-line-numbers-buffer-size)
+
+;; Buffer-local variable to track line number preference
+(defvar-local exordium-buffer-line-numbers nil
+  "Buffer-local override for line number display in Org-Mode.
+When set to 'show, always show line numbers in this buffer.
+When set to 'hide, never show line numbers in this buffer.
+When nil (default), use global settings from `exordium-inhibit-line-numbers-modes'.")
+
+;; Register org-mode startup options: #+STARTUP: showlinenum / hidelinenum
+(add-to-list 'org-startup-options '("showlinenum" exordium-buffer-line-numbers show))
+(add-to-list 'org-startup-options '("hidelinenum" exordium-buffer-line-numbers hide))
+
+;; Redefine the inhibit function to check buffer-local override
+;; This overrides the function from init-linum.el
+(defun exordium--inhibit-line-numbers-p ()
+  "Return non nil if line numbers should be inhibited in current buffer.
+Otherwise return nil.
+This redefinition adds support for buffer-local override in Org-Mode."
+  (or (minibufferp)
+      ;; Check buffer-local override first (for Org-Mode)
+      (eq exordium-buffer-line-numbers 'hide)
+      ;; If explicitly set to show, don't inhibit
+      (and (not (eq exordium-buffer-line-numbers 'show))
+           (or (and exordium-inhibit-line-numbers-modes
+                    (cl-find-if (lambda (mode)
+                                  (derived-mode-p mode))
+                                exordium-inhibit-line-numbers-modes))
+               (and exordium-inhibit-line-numbers-star-buffers
+                    (string-match (rx string-start "*") (buffer-name)))
+               (and exordium-inhibit-line-numbers-buffer-size
+                    (> (buffer-size) exordium-inhibit-line-numbers-buffer-size))))))
+
+;; Hook to refresh line numbers when opening an org file
+(defun exordium-org-refresh-line-numbers ()
+  "Refresh line number display based on buffer-local setting."
+  (cond
+   ((eq exordium-buffer-line-numbers 'show)
+    (display-line-numbers-mode 1))
+   ((eq exordium-buffer-line-numbers 'hide)
+    (display-line-numbers-mode -1))
+   ;; Otherwise let the global mode decide
+   (t nil)))
+
+(add-hook 'org-mode-hook #'exordium-org-refresh-line-numbers)
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
