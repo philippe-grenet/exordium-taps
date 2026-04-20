@@ -3,6 +3,7 @@
 ;;; Code:
 
 (require 'org)
+(require 'org-element)
 
 (setq org-hide-leading-stars t)
 (setq org-fontify-quote-and-verse-blocks t)
@@ -130,6 +131,21 @@
   (backward-char 73))
 
 (define-key org-mode-map (kbd "C-c o m") #'my-org-insert-mermaid-diagram)
+
+;;; C-c o o: Open image link at point in macOS native app
+;;; Note that the other way is C-c C-o which opens the image in a new buffer.
+(defun my-org-open-image-externally ()
+  "Open the image link at point using macOS's default application."
+  (interactive)
+  (let ((context (org-element-context)))
+    (when (eq (org-element-type context) 'link)
+      (let* ((path (org-element-property :path context))
+             (full-path (expand-file-name path (file-name-directory (buffer-file-name)))))
+        (if (file-exists-p full-path)
+            (start-process "open-image" nil "open" full-path)
+          (user-error "File not found: %s" full-path))))))
+
+(define-key org-mode-map (kbd "C-c o o") #'my-org-open-image-externally)
 
 ;; C-c o x: Tag old entries with :ARCHIVE:
 (defun my-org-mark-old-entries (months)
@@ -413,12 +429,24 @@ to move them all to the archive file in one shot."
                             (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
 
 (defconst notes-directories '("~/Documents/org/bql/"
+                              "~/Documents/org/bql/bqe/"
+                              "~/Documents/org/bql/bqnt/"
+                              "~/Documents/org/bql/data-tier/"
+                              "~/Documents/org/bql/dfl/"
+                              "~/Documents/org/bql/engine/"
+                              "~/Documents/org/bql/equity/"
+                              "~/Documents/org/bql/gateway/"
+                              "~/Documents/org/bql/language/"
+                              "~/Documents/org/bql/metadata/"
+                              "~/Documents/org/bql/onboarding/"
                               "~/Documents/org/ap/"
                               "~/Documents/org/architecture/"
+                              "~/Documents/org/ai/"
                               "~/Documents/org/notes/"
                               "~/Documents/org/planning/"
                               "~/Documents/org/management/"
-                              "~/Documents/org/tech/"))
+                              "~/Documents/org/tech/bloomberg/"
+                              "~/Documents/org/tech/general/"))
 
 (defun list-notes-in-directory (dir)
   ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
