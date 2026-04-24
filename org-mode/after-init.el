@@ -505,6 +505,25 @@ to move them all to the archive file in one shot."
 
 ;;(setq org-src-window-setup 'slit-window-right) ; does not work
 
+;; Auto-select the name placeholder in capture buffers so typing replaces it.
+;; This works because delete-selection-mode is enabled (in init-look-and-feel.el).
+(defvar my/org-capture--select-end nil
+  "End position for word to select in capture buffer.")
+
+(defun my/org-capture--activate-selection ()
+  "Activate selection and remove self from `post-command-hook'."
+  (push-mark my/org-capture--select-end nil t)
+  (setq deactivate-mark nil)
+  (remove-hook 'post-command-hook #'my/org-capture--activate-selection t))
+
+(defun my/org-capture-select-word-at-point ()
+  "Select the word at point in a capture buffer so typing replaces it."
+  (when (looking-at "\\w+")
+    (setq my/org-capture--select-end (match-end 0))
+    (add-hook 'post-command-hook #'my/org-capture--activate-selection nil t)))
+
+(add-hook 'org-capture-mode-hook #'my/org-capture-select-word-at-point)
+
 (setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
 
 (setq org-capture-templates
@@ -519,81 +538,81 @@ to move them all to the archive file in one shot."
          :empty-lines-after 0)
         ("S" "\tShabbir" entry
          (file+headline "~/Documents/org/catchup.org" "✨ Shabbir")
-         "** TODO Shabbir %?\n  %i\n"
+         "** TODO %?Shabbir\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("A" "\tAnthony" entry
          (file+headline "~/Documents/org/catchup.org"
                         "✨ Anthony ([[https://docs.google.com/document/d/11epTeSzu5tgxVOf19rn88C41d6JvLyKN4YTpERd6ZW0/edit?tab=t.0][topics]])")
-         "** TODO AC %?\n  %i\n"
+         "** TODO %?AC\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("M" "\tManish" entry
          (file+headline "~/Documents/org/catchup.org"
                         "✨ Manish ([[https://docs.google.com/document/d/1ObXxx36mXhHcKsnYiKc5jMAfDyDeFzIqQdR2dS7sI9E/edit?tab=t.0#heading=h.px0s0g92opc8][topics]])")
-         "** TODO Manish %?\n  %i\n"
+         "** TODO %?Manish\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("s" "\tSathya" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
-         "** TODO Sathya %?\n  %i\n"
+         "** TODO %?Sathya\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("t" "\tTom" entry
          (file+headline "~/Documents/org/catchup.org"
                         "⭐️ Tom ([[https://docs.google.com/document/d/102GWuRqH-sYFMNw9DPKu9npDsGoZXNFW0-mKDWbuRJk/edit#heading=h.2cjiyf4l29p1][topics]])")
-         "** TODO Tom %?\n  %i\n"
+         "** TODO %?Tom\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("g" "\tGino" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Gino")
-         "** TODO Gino %?\n  %i\n"
+         "** TODO %?Gino\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("y" "\tYogesh" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Yogesh")
-         "** TODO Yogesh %?\n  %i\n"
+         "** TODO %?Yogesh\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("r" "\tRishi" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Rishi")
-         "** TODO Rishi %?\n  %i\n"
+         "** TODO %?Rishi\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("p" "\tPranil" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Pranil")
-         "** TODO Pranil %?\n  %i\n"
+         "** TODO %?Pranil\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("j" "\tJas" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Jas")
-         "** TODO Jas %?\n  %i\n"
+         "** TODO %?Jas\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("m" "\tMike" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Mike")
-         "** TODO Mike %?\n  %i\n"
+         "** TODO %?Mike\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("a" "\tAbhishek, Amey, Alicija, Alex")
         ("ag" "\tAbhishek" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
-         "** TODO AG %?\n  %i\n"
+         "** TODO %?AG\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("am" "\tAmey" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Amey")
-         "** TODO Amey %?\n  %i\n"
+         "** TODO %?Amey\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("al" "\tAlicija" entry
          (file+headline "~/Documents/org/catchup.org" "👤 Alicija ([[https://docs.google.com/document/d/13rZFsJHeT8UjChTZMPnRT65Oq1pKILwocxjcma5mkoE/edit?tab=t.3eojide0clcg#heading=h.p6lx1dt4yzzc][topics]])")
-         "** TODO Alicija %?\n  %i\n"
+         "** TODO %?Alicija\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("as" "\tAlex" entry
          (file+headline "~/Documents/org/catchup.org" "⭐️ Alex")
-         "** TODO Alex %?\n  %i\n"
+         "** TODO %?Alex\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ))
