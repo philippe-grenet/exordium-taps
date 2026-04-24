@@ -616,6 +616,38 @@ to move them all to the archive file in one shot."
 (setf (alist-get 'file org-link-frame-setup) #'find-file)
 
 
+;;; DRQS links
+;; Make {DRQS 1234567} and {DRQS 1234567<GO>} clickable links to the DRQS web app.
+;; C-c o D: open DRQS ticket at point in the browser.
+
+(defun my/org-drqs-open (number)
+  "Open DRQS ticket NUMBER in the default browser."
+  (browse-url (format "https://drqs.prod.bloomberg.com/ticket/%s" number)))
+
+(defun my/org-drqs-buttonize ()
+  "Add font-lock rules to make {DRQS NNN} and {DRQS NNN<GO>} clickable."
+  (font-lock-add-keywords
+   nil
+   '(("{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}"
+      (0 'org-link t)))))
+
+(defun my/org-drqs-follow-at-point ()
+  "If point is on a {DRQS ...} reference, open it in the browser."
+  (interactive)
+  (let ((line (buffer-substring-no-properties
+               (line-beginning-position) (line-end-position))))
+    (if (and (string-match "{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}" line)
+             (let ((mbeg (match-beginning 0))
+                   (mend (match-end 0))
+                   (col  (- (point) (line-beginning-position))))
+               (and (>= col mbeg) (<= col mend))))
+        (my/org-drqs-open (match-string 1 line))
+      (user-error "No DRQS reference at point"))))
+
+(add-hook 'org-mode-hook #'my/org-drqs-buttonize)
+(define-key org-mode-map (kbd "C-c o D") #'my/org-drqs-follow-at-point)
+
+
 ;;; Backticks for code snippets
 
 ;; Highlight single backticks as inline code in Org buffers
