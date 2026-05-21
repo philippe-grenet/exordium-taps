@@ -76,7 +76,7 @@
     "filter" "union" "intersect" "setDiff" "list"
     ;; -- Security universes
     "equityUniv" "fundsUniv" "bondsUniv" "debtUniv" "municipalsUniv" "loansUniv"
-    "mortgagesUniv" "preferredUniv"
+    "mortgagesUniv" "preferredUniv" "preferreds"
     ;; -- Security chains and membership
     "members" "peers" "segments" "bonds" "loans" "municipals" "mortgages" "preferred"
     "debt" "options" "futures" "curveMembers"
@@ -99,15 +99,14 @@
                                  (or ,@bql--builtin-funcs)
                                  symbol-end)
                            'no-group))
-         (cn (rx-to-string `(seq symbol-start
-                                 (or ,@bql--constants)
-                                 symbol-end)
-                           'no-group)))
+         (cn (concat "\\<"
+                     (rx-to-string `(or ,@bql--constants) 'no-group)
+                     "\\>")))
     `(
       ;; Keywords
       (,kw . font-lock-keyword-face)
       ;; Builtins (before opening parenthesis)
-      (,(concat "\\<" fn "\\>\\s-*(") . font-lock-builtin-face)
+      (,(concat "\\(\\<" fn "\\>\\)\\s-*(") 1 font-lock-builtin-face)
       ;; Constants
       (,cn . font-lock-constant-face)
       ;; Table/column identifiers
@@ -115,7 +114,7 @@
        1 font-lock-type-face)
       ;; Numbers (use font-lock-constant-face to avoid issues with
       ;; font-lock-number-face evaluation in org source block fontification)
-      ("\\b[0-9]+\\(?:\\.[0-9]+\\)?\\b" . font-lock-constant-face)
+      ("\\b-?[0-9]+\\(?:\\.[0-9]+\\)?[dDmMqQyY]?\\b" . font-lock-constant-face)
       ;; Strings in single or double quotes
       ("'[^']*'" . font-lock-string-face)
       ("\"[^\"]*\"" . font-lock-string-face)
