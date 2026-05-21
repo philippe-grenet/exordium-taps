@@ -37,6 +37,7 @@
 | <kbd>C-c o l</kbd>    | Paste a Jira epic link                                             |
 | <kbd>C-c o i</kbd>    | Insert an image placeholder                                        |
 | <kbd>C-c o m</kbd>    | Insert a Mermaid diagram placeholder                               |
+| <kbd>C-c o T</kbd>    | Toggle table format: standard <-> box-drawing (<kbd>C-u</kbd> to force back) |
 
 ### Viewing
 
