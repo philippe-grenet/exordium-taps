@@ -448,6 +448,7 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; BQL mode
 (load "~/.emacs.d/taps/util/bql-mode.el")
+(load "~/.emacs.d/taps/util/bql-next-mode.el")
 
 
 ;;; after-init ends here
