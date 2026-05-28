@@ -443,7 +443,10 @@ to move them all to the archive file in one shot."
                               "~/Documents/org/architecture/"
                               "~/Documents/org/ai/"
                               "~/Documents/org/notes/"
-                              "~/Documents/org/planning/"
+                              "~/Documents/org/notes/2025/"
+                              "~/Documents/org/notes/2026/"
+                              "~/Documents/org/planning/2025/"
+                              "~/Documents/org/planning/2026/"
                               "~/Documents/org/management/"
                               "~/Documents/org/tech/bloomberg/"
                               "~/Documents/org/tech/general/"))
@@ -666,7 +669,22 @@ to move them all to the archive file in one shot."
 (add-hook 'org-mode-hook #'my/org-drqs-buttonize)
 (define-key org-mode-map (kbd "C-c o D") #'my/org-drqs-follow-at-point)
 
+;; Also handle {DRQS ...} via C-c C-o (org-open-at-point)
+(defun my/org-drqs-open-at-point ()
+  "Open {DRQS ...} at point if any; return non-nil if handled."
+  (let ((line (buffer-substring-no-properties
+               (line-beginning-position) (line-end-position))))
+    (when (and (string-match "{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}" line)
+               (let ((mbeg (match-beginning 0))
+                     (mend (match-end 0))
+                     (col  (- (point) (line-beginning-position))))
+                 (and (>= col mbeg) (<= col mend))))
+      (my/org-drqs-open (match-string 1 line))
+      t)))
 
+(add-hook 'org-open-at-point-functions #'my/org-drqs-open-at-point)
+
+
 ;;; Backticks for code snippets
 
 ;; Highlight single backticks as inline code in Org buffers
