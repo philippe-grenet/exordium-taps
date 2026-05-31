@@ -4,22 +4,35 @@
 (require 'treemacs)
 
 (defconst pg/window-width 120)
-(defconst pg/frame-height 104)
+(defconst pg/frame-height 120)
 
-(defun frame-show-one-or-two-windows (x)
-  "Show a single window if no argument. With C-u 1 prefix, show 2 windows"
-  (interactive "P")
-  (message (if x "Showing two windows" "Showing one window"))
+(add-to-list 'default-frame-alist `(width . ,pg/window-width))
+
+(defun frame-show-one-window ()
+  "Show a single window"
+  (interactive)
   (delete-other-windows)
   ;; doesn't work with multiple monitors, need to find a solution
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
-  (set-frame-width (selected-frame) (+ (if x (* 2 pg/window-width) pg/window-width)
+  (set-frame-width (selected-frame) (+ pg/window-width
                                        (if (eq (treemacs-current-visibility) 'visible) 20 0)))
+  (set-frame-height (selected-frame) pg/frame-height))
+
+(global-set-key [(f10)] #'frame-show-one-window)
+
+(defun frame-show-two-windows ()
+  "Show two windows"
+  (interactive)
+  (delete-other-windows)
+  ;; doesn't work with multiple monitors, need to find a solution
+  ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
+  (set-frame-width (selected-frame) (+ (* 2 pg/window-width)
+                                         (if (eq (treemacs-current-visibility) 'visible) 20 0)))
   (set-frame-height (selected-frame) pg/frame-height)
-  (when x
-    (let ((win (split-window-right)))
-      (switch-to-other-buffer))
+  (let ((win (split-window-right)))
     (switch-to-other-buffer)))
+
+(global-set-key [(shift f10)] #'frame-show-two-windows)
 
 (defun frame-show-component ()
   "Show all 3 files for a C++ component"
@@ -34,8 +47,7 @@
     (switch-to-other-buffer))
   (balance-windows))
 
-(global-set-key [(f10)] #'frame-show-one-or-two-windows)
-(global-set-key [(shift f10)] #'frame-show-component)
+(global-set-key [(meta f10)] #'frame-show-component)
 
 
 
@@ -48,6 +60,18 @@
 
 (global-set-key[(shift f11)] #'distraction-free-mode)
 
+
+
+
+(require 'ace-window)
+
+(setq aw-keys '(49 50 51 52 53 54 55 56 57))
+
+(when (member exordium-theme '(catppuccin-mocha))
+  (require 'color-theme-catppuccin)
+  (with-catppuccin-colors
+   exordium-catppuccin-flavor
+   (set-face-attribute 'aw-leading-char-face nil :foreground red :height 4.0 :weight 'bold)))
 
 
 ;;; Split windows
@@ -111,6 +135,10 @@ i.e. change right window to bottom, or change bottom window to right."
 
 (global-set-key "\C-c3" 'split-window-horizontally-instead)
 (global-set-key "\C-c2" 'split-window-vertically-instead)
+
+;;; Window dedication
+;; Make a window dedicated so Emacs won't reuse it for other buffers
+(global-set-key (kbd "C-c w d") #'exordium-toggle-window-dedicated)
 
 
 
