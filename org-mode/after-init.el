@@ -668,7 +668,8 @@ to move them all to the archive file in one shot."
   (font-lock-add-keywords
    nil
    '(("{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}"
-      (0 'org-link t)))))
+      (0 'org-link prepend)))
+   t))
 
 (defun my/org-drqs-follow-at-point ()
   "If point is on a {DRQS ...} reference, open it in the browser."
