@@ -52,13 +52,13 @@
 
 
 ;; Distraction-free mode
-(require 'darkroom)
-(defun distraction-free-mode ()
-  (interactive)
-  (darkroom-mode 'toggle)
-  (toggle-frame-fullscreen))
+;; (require 'darkroom)
+;; (defun distraction-free-mode ()
+;;   (interactive)
+;;   (darkroom-mode 'toggle)
+;;   (toggle-frame-fullscreen))
 
-(global-set-key[(shift f11)] #'distraction-free-mode)
+;; (global-set-key[(shift f11)] #'distraction-free-mode)
 
 
 

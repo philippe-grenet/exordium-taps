@@ -3,7 +3,8 @@
 ;;; Code:
 
 (require 'treemacs)
-(require 'treemacs-all-the-icons)
+(use-package treemacs-all-the-icons
+  :ensure t)
 
 (setq treemacs-wrap-around nil
       treemacs-width 65

@@ -26,6 +26,7 @@
 (define-key org-mode-map [(super down)] #'org-forward-heading-same-level)
 (define-key org-mode-map [(super up)]   #'org-backward-heading-same-level)
 (define-key org-mode-map [(super left)] #'outline-up-heading)
+(define-key org-mode-map (kbd "C-c l") #'org-store-link) ; C-c C-l to org-insert-link
 
 ;; C-c o d: Mark a task as DONE
 (defun my-org-todo-toggle ()
@@ -234,25 +235,30 @@ to move them all to the archive file in one shot."
 ;;            ("WITHDREW"  . (:background ,purple :foreground ,background :weight bold :box nil))
 ;;            ("HIRED"     . (:background ,green :foreground ,background :weight bold :box nil))))))
 
-;;(require 'init-themes)
-(when (member exordium-theme '(tomorrow-night))
-  (require 'color-theme-tomorrow)
-  (setq org-priority-faces
-        '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
-         (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
-         (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
-  (with-tomorrow-colors
-   (tomorrow-mode-name)
-   (setq org-emphasis-alist
-         `(("*" (:foreground ,red))                         ; ("*" bold)
-           ("/" (:foreground ,green))                       ; ("/" italic)
-           ("_" (:background ,red :foreground ,background)) ; ("_" underline)
-           ("=" org-verbatim verbatim)
-           ("~" org-code verbatim)
-           ("+" (:strike-through t)))))
-  (with-tomorrow-colors
-   (tomorrow-mode-name)
-   (set-face-attribute 'org-headline-done nil :foreground comment)))
+
+;; (when (member exordium-theme '(tomorrow-night))
+;;   (require 'color-theme-tomorrow)
+;;   (setq org-priority-faces
+;;         '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
+;;          (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
+;;          (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
+;;   (with-tomorrow-colors
+;;    (tomorrow-mode-name)
+;;    (setq org-emphasis-alist
+;;          `(("*" (:foreground ,red))                         ; ("*" bold)
+;;            ("/" (:foreground ,green))                       ; ("/" italic)
+;;            ("_" (:background ,red :foreground ,background)) ; ("_" underline)
+;;            ("=" org-verbatim verbatim)
+;;            ("~" org-code verbatim)
+;;            ("+" (:strike-through t)))))
+;;   (with-tomorrow-colors
+;;    (tomorrow-mode-name)
+;;    (set-face-attribute 'org-headline-done nil :foreground comment)))
+
+(defvar exordium-theme)
+(defvar exordium-catppuccin-flavor)
+(eval-when-compile
+  (require 'color-theme-catppuccin))
 
 (when (member exordium-theme '(catppuccin-mocha))
   (require 'color-theme-catppuccin)
@@ -280,116 +286,117 @@ to move them all to the archive file in one shot."
 
 ;;; svg-tag-mode: https://github.com/rougier/svg-tag-mode/
 
-(require 'svg-tag-mode)
+(use-package svg-tag-mode
+  :ensure t
+  :config
+  (progn
+    (defun svg-progress-percent (value)
+      (svg-image (svg-lib-concat
+                  (svg-lib-progress-bar (/ (string-to-number value) 100.0)
+                                        nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                  (svg-lib-tag (concat value "%")
+                               nil :stroke 0 :margin 0)) :ascent 'center))
 
-(defun svg-progress-percent (value)
-  (svg-image (svg-lib-concat
-              (svg-lib-progress-bar (/ (string-to-number value) 100.0)
-                                nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-              (svg-lib-tag (concat value "%")
-                           nil :stroke 0 :margin 0)) :ascent 'center))
+    (defun svg-progress-count (value)
+      (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+             (count (float (car seq)))
+             (total (float (cadr seq))))
+        (svg-image (svg-lib-concat
+                    (svg-lib-progress-bar (/ count total) nil
+                                          :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                    (svg-lib-tag value nil
+                                 :stroke 0 :margin 0)) :ascent 'center)))
 
-(defun svg-progress-count (value)
-  (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-         (count (float (car seq)))
-         (total (float (cadr seq))))
-  (svg-image (svg-lib-concat
-              (svg-lib-progress-bar (/ count total) nil
-                                    :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-              (svg-lib-tag value nil
-                           :stroke 0 :margin 0)) :ascent 'center)))
+    (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+    (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+    (defconst day-re "[A-Za-z]\\{3\\}")
+    (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
 
-(defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
-(defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-(defconst day-re "[A-Za-z]\\{3\\}")
-(defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
-
-(setq svg-tag-tags
-      `(
-        ;; Plain TODO statuses
-        ("\\(TODO\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
-        ("\\(DONE\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
-        ("\\(WORK\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-type-face :inverse t))))
-        ("\\(STOP\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-        ("\\(WAIT\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
-        ("\\(BLOCKED\\)" . ((lambda (tag)
-                             (svg-tag-make tag :face 'dired-flagged :inverse t))))
-        ("\\(READY\\)" . ((lambda (tag)
-                           (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
-        ("\\(REVIEW\\)" . ((lambda (tag)
-                            (svg-tag-make tag :face 'font-lock-variable-name-face :inverse t))))
-        ("\\(QUESTIONED\\)" . ((lambda (tag)
+    (setq svg-tag-tags
+          `(
+            ;; Plain TODO statuses
+            ("\\(TODO\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+            ("\\(DONE\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
+            ("\\(WORK\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-type-face :inverse t))))
+            ("\\(STOP\\)" . ((lambda (tag)
                                (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-        ("\\(POSTPONED\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-        ("\\(PROCEED\\)" . ((lambda (tag)
-                              (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
-        ("\\(REJECT\\)" . ((lambda (tag)
-                             (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
-        ;; Priorities
-        ("\\(\\[#A\\]\\)" . ((lambda (tag)
-                             (svg-tag-make tag
-                                           :face 'font-lock-warning-face :inverse t
-                                           :beg 1 :end -1))))
-        ("\\(\\[#B\\]\\)" . ((lambda (tag)
-                             (svg-tag-make tag
-                                           :face 'font-lock-type-face :inverse t
-                                           :beg 1 :end -1))))
-        ("\\(\\[#C\\]\\)" . ((lambda (tag)
-                             (svg-tag-make tag
-                                           :face 'font-function-name-face :inverse t
-                                           :beg 1 :end -1))))
-        ;; Rectangles with plain words: {:Something:}
-        ;; Consider expending to "\\({:[A-Za-z0-9]+\\(?:[ ][A-Za-z0-9]+\\)*:}\\)"
-        ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
+            ("\\(WAIT\\)" . ((lambda (tag)
+                               (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
+            ("\\(BLOCKED\\)" . ((lambda (tag)
+                                  (svg-tag-make tag :face 'dired-flagged :inverse t))))
+            ("\\(READY\\)" . ((lambda (tag)
+                                (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
+            ("\\(REVIEW\\)" . ((lambda (tag)
+                                 (svg-tag-make tag :face 'font-lock-variable-name-face :inverse t))))
+            ("\\(QUESTIONED\\)" . ((lambda (tag)
+                                     (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
+            ("\\(POSTPONED\\)" . ((lambda (tag)
+                                    (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
+            ("\\(PROCEED\\)" . ((lambda (tag)
+                                  (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
+            ("\\(REJECT\\)" . ((lambda (tag)
+                                 (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
+            ;; Priorities
+            ("\\(\\[#A\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
-                                                 :face 'font-lock-type-face
-                                                 :beg 2 :end -2 :inverse nil))))
-        ;; Rectangles with plain words: {{Something}}
-        ("\\({{[A-Za-z]+}}\\)" . ((lambda (tag)
+                                                 :face 'font-lock-warning-face :inverse t
+                                                 :beg 1 :end -1))))
+            ("\\(\\[#B\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
-                                                 :face 'font-lock-comment-face
-                                                 :beg 1 :end -1 :inverse nil))))
-        ;; Pills with 1 letter or one or 2 numbers: ((A)) ((10))
-        ("\(\([0-9a-zA-Z]\)\)" . ((lambda (tag)
-                                   (svg-tag-make tag :beg 1 :end -1 :radius 12))))
-        ("\(\([0-9][0-9]\)\)" . ((lambda (tag)
-                                  (svg-tag-make tag :beg 1 :end -1 :radius 8))))
-        ;;
-        ;; Active date (with or without day name, with or without time)
-        (,(format "\\(<%s>\\)" date-re) .
-         ((lambda (tag)
-            (svg-tag-make tag :beg 1 :end -1 :margin 0))))
-        (,(format "\\(<%s \\)%s>" date-re day-time-re) .
-         ((lambda (tag)
-            (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
-        (,(format "<%s \\(%s>\\)" date-re day-time-re) .
-         ((lambda (tag)
-            (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
-        ;; Inactive date  (with or without day name, with or without time)
-        (,(format "\\(\\[%s\\]\\)" date-re) .
-         ((lambda (tag)
-            (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
-        (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
-         ((lambda (tag)
-            (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
-        (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
-         ((lambda (tag)
-            (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
-        ;;
-        ;; Progress: [1/3] or [42%]
-        ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
-                                            (svg-progress-percent (substring tag 1 -2)))))
-        ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
-                                          (svg-progress-count (substring tag 1 -1)))))))
-
-(add-hook 'org-mode-hook 'svg-tag-mode)
-
+                                                 :face 'font-lock-type-face :inverse t
+                                                 :beg 1 :end -1))))
+            ("\\(\\[#C\\]\\)" . ((lambda (tag)
+                                   (svg-tag-make tag
+                                                 :face 'font-function-name-face :inverse t
+                                                 :beg 1 :end -1))))
+            ;; Rectangles with plain words: {:Something:}
+            ;; Consider expending to "\\({:[A-Za-z0-9]+\\(?:[ ][A-Za-z0-9]+\\)*:}\\)"
+            ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
+                                        (svg-tag-make tag
+                                                      :face 'font-lock-type-face
+                                                      :beg 2 :end -2 :inverse nil))))
+            ;; Rectangles with plain words: {{Something}}
+            ("\\({{[A-Za-z]+}}\\)" . ((lambda (tag)
+                                        (svg-tag-make tag
+                                                      :face 'font-lock-comment-face
+                                                      :beg 1 :end -1 :inverse nil))))
+            ;; Pills with 1 letter or one or 2 numbers: ((A)) ((10))
+            ("\(\([0-9a-zA-Z]\)\)" . ((lambda (tag)
+                                        (svg-tag-make tag :beg 1 :end -1 :radius 12))))
+            ("\(\([0-9][0-9]\)\)" . ((lambda (tag)
+                                       (svg-tag-make tag :beg 1 :end -1 :radius 8))))
+            ;;
+            ;; Active date (with or without day name, with or without time)
+            (,(format "\\(<%s>\\)" date-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :end -1 :margin 0))))
+            (,(format "\\(<%s \\)%s>" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
+            (,(format "<%s \\(%s>\\)" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
+            ;; Inactive date  (with or without day name, with or without time)
+            (,(format "\\(\\[%s\\]\\)" date-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
+            (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
+            (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
+            ;;
+            ;; Progress: [1/3] or [42%]
+            ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+                                                (svg-progress-percent (substring tag 1 -2)))))
+            ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+                                              (svg-progress-count (substring tag 1 -1)))))))
+    (add-hook 'org-mode-hook 'svg-tag-mode)
+    ))
 
 
 ;;; Overline startup option
@@ -426,6 +433,7 @@ to move them all to the archive file in one shot."
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
                             (,(colorize-note-extension "datasets.org")   . "~/Documents/org/datasets.org")
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
+                            (,(colorize-note-extension "tickets.org") . "~/Documents/org/tickets.org")
                             (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
 
 (defconst notes-directories '("~/Documents/org/bql/"
@@ -447,9 +455,11 @@ to move them all to the archive file in one shot."
                               "~/Documents/org/notes/2026/"
                               "~/Documents/org/planning/2025/"
                               "~/Documents/org/planning/2026/"
-                              "~/Documents/org/management/"
-                              "~/Documents/org/tech/bloomberg/"
-                              "~/Documents/org/tech/general/"))
+                              "~/Documents/org/projects/"
+                              ;; "~/Documents/org/management/"
+                              ;; "~/Documents/org/tech/bloomberg/"
+                              ;; "~/Documents/org/tech/general/"
+                              ))
 
 (defun list-notes-in-directory (dir)
   ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
@@ -620,7 +630,14 @@ to move them all to the archive file in one shot."
          :empty-lines-after 0)
         ))
 
+;; Org Capture = Meta-F12 + F13
 (define-key global-map [(meta f12)] #'org-capture)
+
+;; An attempt to make it work on Emacs-Plus, which unfortunately does not work.
+;; I think Emacs-Plus (NS/Cocoa build) translates <f13> into <delete>.
+(define-key input-decode-map [f13] nil)
+(define-key local-function-key-map [f13] nil)
+
 (define-key global-map [(f13)] #'org-capture)
 (define-key global-map [(delete)] #'org-capture)
 
@@ -727,74 +744,63 @@ to move them all to the archive file in one shot."
 ;;; Calfw mode
 ;;; https://github.com/kiwanami/emacs-calfw
 
-(require 'calfw)
-(require 'calfw-org)
-;;(defalias 'open-calendar 'cfw:open-org-calendar)
-
-(defun open-todos-calendar-view ()
-  "Open the calendar view."
-  (interactive)
-  (split-window-vertically)
-  ;; Fix the bug where it takes a little too much width
-  (let ((w (frame-width (selected-frame))))
-    (set-frame-width (selected-frame) (- w 4))
-    (cfw:open-org-calendar)
-    ;;(cfw:open-calendar-buffer :contents-sources (list (cfw:org-create-source "#8abeb7")))
-    (set-frame-width (selected-frame) w)))
-
-(defun close-todos-calendar-view ()
-  "Close the calendar view."
-  (interactive)
-  (kill-this-buffer)
-  (delete-other-windows))
-
-(with-eval-after-load 'org
-  (bind-key [(f9)] #'open-todos-calendar-view org-mode-map))
-(with-eval-after-load 'calfw
-  (bind-key [(f9)] #'close-todos-calendar-view cfw:calendar-mode-map))
-
-(setq cfw:fchar-junction ?╋
-      cfw:fchar-vertical-line ?┃
-      cfw:fchar-horizontal-line ?━
-      cfw:fchar-left-junction ?┣
-      cfw:fchar-right-junction ?┫
-      cfw:fchar-top-junction ?┯
-      cfw:fchar-top-left-corner ?┏
-      cfw:fchar-top-right-corner ?┓)
-
 (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
 
-;; (when (eq exordium-theme 'tomorrow-night)
-;;   (with-tomorrow-colors 'night
-;;     (custom-set-faces
-;;      `(cfw:face-title ((t (:foreground ,green :weight bold :height 2.0))))
-;;      `(cfw:face-header ((t (:foreground ,yellow :weight bold))))
-;;      `(cfw:face-sunday ((t :foreground ,orange :background ,background :weight bold)))
-;;      `(cfw:face-saturday ((t :foreground ,orange :background ,background :weight bold)))
-;;      `(cfw:face-holiday ((t :background ,orange :foreground ,background :weight bold)))
-;;      `(cfw:face-grid ((t :foreground ,selection)))
-;;      `(cfw:face-default-content ((t :foreground ,purple)))
-;;      `(cfw:face-periods ((t :foreground "cyan")))
-;;      `(cfw:face-day-title ((t :background "grey10")))
-;;      `(cfw:face-default-day ((t :weight bold :inherit cfw:face-day-title)))
-;;      `(cfw:face-annotation ((t :foreground "RosyBrown" :inherit cfw:face-day-title)))
-;;      `(cfw:face-disable ((t :foreground "DarkGray" :inherit cfw:face-day-title)))
-;;      `(cfw:face-today-title ((t :foreground ,background :background ,green :weight bold)))
-;;      `(cfw:face-today ((t :background: ,green :weight bold)))
-;;      `(cfw:face-select ((t :background "#2f2f2f")))
-;;      `(cfw:face-toolbar ((t :foreground ,foreground :background ,selection)))
-;;      `(cfw:face-toolbar-button-off ((t :foreground ,aqua :background ,selection :weight bold)))
-;;      `(cfw:face-toolbar-button-on ((t :foreground ,foreground :background ,selection :weight bold))))))
+(use-package calfw
+  :ensure t
+  :config
+  (progn
+    ;; Theme
+    (when (member exordium-theme '(catppuccin-mocha))
+      (require 'color-theme-catppuccin)
+      (with-catppuccin-colors
+       exordium-catppuccin-flavor
+       (set-face-attribute 'calfw-title-face nil :foreground blue)
+       (set-face-attribute 'calfw-toolbar-button-off-face nil :foreground blue :background surface1)
+       (set-face-attribute 'calfw-toolbar-button-on-face nil :foreground text :background surface1)
+       (set-face-attribute 'calfw-header-face nil :foreground sky)
+       (set-face-attribute 'calfw-saturday-face nil :foreground lavender)
+       (set-face-attribute 'calfw-sunday-face nil :foreground lavender)
+       (set-face-attribute 'calfw-holiday-face nil :foreground peach :background surface0)
 
-(when (member exordium-theme '(catppuccin-mocha))
-  (require 'color-theme-catppuccin)
-  (with-catppuccin-colors
-   exordium-catppuccin-flavor
-   (set-face-attribute 'cfw:face-title nil :foreground blue)
-   (set-face-attribute 'cfw:face-today nil :background lavender)
-   (set-face-attribute 'cfw:face-today-title nil :background blue)
-   (set-face-attribute 'cfw:face-annotation nil :foreground red)
-   (set-face-attribute 'cfw:face-toolbar-button-off nil :foreground green)))
+       (set-face-attribute 'calfw-today-face nil :background surface0 :foreground text)
+       (set-face-attribute 'calfw-today-title-face nil :background green :foreground base)
+       (set-face-attribute 'calfw-annotation-face nil :foreground red)))
+    ;; Table display
+    (setq calfw-fchar-junction ?╋
+          calfw-fchar-vertical-line ?┃
+          calfw-fchar-horizontal-line ?━
+          calfw-fchar-left-junction ?┣
+          calfw-fchar-right-junction ?┫
+          calfw-fchar-top-junction ?┯
+          calfw-fchar-top-left-corner ?┏
+          calfw-fchar-top-right-corner ?┓)))
+
+(use-package calfw-org
+  :ensure t
+  :config
+  (progn
+    (defun open-todos-calendar-view ()
+      "Open the calendar view."
+      (interactive)
+      (split-window-vertically)
+      ;; Fix the bug where it takes a little too much width
+      (let ((w (frame-width (selected-frame))))
+        (set-frame-width (selected-frame) (- w 4))
+        (calfw-org-open-calendar)
+        ;;(cfw:open-calendar-buffer :contents-sources (list (cfw:org-create-source "#8abeb7")))
+        (set-frame-width (selected-frame) w)))
+
+    (defun close-todos-calendar-view ()
+      "Close the calendar view."
+      (interactive)
+      (kill-this-buffer)
+      (delete-other-windows))
+
+    (with-eval-after-load 'org
+      (bind-key [(f9)] #'open-todos-calendar-view org-mode-map))
+    (with-eval-after-load 'calfw
+      (bind-key [(f9)] #'close-todos-calendar-view calfw-calendar-mode-map))))
 
 
 ;; Org modern indent
