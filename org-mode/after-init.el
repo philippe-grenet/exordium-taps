@@ -8,6 +8,13 @@
 (setq org-hide-leading-stars t)
 (setq org-fontify-quote-and-verse-blocks t)
 
+;; Disable logbook drawers (no timestamps on state changes)
+(setq org-log-done nil)
+(setq org-log-into-drawer nil)
+(setq org-log-repeat nil)
+(setq org-todo-keywords
+      '((sequence "TODO" "WORK" "WAIT" "STOP" "BLOCKED" "POSTPONED" "QUESTIONED" "|" "DONE")))
+
 ;;; Remove the hook added by init-org-mode.el
 (remove-hook 'org-mode-hook 'turn-on-visual-line-mode)
 
@@ -653,6 +660,18 @@ to move them all to the archive file in one shot."
 (setq org-archive-location "%s_archive::datetree/")
 
 (setf (alist-get 'file org-link-frame-setup) #'find-file)
+
+
+;;; Make Tab bring up Company for file or image links, in addition to C-.
+
+(defun my/org-complete-file-in-link ()
+  "Trigger file completion when point is inside a [[file-path link."
+  (when (and (looking-back "\\[\\[[^][\n]*" (line-beginning-position))
+             (not (looking-back "\\]\\[" (- (point) 2))))
+    (company-complete)
+    t))
+
+(add-hook 'org-cycle-tab-first-hook #'my/org-complete-file-in-link)
 
 
 ;;; DRQS links
