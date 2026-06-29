@@ -3,6 +3,13 @@
 (setq-default indicate-empty-lines t)
 (setq native-comp-async-report-warnings-errors nil)
 
+;; Recentf saves its list to ~/.emacs.d/recentf (or similar) on exit, but only
+;; up to recentf-max-saved-items entries.
+(setq recentf-max-saved-items 100)
+
+;; We can also display more recent files in Helm (default is 10)
+(setq recentf-max-menu-items 50)
+
 ;; Visual bell
 (setq ring-bell-function
       (lambda ()
