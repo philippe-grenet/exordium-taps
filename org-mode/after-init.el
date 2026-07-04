@@ -931,7 +931,7 @@ This redefinition adds support for buffer-local override in Org-Mode."
 (add-hook 'org-mode-hook #'exordium-org-refresh-line-numbers)
 
 ;; C-c o T: Toggle table format (standard <-> box-drawing)
-(load-file "~/.emacs.d/taps/org-mode/table-format.el")
+(load-file "~/.emacs.d/taps/common/table-format.el")
 (define-key org-mode-map (kbd "C-c o T") #'my/org-table-toggle-format)
 
 ;; C-c o R: Resize table to fit fill-column

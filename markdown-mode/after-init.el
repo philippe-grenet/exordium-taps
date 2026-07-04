@@ -40,6 +40,11 @@
 (load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
 (define-key markdown-mode-map (kbd "s-<tab>") 'markdown-cycle)
 
+;; Table format toggle (standard <-> box-drawing) and resize
+(load-file "~/.emacs.d/taps/common/table-format.el")
+(define-key markdown-mode-map (kbd "C-c m T") 'my/org-table-toggle-format)
+(define-key markdown-mode-map (kbd "C-c m R") 'my/org-table-resize-to-fill-column)
+
 
 ;; Use the Mac's built in dictionary
 (when exordium-osx
