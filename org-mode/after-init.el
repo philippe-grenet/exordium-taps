@@ -934,6 +934,9 @@ This redefinition adds support for buffer-local override in Org-Mode."
 (load-file "~/.emacs.d/taps/org-mode/table-format.el")
 (define-key org-mode-map (kbd "C-c o T") #'my/org-table-toggle-format)
 
+;; C-c o R: Resize table to fit fill-column
+(define-key org-mode-map (kbd "C-c o R") #'my/org-table-resize-to-fill-column)
+
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
 ;; End:

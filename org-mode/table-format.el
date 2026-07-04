@@ -261,6 +261,147 @@ INDENT is prepended to each line.  First row is the header (centered)."
           lines)
     (mapconcat #'identity (nreverse lines) "\n")))
 
+;;;; Resize / word-wrap support
+
+(defun my/org-table--wrap-text (text width)
+  "Wrap TEXT to fit within WIDTH characters.
+Break at word boundaries.  If a single word exceeds WIDTH, it is
+placed alone on its line (overflow allowed).
+Return a list of line strings."
+  (if (string-empty-p text)
+      (list "")
+    (let ((words (split-string text " " t))
+          (lines '())
+          (current ""))
+      (dolist (word words)
+        (if (string-empty-p current)
+            (setq current word)
+          (if (<= (+ (string-width current) 1 (string-width word)) width)
+              (setq current (concat current " " word))
+            (push current lines)
+            (setq current word))))
+      (push current lines)
+      (nreverse lines))))
+
+(defun my/org-table--compute-proportional-widths (content-widths budget)
+  "Distribute BUDGET across columns proportional to CONTENT-WIDTHS.
+Each column gets at least 1.  Return a list of integers summing
+to BUDGET."
+  (let* ((ncols (length content-widths))
+         (total (apply #'+ content-widths))
+         (total (if (zerop total) ncols total))
+         (raw (mapcar (lambda (w)
+                        (max 1 (floor (* budget (/ (float (max w 1)) total)))))
+                      content-widths))
+         (allocated (apply #'+ raw))
+         (remainder (- budget allocated)))
+    (when (> remainder 0)
+      (let* ((indices (number-sequence 0 (1- ncols)))
+             (sorted (sort (copy-sequence indices)
+                           (lambda (a b)
+                             (> (nth a content-widths)
+                                (nth b content-widths))))))
+        (cl-loop for i in sorted
+                 repeat remainder
+                 do (cl-incf (nth i raw)))))
+    (when (< remainder 0)
+      (let* ((indices (number-sequence 0 (1- ncols)))
+             (sorted (sort (copy-sequence indices)
+                           (lambda (a b)
+                             (> (nth a raw) (nth b raw))))))
+        (cl-loop for i in sorted
+                 repeat (abs remainder)
+                 do (cl-decf (nth i raw)))))
+    raw))
+
+(defun my/org-table--wrap-rows (rows content-widths)
+  "Wrap cell text in ROWS to fit CONTENT-WIDTHS.
+Return a list of wrapped-rows, each being a list of cell-line
+lists of uniform height."
+  (mapcar
+   (lambda (row)
+     (let* ((ncols (length content-widths))
+            (padded-row (if (< (length row) ncols)
+                            (append row (make-list (- ncols (length row)) ""))
+                          row))
+            (wrapped (cl-mapcar #'my/org-table--wrap-text
+                                padded-row content-widths))
+            (max-h (apply #'max (mapcar #'length wrapped))))
+       (mapcar (lambda (cell-lines)
+                 (let ((pad (- max-h (length cell-lines))))
+                   (if (> pad 0)
+                       (append cell-lines (make-list pad ""))
+                     cell-lines)))
+               wrapped)))
+   rows))
+
+(defun my/org-table--render-multiline-row (delim cell-lines col-widths center-p)
+  "Render one multi-line row as a list of line strings.
+DELIM is the vertical border character.
+CELL-LINES is a list of lists (one per column) of visual-line strings.
+COL-WIDTHS includes padding.  CENTER-P centers text if non-nil."
+  (let ((height (length (car cell-lines)))
+        (result '()))
+    (dotimes (i height)
+      (let ((cells (mapcar (lambda (cl) (nth i cl)) cell-lines)))
+        (push (my/org-table--data-line delim cells col-widths center-p)
+              result)))
+    (nreverse result)))
+
+(defun my/org-table--render-resized (format wrapped-rows col-widths indent)
+  "Render a resized table with multi-line cells.
+FORMAT is `format-1' or `format-2'.
+WRAPPED-ROWS is the output of `my/org-table--wrap-rows'.
+COL-WIDTHS is the list of column widths (including padding).
+INDENT is the leading whitespace string."
+  (let ((lines '()))
+    (pcase format
+      ('format-2
+       (push (concat indent
+                     (my/org-table--separator-line
+                      my/org-table-box-tl my/org-table-box-tt my/org-table-box-tr
+                      col-widths))
+             lines)
+       (dolist (hl (my/org-table--render-multiline-row
+                    my/org-table-box-v (car wrapped-rows) col-widths t))
+         (push (concat indent hl) lines))
+       (push (concat indent
+                     (my/org-table--separator-line
+                      my/org-table-box-lt my/org-table-box-x my/org-table-box-rt
+                      col-widths))
+             lines)
+       (cl-loop for (row . rest) on (cdr wrapped-rows) do
+                (dolist (dl (my/org-table--render-multiline-row
+                             my/org-table-box-v row col-widths nil))
+                  (push (concat indent dl) lines))
+                (when rest
+                  (push (concat indent
+                                (my/org-table--separator-line
+                                 my/org-table-box-lt my/org-table-box-x
+                                 my/org-table-box-rt col-widths))
+                        lines)))
+       (push (concat indent
+                     (my/org-table--separator-line
+                      my/org-table-box-bl my/org-table-box-bt my/org-table-box-br
+                      col-widths))
+             lines))
+
+      ('format-1
+       (dolist (hl (my/org-table--render-multiline-row
+                    ?| (car wrapped-rows) col-widths nil))
+         (push (concat indent hl) lines))
+       (push (concat indent "|"
+                     (mapconcat (lambda (w) (make-string w ?-))
+                                col-widths "|")
+                     "|")
+             lines)
+       (dolist (row (cdr wrapped-rows))
+         (dolist (dl (my/org-table--render-multiline-row
+                      ?| row col-widths nil))
+           (push (concat indent dl) lines)))))
+
+    (mapconcat #'identity (nreverse lines) "\n")))
+
 ;;;; Interactive command
 
 ;;;###autoload
@@ -289,6 +430,48 @@ from Format 2 to Format 1."
       (insert result "\n")
       ;; Restore approximate point position
       (goto-char (min (+ beg offset) (point))))))
+
+;;;###autoload
+(defun my/org-table-resize-to-fill-column ()
+  "Resize the table at point to fit within `fill-column'.
+If the table already fits, display a message and do nothing.
+Column widths are distributed proportionally to current content
+widths.  Long unbreakable words are allowed to overflow rather
+than being hard-broken."
+  (interactive)
+  (let ((fmt (my/org-table-detect-format)))
+    (unless fmt
+      (user-error "Not in a table"))
+    (let* ((beg (my/org-table-begin))
+           (end (my/org-table-end))
+           (offset (- (point) beg))
+           (parsed (my/org-table-parse beg end))
+           (rows (nth 1 parsed))
+           (indent (nth 2 parsed))
+           (content-widths (my/org-table--compute-widths rows))
+           (ncols (length content-widths))
+           (indent-len (string-width indent))
+           (current-width (+ indent-len (1+ ncols)
+                             (apply #'+ (mapcar (lambda (w) (+ w 2))
+                                                content-widths)))))
+      (if (<= current-width fill-column)
+          (message "Table already fits within fill-column (%d)" fill-column)
+        (let ((budget (- fill-column indent-len (* 3 ncols) 1)))
+          (when (< budget ncols)
+            (user-error "Table cannot fit: too many columns for fill-column"))
+          (let* ((new-content-widths
+                  (my/org-table--compute-proportional-widths
+                   content-widths budget))
+                 (new-col-widths (mapcar (lambda (w) (+ w 2))
+                                        new-content-widths))
+                 (wrapped-rows (my/org-table--wrap-rows
+                                rows new-content-widths))
+                 (result (my/org-table--render-resized
+                          fmt wrapped-rows new-col-widths indent)))
+            (delete-region beg end)
+            (goto-char beg)
+            (insert result "\n")
+            (goto-char (min (+ beg offset) (point)))))))))
 
 (provide 'table-format)
 
