@@ -93,10 +93,10 @@ Prepend by default; with prefix ARG, append."
 
 ;;; C-c o i: insert image
 (defun my-org-insert-image ()
+  "Insert an image link with HTML width attribute."
   (interactive)
-  (insert "#+attr_html: :width 900px\n")
-  (insert "[[./img/.png]]\n")
-  (backward-char 7))
+  (let ((file (read-file-name "Image: " nil nil nil "img/")))
+    (insert (format "#+attr_html: :width 900px\n[[%s]]\n" file))))
 
 (define-key org-mode-map (kbd "C-c o i") #'my-org-insert-image)
 
