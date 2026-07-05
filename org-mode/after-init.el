@@ -13,7 +13,8 @@
 (setq org-log-into-drawer nil)
 (setq org-log-repeat nil)
 (setq org-todo-keywords
-      '((sequence "TODO" "WORK" "WAIT" "STOP" "BLOCKED" "POSTPONED" "QUESTIONED" "|" "DONE")))
+      '((sequence "TODO" "WORK" "WAIT" "|" "STOP" "BLOCKED" "POSTPONED" "QUESTIONED" "DONE")
+        (sequence "READY" "REVIEW" "|" "REJECT" "PROCEED")))
 
 ;;; Remove the hook added by init-org-mode.el
 (remove-hook 'org-mode-hook 'turn-on-visual-line-mode)
