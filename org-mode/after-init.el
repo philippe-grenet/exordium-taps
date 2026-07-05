@@ -772,11 +772,13 @@ to move them all to the archive file in one shot."
 (defun org-sync ()
   "Copy todos and catch up notes to Google Drive."
   (interactive)
-  (copy-file "~/Documents/org/todo.org"
-             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/todo.org" t)
-  (copy-file "~/Documents/org/catchup.org"
-             "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/catchup.org" t)
-  (message "todo.org and catchup.org synced"))
+  (let ((dest-dir "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/"))
+    (if (file-directory-p dest-dir)
+        (progn
+          (copy-file "~/Documents/org/todo.org" (concat dest-dir "todo.org") t)
+          (copy-file "~/Documents/org/catchup.org" (concat dest-dir "catchup.org") t)
+          (message "org-sync: synced"))
+      (message "org-sync: Google Drive not mounted, skipping"))))
 
 ;; Schedule the function every hour. See also run-with-timer and cancel-timer.
 (run-at-time "00:00" 3600 'org-sync)
