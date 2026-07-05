@@ -346,30 +346,26 @@ to move them all to the archive file in one shot."
                             (,(colorize-note-extension "tickets.org") . "~/Documents/org/tickets.org")
                             (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
 
-(defconst notes-directories '("~/Documents/org/bql/"
-                              "~/Documents/org/bql/bqe/"
-                              "~/Documents/org/bql/bqnt/"
-                              "~/Documents/org/bql/data-tier/"
-                              "~/Documents/org/bql/dfl/"
-                              "~/Documents/org/bql/engine/"
-                              "~/Documents/org/bql/equity/"
-                              "~/Documents/org/bql/gateway/"
-                              "~/Documents/org/bql/language/"
-                              "~/Documents/org/bql/metadata/"
-                              "~/Documents/org/bql/onboarding/"
-                              "~/Documents/org/ap/"
-                              "~/Documents/org/architecture/"
-                              "~/Documents/org/ai/"
-                              "~/Documents/org/notes/"
-                              "~/Documents/org/notes/2025/"
-                              "~/Documents/org/notes/2026/"
-                              "~/Documents/org/planning/2025/"
-                              "~/Documents/org/planning/2026/"
-                              "~/Documents/org/projects/"
-                              ;; "~/Documents/org/management/"
-                              ;; "~/Documents/org/tech/bloomberg/"
-                              ;; "~/Documents/org/tech/general/"
-                              ))
+(defconst notes-root-directories
+  '("~/Documents/org/bql/"
+    "~/Documents/org/ap/"
+    "~/Documents/org/architecture/"
+    "~/Documents/org/ai/"
+    "~/Documents/org/notes/"
+    "~/Documents/org/planning/"
+    "~/Documents/org/projects/")
+  "Root directories to scan for notes. Each root and its immediate subdirectories are included.")
+
+(defun notes-directories ()
+  "Return all notes directories: each root plus its immediate subdirectories."
+  (cl-remove-duplicates
+   (cl-loop for root in notes-root-directories
+            when (file-directory-p root)
+            collect root
+            and append (cl-remove-if-not
+                        #'file-directory-p
+                        (directory-files root t "^[^.]")))
+   :test #'string=))
 
 (defun list-notes-in-directory (dir)
   ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
@@ -395,7 +391,7 @@ to move them all to the archive file in one shot."
 (defun list-all-notes ()
   "Return the full alist of notes (file-name . path)."
   (append top-level-notes
-          (mapcan #'list-notes-in-directory notes-directories)))
+          (mapcan #'list-notes-in-directory (notes-directories))))
 
 (defun open-todos (file)
   "Open a note as FILE from the list of active notes in Documents/org."
