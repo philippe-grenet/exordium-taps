@@ -1,4 +1,4 @@
-;;;; Local extensions to Exordium: Markdown mode
+;;;; Local extensions to Exordium: Markdown mode -*- lexical-binding: t -*-
 
 (require 'markdown-mode)
 
@@ -11,8 +11,7 @@
 ;; hide URLs + horizontal line with C-q C-l + 100 char lines
 (add-hook 'markdown-mode-hook
           (lambda ()
-            (setq markdown-hide-urls nil)
-            (setq page-break-line-mode t)
+            (page-break-lines-mode 1)
             (setq fill-column 88)  ; for Tutti
             ;;(exordium-page-break-lines-hook)
             (markdown-toggle-inline-images)))

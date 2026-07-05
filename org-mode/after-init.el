@@ -1,4 +1,4 @@
-;;;; Package --- summary : Local extensions to Exordium: Org Mode
+;;;; Package --- summary : Local extensions to Exordium: Org Mode -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -163,75 +163,6 @@ to move them all to the archive file in one shot."
 
 
 ;;; Look
-
-;; (when (eq exordium-theme 'tomorrow-night)
-;;   ;; (setq org-priority-faces
-;;   ;;       '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
-;;   ;;         (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
-;;   ;;         (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
-
-;;   (setq org-cycle-separator-lines -1)
-
-;;   (with-tomorrow-colors
-;;    (tomorrow-mode-name)
-;;    (setq org-emphasis-alist
-;;          `(("*" (:foreground ,red))                         ; ("*" bold)
-;;            ("/" (:foreground ,green))                       ; ("/" italic)
-;;            ("_" (:background ,red :foreground ,background)) ; ("_" underline)
-;;            ("=" org-verbatim verbatim)
-;;            ("~" org-code verbatim)
-;;            ("+" (:strike-through t)))))
-
-;;   (with-tomorrow-colors
-;;    (tomorrow-mode-name)
-;;    (set-face-attribute 'org-headline-done nil :foreground comment))
-
-;;   (with-tomorrow-colors
-;;    (tomorrow-mode-name)
-;;    (setq org-todo-keyword-faces
-;;          `(("TODO"      . (:foreground ,red :weight bold :box nil))
-;;            ("DONE"      . (:foreground ,green :weight bold :box nil))
-;;            ("WORK"      . (:foreground ,yellow :weight bold :box nil))
-;;            ("WAIT"      . (:foreground ,orange :weight bold :box nil))
-;;            ("STOP"      . (:foreground ,comment :weight bold :box nil))
-
-;;            ;; for catch up:
-;;            ("NEXT"      . (:background ,red :foreground ,background :weight bold :box nil))
-
-;;            ;; for BDGT:
-;;            ("SUBMITTED" . (:foreground ,orange :weight bold :box nil))
-;;            ("APPROVED"  . (:foreground ,yellow :weight bold :box nil))
-;;            ("PARTIAL"   . (:background ,yellow :foreground ,background :weight bold :box nil))
-;;            ("COMPLETE"  . (:background ,green :foreground ,background :weight bold :box nil))
-;;            ("CANCELED"  . (:background ,comment :foreground ,background :weight bold :box nil))
-
-;;            ;; for hire:
-;;            ("BAD"       . (:background ,red :foreground ,background :weight bold :box nil))
-;;            ("MEDIUM"    . (:background ,orange :foreground ,background :weight bold :box nil))
-;;            ("GOOD"      . (:background ,green :foreground ,background :weight bold :box nil))
-;;            ("REJECTED"  . (:background ,red :foreground ,background :weight bold :box nil))
-;;            ("WITHDREW"  . (:background ,purple :foreground ,background :weight bold :box nil))
-;;            ("HIRED"     . (:background ,green :foreground ,background :weight bold :box nil))))))
-
-
-;; (when (member exordium-theme '(tomorrow-night))
-;;   (require 'color-theme-tomorrow)
-;;   (setq org-priority-faces
-;;         '((?A :foreground "#1d1f21" :background "#cc6666" :weight bold)
-;;          (?B :foreground "#1d1f21" :background "#de935f" :weight bold)
-;;          (?C :foreground "#1d1f21" :background "#b5bd68" :weight bold)))
-;;   (with-tomorrow-colors
-;;    (tomorrow-mode-name)
-;;    (setq org-emphasis-alist
-;;          `(("*" (:foreground ,red))                         ; ("*" bold)
-;;            ("/" (:foreground ,green))                       ; ("/" italic)
-;;            ("_" (:background ,red :foreground ,background)) ; ("_" underline)
-;;            ("=" org-verbatim verbatim)
-;;            ("~" org-code verbatim)
-;;            ("+" (:strike-through t)))))
-;;   (with-tomorrow-colors
-;;    (tomorrow-mode-name)
-;;    (set-face-attribute 'org-headline-done nil :foreground comment)))
 
 (defvar exordium-theme)
 (defvar exordium-catppuccin-flavor)
