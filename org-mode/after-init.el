@@ -61,59 +61,30 @@
 
 (define-key org-mode-map (kbd "C-c o l") 'my-org-paste-epic-link)
 
-;; C-c o d/w/b: refile to Today, Week or Backlog.
+;; C-c o t/w/b: refile to Today, Week or Backlog.
 ;; Move task to the beginning of the section.
 ;; With argument C-u, move task to the end of the section.
-(defun my-org-refile-to-today (arg)
-  "Refile current headline to specific file and heading."
-  (interactive "P")
+(defun my-org-refile-to (target-headline arg)
+  "Refile current headline to TARGET-HEADLINE in todo.org.
+Prepend by default; with prefix ARG, append."
   (let* ((target-file "~/Documents/org/todo.org")
-         (target-headline "☕️ Today")
-         ;; Find the position of the headline in the target file
          (pos (save-excursion
                 (find-file target-file)
                 (org-find-exact-headline-in-buffer target-headline)))
-         ;; Move to the beginning by default. Prefix with C-u to add at the end
          (org-reverse-note-order (not arg)))
-    ;; org-refile arguments:
-    ;; 1. prefix-arg: nil
-    ;; 2. default-buffer: nil
-    ;; 3. rfloc: (headline-name target-file nil pos)
     (org-refile nil nil (list target-headline target-file nil pos))))
+
+(defun my-org-refile-to-today (arg)
+  "Refile current headline to Today." (interactive "P")
+  (my-org-refile-to "☕️ Today" arg))
 
 (defun my-org-refile-to-week (arg)
-  "Refile current headline to specific file and heading."
-  (interactive "P")
-  (let* ((target-file "~/Documents/org/todo.org")
-         (target-headline "Week")
-         ;; Find the position of the headline in the target file
-         (pos (save-excursion
-                (find-file target-file)
-                (org-find-exact-headline-in-buffer target-headline)))
-         ;; Move to the beginning by default. Prefix with C-u to add at the end
-         (org-reverse-note-order (not arg)))
-    ;; org-refile arguments:
-    ;; 1. prefix-arg: nil
-    ;; 2. default-buffer: nil
-    ;; 3. rfloc: (headline-name target-file nil pos)
-    (org-refile nil nil (list target-headline target-file nil pos))))
+  "Refile current headline to Week." (interactive "P")
+  (my-org-refile-to "Week" arg))
 
 (defun my-org-refile-to-backlog (arg)
-  "Refile current headline to specific file and heading."
-  (interactive "P")
-  (let* ((target-file "~/Documents/org/todo.org")
-         (target-headline "Backlog")
-         ;; Find the position of the headline in the target file
-         (pos (save-excursion
-                (find-file target-file)
-                (org-find-exact-headline-in-buffer target-headline)))
-         ;; Move to the beginning by default. Prefix with C-u to add at the end
-         (org-reverse-note-order (not arg)))
-    ;; org-refile arguments:
-    ;; 1. prefix-arg: nil
-    ;; 2. default-buffer: nil
-    ;; 3. rfloc: (headline-name target-file nil pos)
-    (org-refile nil nil (list target-headline target-file nil pos))))
+  "Refile current headline to Backlog." (interactive "P")
+  (my-org-refile-to "Backlog" arg))
 
 (define-key org-mode-map (kbd "C-c o t") #'my-org-refile-to-today)
 (define-key org-mode-map (kbd "C-c o w") #'my-org-refile-to-week)
