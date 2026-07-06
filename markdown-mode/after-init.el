@@ -1,4 +1,4 @@
-;;;; Local extensions to Exordium: Markdown mode
+;;;; Local extensions to Exordium: Markdown mode -*- lexical-binding: t -*-
 
 (require 'markdown-mode)
 
@@ -11,10 +11,9 @@
 ;; hide URLs + horizontal line with C-q C-l + 100 char lines
 (add-hook 'markdown-mode-hook
           (lambda ()
-            (setq markdown-hide-urls nil)
-            (setq page-break-line-mode t)
+            (page-break-lines-mode 1)
             (setq fill-column 88)  ; for Tutti
-            (exordium-page-break-lines-hook)
+            ;;(exordium-page-break-lines-hook)
             (markdown-toggle-inline-images)))
 
 
@@ -26,19 +25,26 @@
   (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
 
 ;; Utilities
-(defun straighten-quotes (beg end)
-  "Replace 'smart quotes' in buffer or region with ascii quotes."
-  (interactive "r")
-  (format-replace-strings '(("\x201C" . "\"")
-                            ("\x201D" . "\"")
-                            ("\x2018" . "'")
-                            ("\x2019" . "'"))
-                          nil beg end))
+(defun straighten-quotes (&optional beg end)
+  "Replace 'smart quotes' in region or buffer with ascii quotes."
+  (interactive (when (use-region-p) (list (region-beginning) (region-end))))
+  (let ((beg (or beg (point-min)))
+        (end (or end (point-max))))
+    (format-replace-strings '(("\x201C" . "\"")
+                              ("\x201D" . "\"")
+                              ("\x2018" . "'")
+                              ("\x2019" . "'"))
+                            nil beg end)))
 
 
 ;; Support for tables (this will be in Elpa one day)
 (load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
 (define-key markdown-mode-map (kbd "s-<tab>") 'markdown-cycle)
+
+;; Table format toggle (standard <-> box-drawing) and resize
+(load-file "~/.emacs.d/taps/common/table-format.el")
+(define-key markdown-mode-map (kbd "C-c m T") 'my/org-table-toggle-format)
+(define-key markdown-mode-map (kbd "C-c m R") 'my/org-table-resize-to-fill-column)
 
 
 ;; Use the Mac's built in dictionary

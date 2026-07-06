@@ -3,6 +3,13 @@
 (setq-default indicate-empty-lines t)
 (setq native-comp-async-report-warnings-errors nil)
 
+;; Recentf saves its list to ~/.emacs.d/recentf (or similar) on exit, but only
+;; up to recentf-max-saved-items entries.
+(setq recentf-max-saved-items 100)
+
+;; We can also display more recent files in Helm (default is 10)
+(setq recentf-max-menu-items 50)
+
 ;; Visual bell
 (setq ring-bell-function
       (lambda ()
@@ -153,6 +160,9 @@ or comment block. See also `repunctuate-sentences'."
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
 
+;; Emacs-Plus binds super-q to save-buffers-kill-emacs, lets remove it so I can use this as prefix:
+(global-unset-key (kbd "s-q"))
+
 ;; Math
 (global-set-key (kbd "s-q m n") "□") ; necessary
 (global-set-key (kbd "s-q m p") "♢") ; possible
@@ -228,7 +238,7 @@ or comment block. See also `repunctuate-sentences'."
 (global-set-key (kbd "s-q g Y") "Ψ")
 (global-set-key (kbd "s-q g W") "Ω")
 
-;; Flags
+;; Flags FIXME:
 (global-set-key (kbd "s-q f g") "🟩") ; green
 (global-set-key (kbd "s-q f a") "🟧") ; amber
 (global-set-key (kbd "s-q f r") "🟥") ; red
@@ -267,6 +277,11 @@ or comment block. See also `repunctuate-sentences'."
 (add-hook 'markdown-mode-hook (lambda ()
                            (setq prettify-symbols-alist my-prettify-symbol-alist)))
 (global-prettify-symbols-mode +1)
+
+
+;;; Emojis
+;; Across MacOs the shortbut is Ctrl-Command-Space, but that is mark-sexp in Emacs.
+(global-set-key (kbd "s-SPC") #'ns-do-show-character-palette)
 
 
 ;;; Company word autocomplete
@@ -419,11 +434,11 @@ or comment block. See also `repunctuate-sentences'."
 
 
 ;; Atomic chrome
-(require 'atomic-chrome)
-(setq atomic-chrome-default-major-mode 'markdown-mode
-      atomic-chrome-buffer-open-style 'full)
-(with-demoted-errors "Can't start atomic-chrome: %S"
-  (atomic-chrome-start-server))
+;; (require 'atomic-chrome)
+;; (setq atomic-chrome-default-major-mode 'markdown-mode
+;;       atomic-chrome-buffer-open-style 'full)
+;; (with-demoted-errors "Can't start atomic-chrome: %S"
+;;   (atomic-chrome-start-server))
 
 
 ;; Ultra scroll

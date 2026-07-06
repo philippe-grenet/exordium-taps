@@ -21,11 +21,9 @@
     ;; Strings: "..." and '...'
     (modify-syntax-entry ?\" "\"" st)
     (modify-syntax-entry ?' "\"" st)
-    ;; Comments: -- to end of line, and /* ... */
-    (modify-syntax-entry ?- ". 12" st)
+    ;; Comments: ## to end of line
+    (modify-syntax-entry ?# ". 12" st)
     (modify-syntax-entry ?\n ">" st)
-    (modify-syntax-entry ?/ ". 124b" st)
-    (modify-syntax-entry ?* ". 23" st)
     ;; Comparison operators: ensure < and > are plain punctuation
     ;; (prevents org-mode's paired-delimiter treatment from leaking in)
     (modify-syntax-entry ?< "." st)
@@ -205,10 +203,10 @@
   :syntax-table bql-mode-syntax-table
   (setq-local case-fold-search t)
   (setq-local font-lock-defaults
-              '(bql-font-lock-keywords t t ((?< . ".") (?> . "."))))
-  (setq-local comment-start "-- ")
+              '(bql-font-lock-keywords nil t ((?< . ".") (?> . "."))))
+  (setq-local comment-start "## ")
   (setq-local comment-end "")
-  (setq-local comment-start-skip "\\(?:--+\\|/\\*+\\)\\s-*")
+  (setq-local comment-start-skip "##\\s-*")
   (setq-local indent-line-function #'bql-indent-line)
   (setq-local electric-pair-pairs bql-electric-pairs)
   (setq-local electric-pair-text-pairs bql-electric-pairs)

@@ -37,7 +37,13 @@
 | <kbd>C-c o l</kbd>    | Paste a Jira epic link                                             |
 | <kbd>C-c o i</kbd>    | Insert an image placeholder                                        |
 | <kbd>C-c o m</kbd>    | Insert a Mermaid diagram placeholder                               |
+
+### Tables
+
+| Keybinding            | Description                                                                |
+| --------------------- | -------------------------------------------------------------------------- |
 | <kbd>C-c o T</kbd>    | Toggle table format: standard <-> box-drawing (<kbd>C-u</kbd> to force back) |
+| <kbd>C-c o R</kbd>    | Resize table to fit `fill-column` by wrapping cell content                 |
 
 ### Viewing
 
