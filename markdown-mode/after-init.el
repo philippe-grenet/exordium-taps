@@ -185,6 +185,43 @@ If no region is active, converts the entire buffer in-place."
       (push "#+end_src" out))
     (mapconcat #'identity (nreverse out) "\n")))
 
+;;; Markdown rendering using pandoc (another option is multimarkdown)
+(defvar my/markdown-preview-theme 'dark
+  "Theme for pandoc live preview: `dark' (Mocha) or `light' (Latte).")
+
+(defun my/markdown-set-preview-command ()
+  "Set `markdown-command' according to `my/markdown-preview-theme'."
+  (let ((header (if (eq my/markdown-preview-theme 'light)
+                    "~/.emacs.d/taps/markdown-mode/pandoc-light.html"
+                  "~/.emacs.d/taps/markdown-mode/pandoc-mocha.html")))
+    (setq markdown-command
+          (concat "/opt/homebrew/bin/pandoc --standalone --mathml"
+                  " --include-in-header=" (expand-file-name header)))))
+
+(my/markdown-set-preview-command)
+
+(defun my/markdown-toggle-preview-theme ()
+  "Toggle the live preview between dark and light, then re-render."
+  (interactive)
+  (setq my/markdown-preview-theme
+        (if (eq my/markdown-preview-theme 'light) 'dark 'light))
+  (my/markdown-set-preview-command)
+  (when (bound-and-true-p markdown-live-preview-mode)
+    (markdown-live-preview-export))
+  (message "Markdown preview theme: %s" my/markdown-preview-theme))
+
+(define-key markdown-mode-map (kbd "C-c m t") 'my/markdown-toggle-preview-theme)
+
+(defun my/markdown-preview-window-xwidget (file)
+  "Preview FILE with xwidget browser"
+  (xwidget-webkit-browse-url (concat "file://" file))
+  (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
+    (when (buffer-live-p buf)
+      (and (eq buf (current-buffer)) (quit-window))
+      (pop-to-buffer buf))))
+
+(setq markdown-live-preview-window-function #'my/markdown-preview-window-xwidget)
+
 
 ;; == Snippets ==
 ;; (add-hook 'markdown-mode-hook
