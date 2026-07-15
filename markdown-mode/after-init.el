@@ -212,12 +212,24 @@ If no region is active, converts the entire buffer in-place."
 
 (define-key markdown-mode-map (kbd "C-c m t") 'my/markdown-toggle-preview-theme)
 
+(defvar-local my/markdown-preview-export-file nil
+  "Exported HTML file backing this xwidget preview buffer.")
+
+(defun my/markdown-preview-cleanup-file ()
+  "Delete the exported HTML file backing this xwidget preview buffer."
+  (when (and my/markdown-preview-export-file
+             (file-exists-p my/markdown-preview-export-file))
+    (delete-file my/markdown-preview-export-file)))
+
 (defun my/markdown-preview-window-xwidget (file)
   "Preview FILE with xwidget browser"
   (xwidget-webkit-browse-url (concat "file://" file))
   (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
     (when (buffer-live-p buf)
       (and (eq buf (current-buffer)) (quit-window))
+      (with-current-buffer buf
+        (setq-local my/markdown-preview-export-file file)
+        (add-hook 'kill-buffer-hook #'my/markdown-preview-cleanup-file nil t))
       (pop-to-buffer buf))))
 
 (setq markdown-live-preview-window-function #'my/markdown-preview-window-xwidget)
