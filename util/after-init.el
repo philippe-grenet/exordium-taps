@@ -99,6 +99,9 @@ or comment block. See also `repunctuate-sentences'."
       helm-autoresize-min-height 35)
 (helm-autoresize-mode t)
 
+;; Use arrows to move to the line offering to create a new file
+(setq helm-move-to-line-cycle-in-source nil)
+
 ;; C-x b replacement for switch-to-buffer
 (define-key global-map (kbd "C-x b") 'helm-buffers-list)
 
@@ -263,9 +266,11 @@ or comment block. See also `repunctuate-sentences'."
 (set-fontset-font t '(#x2b00 . #x2bff) "Hiragino Maru Gothic ProN")
 
 (defconst my-prettify-symbol-alist '(("=>" . ?⇒)
-                                     ("->" . ?⮕)
+                                     ("->" . ?→)
+                                     ("-->" . ?⮕)
                                      ("<=" . ?⇐)
-                                     ("<-" . ?⬅)
+                                     ("<-" . ?←)
+                                     ("<--" . ?⬅)
                                      ("<->" . ?⬌)
                                      ("|^" . ?⬆)
                                      ("|v" . ?⬇)
