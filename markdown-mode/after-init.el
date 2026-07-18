@@ -198,6 +198,9 @@ If no region is active, converts the entire buffer in-place."
 (defvar-local my/markdown-preview-export-file nil
   "Exported HTML file backing this xwidget preview buffer.")
 
+(defvar my/markdown-preview-xwidget nil
+  "Xwidget session used by the markdown live preview.")
+
 (defun my/markdown-preview-cleanup-file ()
   "Delete the exported HTML file backing this xwidget preview buffer."
   (when (and my/markdown-preview-export-file
@@ -207,7 +210,8 @@ If no region is active, converts the entire buffer in-place."
 (defun my/markdown-preview-window-xwidget (file)
   "Preview FILE with xwidget browser"
   (xwidget-webkit-browse-url (concat "file://" file))
-  (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
+  (setq my/markdown-preview-xwidget (xwidget-webkit-current-session))
+  (let ((buf (xwidget-buffer my/markdown-preview-xwidget)))
     (when (buffer-live-p buf)
       (and (eq buf (current-buffer)) (quit-window))
       (with-current-buffer buf
@@ -216,6 +220,41 @@ If no region is active, converts the entire buffer in-place."
       (pop-to-buffer buf))))
 
 (setq markdown-live-preview-window-function #'my/markdown-preview-window-xwidget)
+
+
+;;; Scroll sync: keep the preview centered near point in the source buffer.
+(defvar my/markdown-preview-sync-scroll-enabled t
+  "When non-nil, scroll the xwidget preview to track point in the source.")
+
+(defvar-local my/markdown-preview-last-line nil
+  "Last source line synced to the preview, to avoid redundant scrolls.")
+
+(defun my/markdown-preview-sync-scroll ()
+  "Scroll the xwidget preview to match point in the markdown source.
+Uses proportional scroll (point's line / total lines), which is
+approximate but tracks well in practice.  Does nothing when
+`my/markdown-preview-sync-scroll-enabled' is nil."
+  (when (and my/markdown-preview-sync-scroll-enabled
+             (bound-and-true-p markdown-live-preview-mode)
+             my/markdown-preview-xwidget
+             (xwidget-live-p my/markdown-preview-xwidget))
+    (let ((line (line-number-at-pos)))
+      (unless (eq line my/markdown-preview-last-line)
+        (setq my/markdown-preview-last-line line)
+        (let ((ratio (/ (float line)
+                        (max 1 (line-number-at-pos (point-max))))))
+          (xwidget-webkit-execute-script
+           my/markdown-preview-xwidget
+           (format "window.scrollTo(0, (document.body.scrollHeight - window.innerHeight) * %f);"
+                   ratio)))))))
+
+(add-hook 'markdown-live-preview-mode-hook
+          (lambda ()
+            (if markdown-live-preview-mode
+                (add-hook 'post-command-hook
+                          #'my/markdown-preview-sync-scroll nil t)
+              (remove-hook 'post-command-hook
+                           #'my/markdown-preview-sync-scroll t))))
 
 
 ;; == Snippets ==
