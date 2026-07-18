@@ -51,7 +51,18 @@ or comment block. See also `repunctuate-sentences'."
           (fill-paragraph))
       (message "No region or comment"))))
 
-(defun msg ()
+(defun straighten-quotes (&optional beg end)
+  "Replace 'smart quotes' in region or buffer with ascii quotes."
+  (interactive (when (use-region-p) (list (region-beginning) (region-end))))
+  (let ((beg (or beg (point-min)))
+        (end (or end (point-max))))
+    (format-replace-strings '(("\x201C" . "\"")
+                              ("\x201D" . "\"")
+                              ("\x2018" . "'")
+                              ("\x2019" . "'"))
+                            nil beg end)))
+
+(defun note ()
   "Create a new scratch bufer to edit markdown, that does not
   need to be safed."
   (interactive)

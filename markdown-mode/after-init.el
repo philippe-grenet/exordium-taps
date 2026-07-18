@@ -17,26 +17,6 @@
             (markdown-toggle-inline-images)))
 
 
-;; Renderer:
-;; markdown rendering or impatient-markdown-mode:
-(when exordium-osx
-  ;; (setq markdown-command "/Users/pgrenet/Tools/markup/bin/github-markup"
-  ;;       markdown-command-needs-filename t)
-  (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
-
-;; Utilities
-(defun straighten-quotes (&optional beg end)
-  "Replace 'smart quotes' in region or buffer with ascii quotes."
-  (interactive (when (use-region-p) (list (region-beginning) (region-end))))
-  (let ((beg (or beg (point-min)))
-        (end (or end (point-max))))
-    (format-replace-strings '(("\x201C" . "\"")
-                              ("\x201D" . "\"")
-                              ("\x2018" . "'")
-                              ("\x2019" . "'"))
-                            nil beg end)))
-
-
 ;; Support for tables (this will be in Elpa one day)
 (load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
 (define-key markdown-mode-map (kbd "s-<tab>") 'markdown-cycle)
@@ -184,6 +164,9 @@ If no region is active, converts the entire buffer in-place."
     (when in-fence
       (push "#+end_src" out))
     (mapconcat #'identity (nreverse out) "\n")))
+
+
+;; Rendering
 
 ;;; Markdown rendering using pandoc (another option is multimarkdown)
 (defvar my/markdown-preview-theme 'dark
