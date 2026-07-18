@@ -17,26 +17,6 @@
             (markdown-toggle-inline-images)))
 
 
-;; Renderer:
-;; markdown rendering or impatient-markdown-mode:
-(when exordium-osx
-  ;; (setq markdown-command "/Users/pgrenet/Tools/markup/bin/github-markup"
-  ;;       markdown-command-needs-filename t)
-  (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
-
-;; Utilities
-(defun straighten-quotes (&optional beg end)
-  "Replace 'smart quotes' in region or buffer with ascii quotes."
-  (interactive (when (use-region-p) (list (region-beginning) (region-end))))
-  (let ((beg (or beg (point-min)))
-        (end (or end (point-max))))
-    (format-replace-strings '(("\x201C" . "\"")
-                              ("\x201D" . "\"")
-                              ("\x2018" . "'")
-                              ("\x2019" . "'"))
-                            nil beg end)))
-
-
 ;; Support for tables (this will be in Elpa one day)
 (load-file "~/.emacs.d/taps/markdown-mode/markdown-mode-table.el")
 (define-key markdown-mode-map (kbd "s-<tab>") 'markdown-cycle)
@@ -184,6 +164,97 @@ If no region is active, converts the entire buffer in-place."
     (when in-fence
       (push "#+end_src" out))
     (mapconcat #'identity (nreverse out) "\n")))
+
+
+;; Rendering
+
+;;; Markdown rendering using pandoc (another option is multimarkdown)
+(defvar my/markdown-preview-theme 'dark
+  "Theme for pandoc live preview: `dark' (Mocha) or `light' (Latte).")
+
+(defun my/markdown-set-preview-command ()
+  "Set `markdown-command' according to `my/markdown-preview-theme'."
+  (let ((header (if (eq my/markdown-preview-theme 'light)
+                    "~/.emacs.d/taps/markdown-mode/pandoc-light.html"
+                  "~/.emacs.d/taps/markdown-mode/pandoc-mocha.html")))
+    (setq markdown-command
+          (concat "/opt/homebrew/bin/pandoc --standalone --mathml"
+                  " --include-in-header=" (expand-file-name header)))))
+
+(my/markdown-set-preview-command)
+
+(defun my/markdown-toggle-preview-theme ()
+  "Toggle the live preview between dark and light, then re-render."
+  (interactive)
+  (setq my/markdown-preview-theme
+        (if (eq my/markdown-preview-theme 'light) 'dark 'light))
+  (my/markdown-set-preview-command)
+  (when (bound-and-true-p markdown-live-preview-mode)
+    (markdown-live-preview-export))
+  (message "Markdown preview theme: %s" my/markdown-preview-theme))
+
+(define-key markdown-mode-map (kbd "C-c m t") 'my/markdown-toggle-preview-theme)
+
+(defvar-local my/markdown-preview-export-file nil
+  "Exported HTML file backing this xwidget preview buffer.")
+
+(defvar my/markdown-preview-xwidget nil
+  "Xwidget session used by the markdown live preview.")
+
+(defun my/markdown-preview-cleanup-file ()
+  "Delete the exported HTML file backing this xwidget preview buffer."
+  (when (and my/markdown-preview-export-file
+             (file-exists-p my/markdown-preview-export-file))
+    (delete-file my/markdown-preview-export-file)))
+
+(defun my/markdown-preview-window-xwidget (file)
+  "Preview FILE with xwidget browser"
+  (xwidget-webkit-browse-url (concat "file://" file))
+  (setq my/markdown-preview-xwidget (xwidget-webkit-current-session))
+  (let ((buf (xwidget-buffer my/markdown-preview-xwidget)))
+    (when (buffer-live-p buf)
+      (and (eq buf (current-buffer)) (quit-window))
+      (with-current-buffer buf
+        (setq-local my/markdown-preview-export-file file)
+        (add-hook 'kill-buffer-hook #'my/markdown-preview-cleanup-file nil t))
+      (pop-to-buffer buf))))
+
+(setq markdown-live-preview-window-function #'my/markdown-preview-window-xwidget)
+
+
+;;; Scroll sync: keep the preview centered near point in the source buffer.
+(defvar my/markdown-preview-sync-scroll-enabled t
+  "When non-nil, scroll the xwidget preview to track point in the source.")
+
+(defvar-local my/markdown-preview-last-line nil
+  "Last source line synced to the preview, to avoid redundant scrolls.")
+
+(defun my/markdown-preview-sync-scroll ()
+  "Scroll the xwidget preview to match point in the markdown source.
+Uses proportional scroll (point's line / total lines), which is
+approximate but tracks well in practice.  Does nothing when
+`my/markdown-preview-sync-scroll-enabled' is nil."
+  (when (and my/markdown-preview-sync-scroll-enabled
+             (bound-and-true-p markdown-live-preview-mode)
+             my/markdown-preview-xwidget
+             (xwidget-live-p my/markdown-preview-xwidget))
+    (let ((line (line-number-at-pos)))
+      (unless (eq line my/markdown-preview-last-line)
+        (setq my/markdown-preview-last-line line)
+        (let ((ratio (/ (float line)
+                        (max 1 (line-number-at-pos (point-max))))))
+          (xwidget-webkit-execute-script
+           my/markdown-preview-xwidget
+           (format "window.scrollTo(0, (document.body.scrollHeight - window.innerHeight) * %f);"
+                   ratio)))))))
+
+(add-hook 'markdown-live-preview-mode-hook
+          (lambda ()
+            (if markdown-live-preview-mode
+                (add-hook 'post-command-hook
+                          #'my/markdown-preview-sync-scroll nil t)
+              (remove-hook 'post-command-hook
+                           #'my/markdown-preview-sync-scroll t))))
 
 
 ;; == Snippets ==

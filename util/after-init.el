@@ -51,7 +51,18 @@ or comment block. See also `repunctuate-sentences'."
           (fill-paragraph))
       (message "No region or comment"))))
 
-(defun msg ()
+(defun straighten-quotes (&optional beg end)
+  "Replace 'smart quotes' in region or buffer with ascii quotes."
+  (interactive (when (use-region-p) (list (region-beginning) (region-end))))
+  (let ((beg (or beg (point-min)))
+        (end (or end (point-max))))
+    (format-replace-strings '(("\x201C" . "\"")
+                              ("\x201D" . "\"")
+                              ("\x2018" . "'")
+                              ("\x2019" . "'"))
+                            nil beg end)))
+
+(defun note ()
   "Create a new scratch bufer to edit markdown, that does not
   need to be safed."
   (interactive)
@@ -98,6 +109,9 @@ or comment block. See also `repunctuate-sentences'."
 (setq helm-autoresize-max-height 35
       helm-autoresize-min-height 35)
 (helm-autoresize-mode t)
+
+;; Use arrows to move to the line offering to create a new file
+(setq helm-move-to-line-cycle-in-source nil)
 
 ;; C-x b replacement for switch-to-buffer
 (define-key global-map (kbd "C-x b") 'helm-buffers-list)
@@ -263,9 +277,11 @@ or comment block. See also `repunctuate-sentences'."
 (set-fontset-font t '(#x2b00 . #x2bff) "Hiragino Maru Gothic ProN")
 
 (defconst my-prettify-symbol-alist '(("=>" . ?⇒)
-                                     ("->" . ?⮕)
+                                     ("->" . ?→)
+                                     ("-->" . ?⮕)
                                      ("<=" . ?⇐)
-                                     ("<-" . ?⬅)
+                                     ("<-" . ?←)
+                                     ("<--" . ?⬅)
                                      ("<->" . ?⬌)
                                      ("|^" . ?⬆)
                                      ("|v" . ?⬇)
@@ -463,6 +479,7 @@ or comment block. See also `repunctuate-sentences'."
 
 ;; BQL mode
 (load "~/.emacs.d/taps/util/bql-mode.el")
+(load "~/.emacs.d/taps/util/bql-next-mode.el")
 
 
 ;;; after-init ends here

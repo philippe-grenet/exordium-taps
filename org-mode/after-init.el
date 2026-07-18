@@ -348,12 +348,13 @@ to move them all to the archive file in one shot."
 
 (defconst notes-root-directories
   '("~/Documents/org/bql/"
-    "~/Documents/org/ap/"
-    "~/Documents/org/architecture/"
-    "~/Documents/org/ai/"
-    "~/Documents/org/notes/"
+    "~/Documents/org/calcrt/"
     "~/Documents/org/planning/"
-    "~/Documents/org/projects/")
+    "~/Documents/org/projects/"
+    "~/Documents/org/architecture/"
+    "~/Documents/org/notes/"
+    "~/Documents/org/ap/"
+    "~/Documents/org/ai/")
   "Root directories to scan for notes. Each root and its immediate subdirectories are included.")
 
 (defun notes-directories ()
