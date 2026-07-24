@@ -343,6 +343,7 @@ to move them all to the archive file in one shot."
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
                             (,(colorize-note-extension "datasets.org")   . "~/Documents/org/datasets.org")
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
+                            (,(colorize-note-extension "meetings.org") . "~/Documents/org/meetings.org")
                             (,(colorize-note-extension "tickets.org") . "~/Documents/org/tickets.org")
                             (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
 
