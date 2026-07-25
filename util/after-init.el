@@ -278,10 +278,10 @@ or comment block. See also `repunctuate-sentences'."
 
 (defconst my-prettify-symbol-alist '(("=>" . ?⇒)
                                      ("->" . ?→)
-                                     ("-->" . ?⮕)
+                                     ("==>" . ?⮕)
                                      ("<=" . ?⇐)
                                      ("<-" . ?←)
-                                     ("<--" . ?⬅)
+                                     ("<==" . ?⬅)
                                      ("<->" . ?⬌)
                                      ("|^" . ?⬆)
                                      ("|v" . ?⬇)
