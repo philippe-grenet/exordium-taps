@@ -32,6 +32,10 @@
   (load-file "~/.emacs.d/taps/markdown-mode/osx-dictionary.el")
   (define-key markdown-mode-map (kbd "s-$") 'osx-dictionary))
 
+
+;; Inline Mermaid rendering (C-c m m / C-c m M)
+(load-file "~/.emacs.d/taps/markdown-mode/markdown-mermaid.el")
+
 
 ;;; Minimal Markdown -> Org converter (pure Elisp), in-place on region.
 ;;; Usage:
