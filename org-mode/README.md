@@ -10,7 +10,17 @@
 | <kbd>F12</kbd>                      | List files in Org repo                               |
 | <kbd>S-F12</kbd>                    | Open todo list                                       |
 | <kbd>C-F12</kbd>                    | Open catch up notes                                  |
+| <kbd>C-c o c</kbd>                  | Show next-meeting TODOs for a person (see below)     |
 | <kbd>F19</kbd>                      | Open/close calendar                                  |
+
+#### Catch-up TODOs
+
+<kbd>C-c o c</kbd> is a companion to Capture (<kbd>M-F12</kbd>): from any buffer it pops
+up the same single-key person menu built from `org-capture-templates` (plus Inbox and
+Today). After picking a person, a small, dismissable buffer lists only their open
+discussion items — the headings marked `TODO`, `WORK`, or `WAIT` directly under that
+person in `catchup.org` (dated notes and closed items are skipped) — so you can quickly
+see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
 
 ### Navigation
 
