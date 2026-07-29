@@ -10,16 +10,19 @@ Keybinding           | Description
 <kbd>S-F12</kbd>     | Open HIRE
 <kbd>C-F12</kbd>     | Capture (today, week, next, team meeting)
 <kbd>C-c t</kbd>     | Move task to today
+<kbd>C-c o #</kbd>   | Insert/update the file description (`#+description:`)
 
 ## Markdown mode
 
 Keybinding           | Description
 ---------------------|---------------------------------------------------------
 <kbd>S-$</kbd>       | Look for word in the MacOS dictionary app
+<kbd>C-c m #</kbd>   | Insert/update the file description (YAML frontmatter)
 
 Functions:
 
 - M-x `straighten-quotes`: replace non-ascii quotes in the region.
+- M-x `my/update-description`: insert/update a one-line file description (Org `#+description:` or Markdown frontmatter, by major mode).
 
 ## Utilities
 

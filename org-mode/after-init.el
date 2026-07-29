@@ -932,6 +932,10 @@ This redefinition adds support for buffer-local override in Org-Mode."
 ;; C-c o R: Resize table to fit fill-column
 (define-key org-mode-map (kbd "C-c o R") #'my/org-table-resize-to-fill-column)
 
+;; C-c o #: Insert/update the file description (#+description: keyword)
+(load-file "~/.emacs.d/taps/common/description-field.el")
+(define-key org-mode-map (kbd "C-c o #") #'my/update-description)
+
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
 ;; End:

@@ -47,6 +47,7 @@ see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
 | <kbd>C-c o l</kbd>    | Paste a Jira epic link                                             |
 | <kbd>C-c o i</kbd>    | Insert an image placeholder                                        |
 | <kbd>C-c o m</kbd>    | Insert a Mermaid diagram placeholder                               |
+| <kbd>C-c o #</kbd>    | Insert/update the file description (`my/update-description`)       |
 
 ### Tables
 
@@ -78,6 +79,18 @@ see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
 | QUESTIONED  | for requirements                                                             |
 | PROCEED     | for hiring                                                                   |
 | REJECT      | for hiring                                                                   |
+
+## File description
+
+<kbd>C-c o #</kbd> (`M-x my/update-description`) inserts or updates a one-line
+`#+description:` keyword near the top of the file, for use by an LLM-wiki
+`index.md` indexer. An existing `#+description:` line (case-insensitive) is
+updated in place; otherwise the keyword is inserted into the top keyword block —
+right after `#+title:` if present, else after the last leading `#+keyword:`
+line, else at the very top, always before the first headline. When updating, the
+prompt is pre-filled with the current value. The same command works in Markdown
+buffers (see the Markdown tap), where it maintains a YAML frontmatter
+`description:` key instead.
 
 ## Special syntax
 

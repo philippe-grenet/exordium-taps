@@ -26,6 +26,10 @@
 (define-key markdown-mode-map (kbd "C-c m T") 'my/org-table-toggle-format)
 (define-key markdown-mode-map (kbd "C-c m R") 'my/org-table-resize-to-fill-column)
 
+;; C-c m #: Insert/update the file description (YAML frontmatter `description:')
+(load-file "~/.emacs.d/taps/common/description-field.el")
+(define-key markdown-mode-map (kbd "C-c m #") #'my/update-description)
+
 
 ;; Use the Mac's built in dictionary
 (when exordium-osx
