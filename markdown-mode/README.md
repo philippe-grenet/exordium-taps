@@ -19,6 +19,7 @@
 | <kbd>s-Tab</kbd>        | Cycle visibility (`markdown-cycle`)                  |
 | <kbd>s-$</kbd>          | Look up word in macOS Dictionary (macOS only)        |
 | <kbd>C-c m #</kbd>      | Insert/update the file description (`my/update-description`) |
+| <kbd>C-c m i</kbd>      | Insert an image link, defaulting to the `img/` subdirectory  |
 
 ### Table format
 

@@ -30,6 +30,17 @@
 (load-file "~/.emacs.d/taps/common/description-field.el")
 (define-key markdown-mode-map (kbd "C-c m #") #'my/update-description)
 
+;; C-c m i: Insert a Markdown image link, defaulting to the `img/' subdirectory.
+(defun my/markdown-insert-image ()
+  "Insert a Markdown image link, prompting for the file under `img/'.
+Point is left inside the alt-text brackets."
+  (interactive)
+  (let ((file (read-file-name "Image: " nil nil nil "img/")))
+    (insert (format "![](%s)" file))
+    (search-backward "](")))
+
+(define-key markdown-mode-map (kbd "C-c m i") #'my/markdown-insert-image)
+
 
 ;; Use the Mac's built in dictionary
 (when exordium-osx
