@@ -116,12 +116,24 @@ or comment block. See also `repunctuate-sentences'."
 ;; C-x b replacement for switch-to-buffer
 (define-key global-map (kbd "C-x b") 'helm-buffers-list)
 
-;; ;; Change the order of buffers in switch-to-buffer: show non-system buffers first
-;; (defun pg-around-helm-buffers-sort-transformer (candidates source)
-;;   candidates)
+;; Change the order of buffers in the C-x b list: opened files first (most
+;; recently displayed on top), then system/non-file buffers, then the buffers
+;; visible in the current frame (so the current buffer stays buried at the end).
+(defun pg-helm-buffers-reorder-buffer-list (visibles others)
+  "Reorder Helm's buffer list to group file buffers before system buffers.
+VISIBLES are the buffers displayed in the current frame; they are kept
+at the very end.  OTHERS are all the remaining buffers, already in
+`buffer-list' order (most-recently-displayed first).  OTHERS are split
+into file-visiting buffers and the rest, each keeping their relative
+order."
+  (let (files non-files)
+    (dolist (name others)
+      (if (buffer-file-name (get-buffer name))
+          (push name files)
+        (push name non-files)))
+    (nconc (nreverse files) (nreverse non-files) visibles)))
 
-;; (advice-add 'helm-buffers-sort-transformer
-;;             :override #'pg-around-helm-buffers-sort-transformer)
+(setq helm-buffer-list-reorder-fn #'pg-helm-buffers-reorder-buffer-list)
 
 ;; C-x f is better than C-x h
 (define-key global-map (kbd "C-c f") 'helm-projectile)
