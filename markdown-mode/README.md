@@ -18,6 +18,8 @@
 | ----------------------- | ---------------------------------------------------- |
 | <kbd>s-Tab</kbd>        | Cycle visibility (`markdown-cycle`)                  |
 | <kbd>s-$</kbd>          | Look up word in macOS Dictionary (macOS only)        |
+| <kbd>C-c m #</kbd>      | Insert/update the file description (`my/update-description`) |
+| <kbd>C-c m i</kbd>      | Insert an image link, defaulting to the `img/` subdirectory  |
 
 ### Table format
 
@@ -57,6 +59,16 @@ Inside a pipe table, standard keys are context-sensitive:
 Outside a table, <kbd>M-left</kbd> / <kbd>M-right</kbd> move by syntax unit.
 
 ## Utilities
+
+### File description
+
+`M-x my/update-description` (<kbd>C-c m #</kbd>) inserts or updates a one-line
+description in the buffer's YAML frontmatter, for use by an LLM-wiki `index.md`
+indexer. If frontmatter exists (a `---`-fenced block on line 1), the
+`description:` key is updated in place or added; otherwise a new block is
+prepended above any `# H1`. The value is double-quoted when it contains a colon
+or other YAML-special characters. When updating, the prompt is pre-filled with
+the current value. The same command works in Org buffers (see the Org tap).
 
 ### Straighten quotes
 

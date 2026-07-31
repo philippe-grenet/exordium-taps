@@ -549,6 +549,98 @@ to move them all to the archive file in one shot."
 (define-key global-map [(delete)] #'org-capture)
 
 
+;;; Catch-up TODOs
+;;; C-c o C: pick a person (same keys as org-capture) and pop up a small buffer
+;;; listing the open discussion items (TODO/WORK/WAIT) to raise at the next meeting.
+
+(defvar my/org-catchup-todo-keywords '("TODO" "WORK" "WAIT")
+  "TODO keywords considered open discussion items for catch-up popups.")
+
+(defun my/org-catchup--people-table ()
+  "Build an `org-mks' table of catchup people from `org-capture-templates'.
+Prefix groups (2-element templates, e.g. the \"a\" submenu) are kept; full
+templates that target a file+headline (catch-up people plus Inbox/Today) are
+kept, producing (KEY DESC HEADLINE FILE).  Prefix groups with no surviving
+child are pruned."
+  (let (table)
+    (dolist (tmpl org-capture-templates)
+      (pcase tmpl
+        (`(,key ,desc) (push (list key desc) table))              ; prefix group
+        (`(,key ,desc ,_type ,target . ,_)
+         (when (and (consp target)
+                    (eq (car target) 'file+headline))
+           (push (list key desc (nth 2 target) (nth 1 target))    ; usable entry
+                 table)))))
+    (setq table (nreverse table))
+    ;; Drop prefix groups (length 2) that no usable entry extends.
+    (cl-remove-if (lambda (e)
+                    (and (= (length e) 2)
+                         (not (cl-some (lambda (o)
+                                         (and (> (length o) 2)
+                                              (not (equal o e))
+                                              (string-prefix-p (car e) (car o))))
+                                       table))))
+                  table)))
+
+(defun my/org-catchup--collect (headline file)
+  "Return list of subtree strings for open items directly under HEADLINE in FILE."
+  (with-current-buffer (find-file-noselect file)
+    (save-excursion
+      (save-restriction
+        (widen)
+        (let ((pos (org-find-exact-headline-in-buffer headline)))
+          (unless pos (user-error "Headline not found: %s" headline))
+          (goto-char pos)
+          (let ((child-level (1+ (org-current-level))))
+            (org-narrow-to-subtree)
+            (delq nil
+                  (org-map-entries
+                   (lambda ()
+                     (when (and (= (org-current-level) child-level)
+                                (member (org-get-todo-state)
+                                        my/org-catchup-todo-keywords))
+                       (buffer-substring-no-properties
+                        (line-beginning-position)
+                        (save-excursion (org-end-of-subtree t t)))))
+                   t 'tree))))))))
+
+(defun my/org-catchup--show (name headline file)
+  "Display the open items under HEADLINE in FILE in a small, dismissable buffer.
+NAME is used for the buffer name and header line."
+  (let ((items (my/org-catchup--collect headline file)))
+    (if (null items)
+        (message "No open (TODO/WORK/WAIT) items for %s" name)
+      (let ((buf (get-buffer-create (format "*Catch-up: %s*" name))))
+        (with-current-buffer buf
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert (mapconcat (lambda (s) (string-trim-right s)) items "\n")))
+          (goto-char (point-min))
+          (org-mode)                         ; fontification + svg-tag TODO pills
+          (setq-local header-line-format
+                      (format " Catch-up — %s   (q to dismiss)" name))
+          (view-mode 1))                     ; read-only; q = quit-window
+        (let ((win (display-buffer
+                    buf '((display-buffer-below-selected display-buffer-at-bottom)))))
+          (when win
+            (fit-window-to-buffer win (floor (* 0.5 (frame-height))) 5)
+            (ignore-errors (window-resize win 1))  ; one blank line of breathing room
+            (select-window win)))))))        ; focus so q dismisses immediately
+
+(defun my/org-catchup-todos ()
+  "Pick a catch-up person (same keys as `org-capture') and show their open items."
+  (interactive)
+  (let* ((entry (org-mks (my/org-catchup--people-table)
+                         "Select person for catch-up TODOs" "Person: "))
+         ;; DESC may contain a leading/interior tab (e.g. "📥\tInbox"); normalise.
+         (name (string-trim (replace-regexp-in-string "\t+" " " (nth 1 entry))))
+         (headline (nth 2 entry))
+         (file (nth 3 entry)))
+    (my/org-catchup--show name headline file)))
+
+(define-key global-map (kbd "C-c o c") #'my/org-catchup-todos)
+
+
 ;;; File location
 
 ;; Link abbreviations.
@@ -838,6 +930,10 @@ This redefinition adds support for buffer-local override in Org-Mode."
 
 ;; C-c o R: Resize table to fit fill-column
 (define-key org-mode-map (kbd "C-c o R") #'my/org-table-resize-to-fill-column)
+
+;; C-c o #: Insert/update the file description (#+description: keyword)
+(load-file "~/.emacs.d/taps/common/description-field.el")
+(define-key org-mode-map (kbd "C-c o #") #'my/update-description)
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
