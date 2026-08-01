@@ -1,1 +1,5 @@
 *.elc
+
+# Internal (Bloomberg-only) tap: separate bbgithub repo
+# (pgrenet/exordium-taps-internal) cloned here; never publish to this repo.
+/zz-internal/

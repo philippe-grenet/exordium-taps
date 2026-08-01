@@ -491,7 +491,8 @@ order."
 
 ;; BQL mode
 (load "~/.emacs.d/taps/util/bql-mode.el")
-(load "~/.emacs.d/taps/util/bql-next-mode.el")
+;; BQL.Next mode is internal-only; it lives in the zz-internal tap
+;; (pgrenet/exordium-taps-internal) and loads itself when that tap is present.
 
 
 ;;; after-init ends here
