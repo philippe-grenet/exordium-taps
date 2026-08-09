@@ -241,14 +241,6 @@ to move them all to the archive file in one shot."
                                 (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
             ("\\(REVIEW\\)" . ((lambda (tag)
                                  (svg-tag-make tag :face 'font-lock-variable-name-face :inverse t))))
-            ("\\(QUESTIONED\\)" . ((lambda (tag)
-                                     (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-            ("\\(POSTPONED\\)" . ((lambda (tag)
-                                    (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-            ("\\(PROCEED\\)" . ((lambda (tag)
-                                  (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
-            ("\\(REJECT\\)" . ((lambda (tag)
-                                 (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
             ;; Priorities
             ("\\(\\[#A\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
@@ -307,6 +299,64 @@ to move them all to the archive file in one shot."
                                               (svg-progress-count (substring tag 1 -1)))))))
     (add-hook 'org-mode-hook 'svg-tag-mode)
     ))
+
+
+;;; Auto svg-tags for per-file TODO keywords
+;;
+;; Files may declare extra states via a "#+todo:" line (e.g. DROPPED, GOAL)
+;; that have no rule in the global `svg-tag-tags'.  For any such keyword we
+;; generate a buffer-local pill on the fly.  Colours are auto-cycled, but a
+;; file can pin them explicitly with one or more directives:
+;;
+;;   #+svg_todo: DROPPED font-lock-comment-face
+;;   #+svg_todo: GOAL    font-lock-warning-face
+
+(defvar my/svg-todo-auto-palette
+  '(font-lock-keyword-face font-lock-constant-face
+    font-lock-preprocessor-face font-lock-doc-face)
+  "Faces cycled through for auto-generated TODO svg tags.")
+
+(defun my/svg-todo-covered-p (kw)
+  "Non-nil if KW already matches an existing `svg-tag-tags' rule."
+  (cl-some (lambda (entry) (string-match-p (car entry) kw)) svg-tag-tags))
+
+(defun my/svg-todo-overrides ()
+  "Return an alist (KEYWORD . FACE) parsed from #+svg_todo: directives."
+  (let (alist)
+    (dolist (val (cdr (assoc "SVG_TODO" (org-collect-keywords '("SVG_TODO")))))
+      (pcase-let ((`(,kw ,face) (split-string (string-trim val) nil t)))
+        (when (and kw face (facep (intern face)))
+          (push (cons kw (intern face)) alist))))
+    alist))
+
+(defun my/svg-todo-auto-tags ()
+  "Give any file-local TODO keyword without an svg rule a default pill.
+Explicit colours from #+svg_todo: directives take precedence over the
+auto-cycled palette; done-type keywords otherwise fall back to a dimmed face."
+  (when (bound-and-true-p svg-tag-mode)
+    (let ((overrides (my/svg-todo-overrides))
+          (extra '())
+          (i 0))
+      (dolist (kw (and (boundp 'org-todo-keywords-1) org-todo-keywords-1))
+        (unless (my/svg-todo-covered-p kw)
+          (let ((face (or (cdr (assoc kw overrides))
+                          (if (member kw org-done-keywords)
+                              'font-lock-comment-face
+                            (prog1 (nth (mod i (length my/svg-todo-auto-palette))
+                                        my/svg-todo-auto-palette)
+                              (setq i (1+ i)))))))
+            (push (cons (format "\\(%s\\)" (regexp-quote kw))
+                        (list (lambda (tag)
+                                (svg-tag-make tag :face face :inverse t))))
+                  extra))))
+      (when extra
+        ;; Buffer-local copy = new rules + global rules; global list untouched.
+        (setq-local svg-tag-tags (append extra svg-tag-tags))
+        (svg-tag-mode -1)
+        (svg-tag-mode 1)))))
+
+;; Append so it runs AFTER svg-tag-mode has been enabled by its own hook.
+(add-hook 'org-mode-hook #'my/svg-todo-auto-tags t)
 
 
 ;;; Overline startup option

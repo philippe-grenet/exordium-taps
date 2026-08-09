@@ -76,9 +76,36 @@ see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
 | BLOCKED     | blocked on something (not someone)                                           |
 | READY       | for mentoring                                                                |
 | REVIEW      | for requirements                                                             |
-| QUESTIONED  | for requirements                                                             |
-| PROCEED     | for hiring                                                                   |
-| REJECT      | for hiring                                                                   |
+
+These statuses are styled as SVG pills globally. A file that declares its own
+extra statuses via a `#+todo:` line gets pills for them automatically (see
+below), so you can use ad-hoc workflows without touching this config.
+
+### Per-file statuses
+
+When a file defines extra TODO keywords with a `#+todo:` (or `#+seq_todo:`)
+line, any keyword that isn't already styled globally is given an SVG pill on the
+fly, in that buffer only. Colours are auto-assigned: done-type keywords (those
+after the `|`) are dimmed, the rest cycle through a small palette.
+
+```org
+#+todo: TODO GOAL | DONE DROPPED
+```
+
+To pin a specific colour instead of the auto-assigned one, add one or more
+`#+svg_todo:` directives naming the keyword and a face:
+
+```org
+#+svg_todo: DROPPED font-lock-comment-face
+#+svg_todo: GOAL    font-lock-warning-face
+```
+
+Invalid face names are ignored (the keyword falls back to the auto palette). The
+global `svg-tag-tags` list is never modified — each buffer gets its own copy.
+
+Note: pills are generated when the buffer loads. If you edit a `#+todo:` or
+`#+svg_todo:` line in an open buffer, re-run `M-x org-mode` (or revert the file)
+to pick up the change.
 
 ## File description
 
