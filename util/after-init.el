@@ -27,7 +27,7 @@
 (defun fill-unfill-paragraph (arg)
   (interactive "P")
   (if arg
-      (unfill-paragraph)
+      (exordium-unfill-paragraph t)
     (fill-paragraph)))
 (define-key global-map (kbd "M-q") 'fill-unfill-paragraph)
 
@@ -489,6 +489,16 @@ order."
   :ensure t)
 
 
+;; Emacs server
+;; Start the server unless one is already running (e.g. another Emacs
+;; instance launched for testing already holds the socket).
+(require 'server)
+(if (server-running-p)
+    (message "Emacs server already running")
+  (server-start)
+  (message "Emacs server started"))
+
+
 ;; BQL mode
 (load "~/.emacs.d/taps/util/bql-mode.el")
 
