@@ -214,6 +214,9 @@ If no region is active, converts the entire buffer in-place."
 
 (define-key markdown-mode-map (kbd "C-c m t") 'my/markdown-toggle-preview-theme)
 
+;; C-c m v: toggle the live preview (mirrors C-c o v in org-mode).
+(define-key markdown-mode-map (kbd "C-c m v") 'markdown-live-preview-mode)
+
 (defvar-local my/markdown-preview-export-file nil
   "Exported HTML file backing this xwidget preview buffer.")
 

@@ -983,6 +983,10 @@ This redefinition adds support for buffer-local override in Org-Mode."
 (load-file "~/.emacs.d/taps/common/description-field.el")
 (define-key org-mode-map (kbd "C-c o #") #'my/update-description)
 
+
+;; Live HTML preview in an xwidget (C-c o v / C-c o V). See org-preview.el.
+(load-file "~/.emacs.d/taps/org-mode/org-preview.el")
+
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
 ;; End:
