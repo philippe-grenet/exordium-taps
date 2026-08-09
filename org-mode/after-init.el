@@ -341,15 +341,13 @@ to move them all to the archive file in one shot."
 
 (defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
                             (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
-                            (,(colorize-note-extension "datasets.org")   . "~/Documents/org/datasets.org")
-                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")
-                            (,(colorize-note-extension "tickets.org") . "~/Documents/org/tickets.org")
-                            (,(colorize-note-extension "requirements.org") . "~/Documents/org/requirements.org")))
+                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
 
 (defconst notes-root-directories
   '("~/Documents/org/bql/"
     "~/Documents/org/calcrt/"
     "~/Documents/org/planning/"
+    "~/Documents/org/datasets/"
     "~/Documents/org/projects/"
     "~/Documents/org/architecture/"
     "~/Documents/org/notes/"
