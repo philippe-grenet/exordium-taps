@@ -84,6 +84,15 @@ Renders ` ```mermaid ` fenced code blocks as images shown in overlays right belo
 
 Press <kbd>C-c m m</kbd> to render and <kbd>C-c m M</kbd> to clear. Overlays do not auto-refresh, so re-run <kbd>C-c m m</kbd> after editing a block. Rendering options (theme, background, width) are `defvar`s at the top of `markdown-mermaid.el`.
 
+### Live preview
+
+<kbd>C-c m v</kbd> toggles a live HTML preview in an xwidget window (rendered with
+pandoc, re-rendered on save), and <kbd>C-c m t</kbd> toggles its theme (dark Mocha
+<-> light Latte). Closing either the source Markdown buffer or the preview buffer
+tears down the preview symmetrically: the other buffer is closed and the temporary
+HTML file is deleted. Closing the preview never kills the source buffer, so it
+won't respawn.
+
 ## Files
 
 | File                            | Purpose                                                               |

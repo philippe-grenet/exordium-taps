@@ -64,6 +64,19 @@ see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
 | <kbd>C-c o o<kbd>     | Open image externally (using native MacOS app)                     |
 | <kbd>C-c o D<kbd>     | Open DRQS                                                          |
 
+### Live preview
+
+| Keybinding            | Description                                                             |
+| --------------------- | ---------------------------------------------------------------------- |
+| <kbd>C-c o v</kbd>    | Toggle live HTML preview in an xwidget (<kbd>C-u</kbd> to include a TOC) |
+| <kbd>C-c o V</kbd>    | Toggle preview theme (Mocha <-> Latte)                                 |
+
+Renders the buffer to HTML via `ox-html` in an xwidget window, re-rendered on save,
+using the same Catppuccin CSS as the Markdown preview. Closing either the source Org
+buffer or the preview buffer tears down the preview symmetrically: the other buffer
+is closed and the temporary HTML file (in `/tmp`) is deleted. Closing the preview
+never kills the source buffer, so it won't respawn.
+
 ## Statuses
 
 | Status      | Meaning                                                                      |

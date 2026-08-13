@@ -403,27 +403,52 @@ auto-cycled palette; done-type keywords otherwise fall back to a dimmed face."
     "~/Documents/org/notes/"
     "~/Documents/org/ap/"
     "~/Documents/org/ai/")
-  "Root directories to scan for notes. Each root and its immediate subdirectories are included.")
+  "Root directories to scan for notes. Each root and its subdirectories, down
+to two levels below the root, are included.")
+
+(defun notes--subdirectories (dir depth)
+  "Return DIR followed by its subdirectories down to DEPTH levels below DIR.
+DEPTH of 0 returns just DIR, DEPTH of 1 returns DIR and its immediate
+subdirectories, and so on. Dot-directories are skipped."
+  (cons dir
+        (when (> depth 0)
+          (cl-mapcan (lambda (sub) (notes--subdirectories sub (1- depth)))
+                     (cl-remove-if-not
+                      #'file-directory-p
+                      (directory-files dir t "^[^.]"))))))
 
 (defun notes-directories ()
-  "Return all notes directories: each root plus its immediate subdirectories."
+  "Return all notes directories: each root plus its subdirectories, down to
+two levels below each root (three levels including the root)."
   (cl-remove-duplicates
    (cl-loop for root in notes-root-directories
             when (file-directory-p root)
-            collect root
-            and append (cl-remove-if-not
-                        #'file-directory-p
-                        (directory-files root t "^[^.]")))
+            append (notes--subdirectories root 2))
    :test #'string=))
+
+(defun notes--dir-label (dir)
+  "Return DIR's path label starting from its matching notes root.
+For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
+  (let* ((dir (file-name-as-directory (expand-file-name dir)))
+         (root (cl-find-if
+                (lambda (r)
+                  (string-prefix-p (file-name-as-directory (expand-file-name r)) dir))
+                notes-root-directories)))
+    (if root
+        (let ((parent (file-name-directory
+                       (directory-file-name (file-name-as-directory
+                                             (expand-file-name root))))))
+          (directory-file-name (file-relative-name dir parent)))
+      (file-name-nondirectory (directory-file-name dir)))))
 
 (defun list-notes-in-directory (dir)
   ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
-  ;; file-name includes the last sub-directory.
+  ;; file-name includes the sub-directory path relative to the notes root.
   ;; The list is sorted by file-name ascending.
   (cl-flet ((note-name-and-path (file)
               (let* ((file-name (file-name-base file))
                      (file-ext  (file-name-extension file t)))
-                (cons (concat (propertize (car (last (delete "" (split-string dir "/"))))
+                (cons (concat (propertize (notes--dir-label dir)
                                           'face 'helm-ff-directory)
                               "/" file-name
                               (propertize file-ext 'face (if (string= file-ext ".org")

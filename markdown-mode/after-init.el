@@ -223,11 +223,47 @@ If no region is active, converts the entire buffer in-place."
 (defvar my/markdown-preview-xwidget nil
   "Xwidget session used by the markdown live preview.")
 
-(defun my/markdown-preview-cleanup-file ()
-  "Delete the exported HTML file backing this xwidget preview buffer."
-  (when (and my/markdown-preview-export-file
-             (file-exists-p my/markdown-preview-export-file))
-    (delete-file my/markdown-preview-export-file)))
+(defvar my/markdown-preview--in-teardown nil
+  "Non-nil while tearing down a preview, to prevent re-entrant kills.")
+
+(defun my/markdown-preview-teardown (source xwidget file)
+  "Tear down a markdown live preview.
+Delete FILE, kill the XWIDGET preview buffer, and turn off live
+preview in the SOURCE buffer (SOURCE itself is never killed).
+Safe to call from the `kill-buffer-hook' of either buffer: the
+buffer currently being killed is left alone and re-entrant calls
+are ignored, so killing the source and killing the xwidget behave
+the same."
+  (unless my/markdown-preview--in-teardown
+    (let ((my/markdown-preview--in-teardown t)
+          (kill-buffer-query-functions nil))
+      (when (and file (file-exists-p file))
+        (delete-file file))
+      (when (buffer-live-p source)
+        (with-current-buffer source
+          (setq markdown-live-preview-buffer nil) ; avoid re-killing xwidget
+          (when (and (bound-and-true-p markdown-live-preview-mode)
+                     (not (eq source (current-buffer))))
+            (markdown-live-preview-mode -1))))
+      (when (and (buffer-live-p xwidget)
+                 (not (eq xwidget (current-buffer))))
+        (kill-buffer xwidget)))))
+
+(defun my/markdown-preview--on-xwidget-kill ()
+  "Tear down the preview when the xwidget buffer is killed."
+  (my/markdown-preview-teardown
+   markdown-live-preview-source-buffer
+   (current-buffer)
+   my/markdown-preview-export-file))
+
+(defun my/markdown-preview--on-source-kill ()
+  "Tear down the preview when the markdown source buffer is killed."
+  (my/markdown-preview-teardown
+   (current-buffer)
+   markdown-live-preview-buffer
+   (and (buffer-live-p markdown-live-preview-buffer)
+        (buffer-local-value 'my/markdown-preview-export-file
+                            markdown-live-preview-buffer))))
 
 (defun my/markdown-preview-window-xwidget (file)
   "Preview FILE with xwidget browser"
@@ -238,7 +274,7 @@ If no region is active, converts the entire buffer in-place."
       (and (eq buf (current-buffer)) (quit-window))
       (with-current-buffer buf
         (setq-local my/markdown-preview-export-file file)
-        (add-hook 'kill-buffer-hook #'my/markdown-preview-cleanup-file nil t))
+        (add-hook 'kill-buffer-hook #'my/markdown-preview--on-xwidget-kill nil t))
       (pop-to-buffer buf))))
 
 (setq markdown-live-preview-window-function #'my/markdown-preview-window-xwidget)
@@ -273,10 +309,15 @@ approximate but tracks well in practice.  Does nothing when
 (add-hook 'markdown-live-preview-mode-hook
           (lambda ()
             (if markdown-live-preview-mode
-                (add-hook 'post-command-hook
-                          #'my/markdown-preview-sync-scroll nil t)
+                (progn
+                  (add-hook 'post-command-hook
+                            #'my/markdown-preview-sync-scroll nil t)
+                  (add-hook 'kill-buffer-hook
+                            #'my/markdown-preview--on-source-kill nil t))
               (remove-hook 'post-command-hook
-                           #'my/markdown-preview-sync-scroll t))))
+                           #'my/markdown-preview-sync-scroll t)
+              (remove-hook 'kill-buffer-hook
+                           #'my/markdown-preview--on-source-kill t))))
 
 
 ;; == Snippets ==

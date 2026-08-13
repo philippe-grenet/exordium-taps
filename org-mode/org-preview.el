@@ -145,21 +145,70 @@ themes.  A table of contents is included only when
     (org-export-to-file 'html file)
     file))
 
-(defun my/org-preview-cleanup-file ()
-  "Delete the temp HTML file backing this buffer's Org preview."
-  (when (and my/org-preview-export-file
-             (file-exists-p my/org-preview-export-file))
-    (delete-file my/org-preview-export-file))
-  (setq my/org-preview-export-file nil))
+(defvar-local my/org-preview-buffer nil
+  "Xwidget preview buffer backing this Org source buffer.")
+
+(defvar-local my/org-preview-source-buffer nil
+  "Org source buffer that this xwidget preview was generated from.")
+
+(defvar my/org-preview--in-teardown nil
+  "Non-nil while tearing down a preview, to prevent re-entrant kills.")
+
+(defun my/org-preview-teardown (source xwidget file)
+  "Tear down an Org live preview.
+Delete FILE, kill the XWIDGET preview buffer, and turn off live
+preview in the SOURCE buffer (SOURCE itself is never killed).
+Safe to call from the `kill-buffer-hook' of either buffer: the
+buffer currently being killed is left alone and re-entrant calls
+are ignored, so killing the source and killing the xwidget behave
+the same."
+  (unless my/org-preview--in-teardown
+    (let ((my/org-preview--in-teardown t)
+          (kill-buffer-query-functions nil))
+      (when (and file (file-exists-p file))
+        (delete-file file))
+      (when (buffer-live-p source)
+        (with-current-buffer source
+          (setq my/org-preview-buffer nil     ; avoid re-killing xwidget
+                my/org-preview-export-file nil)
+          (when (and (bound-and-true-p my/org-live-preview-mode)
+                     (not (eq source (current-buffer))))
+            (my/org-live-preview-mode -1))))
+      (when (and (buffer-live-p xwidget)
+                 (not (eq xwidget (current-buffer))))
+        (kill-buffer xwidget)))))
+
+(defun my/org-preview--on-xwidget-kill ()
+  "Tear down the preview when the xwidget buffer is killed."
+  (let ((source my/org-preview-source-buffer))
+    (my/org-preview-teardown
+     source
+     (current-buffer)
+     (and (buffer-live-p source)
+          (buffer-local-value 'my/org-preview-export-file source)))))
+
+(defun my/org-preview--on-source-kill ()
+  "Tear down the preview when the Org source buffer is killed."
+  (my/org-preview-teardown
+   (current-buffer)
+   my/org-preview-buffer
+   my/org-preview-export-file))
 
 (defun my/org-preview-window-xwidget (file)
   "Show FILE in the xwidget preview window, reusing the session."
-  (xwidget-webkit-browse-url (concat "file://" file))
-  (setq my/org-preview-xwidget (xwidget-webkit-current-session))
-  (let ((buf (xwidget-buffer my/org-preview-xwidget)))
-    (when (buffer-live-p buf)
-      (and (eq buf (current-buffer)) (quit-window))
-      (pop-to-buffer buf))))
+  (let ((source (current-buffer)))
+    (xwidget-webkit-browse-url (concat "file://" file))
+    (setq my/org-preview-xwidget (xwidget-webkit-current-session))
+    (let ((buf (xwidget-buffer my/org-preview-xwidget)))
+      (when (buffer-live-p buf)
+        (and (eq buf (current-buffer)) (quit-window))
+        (when (buffer-live-p source)
+          (with-current-buffer source
+            (setq my/org-preview-buffer buf)))
+        (with-current-buffer buf
+          (setq my/org-preview-source-buffer source)
+          (add-hook 'kill-buffer-hook #'my/org-preview--on-xwidget-kill nil t))
+        (pop-to-buffer buf)))))
 
 (defun my/org-preview-refresh ()
   "Re-export the current Org buffer and update the xwidget preview."
@@ -201,12 +250,14 @@ Re-renders on every save; tracks point via proportional scroll."
           (user-error "This Emacs was built without xwidget support"))
         (add-hook 'after-save-hook #'my/org-preview-refresh nil t)
         (add-hook 'post-command-hook #'my/org-preview-sync-scroll nil t)
-        (add-hook 'kill-buffer-hook #'my/org-preview-cleanup-file nil t)
+        (add-hook 'kill-buffer-hook #'my/org-preview--on-source-kill nil t)
         (my/org-preview-refresh))
     (remove-hook 'after-save-hook #'my/org-preview-refresh t)
     (remove-hook 'post-command-hook #'my/org-preview-sync-scroll t)
-    (remove-hook 'kill-buffer-hook #'my/org-preview-cleanup-file t)
-    (my/org-preview-cleanup-file)))
+    (remove-hook 'kill-buffer-hook #'my/org-preview--on-source-kill t)
+    (my/org-preview-teardown (current-buffer)
+                             my/org-preview-buffer
+                             my/org-preview-export-file)))
 
 (defun my/org-live-preview (&optional arg)
   "Toggle the Org live HTML preview.
