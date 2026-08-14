@@ -530,81 +530,78 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
          :prepend t
          :empty-lines-after 0)
         ("S" "\tShabbir" entry
-         (file+headline "~/Documents/org/catchup.org" "✨ Shabbir")
+         (file+headline "~/Documents/org/catchup.org" "✨ Shabbir Dahodwala")
          "** TODO %?Shabbir\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("A" "\tAnthony" entry
-         (file+headline "~/Documents/org/catchup.org"
-                        "✨ Anthony ([[https://docs.google.com/document/d/11epTeSzu5tgxVOf19rn88C41d6JvLyKN4YTpERd6ZW0/edit?tab=t.0][topics]])")
+         (file+headline "~/Documents/org/catchup.org" "✨ AC (Anthony Comerico)")
          "** TODO %?AC\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("M" "\tManish" entry
-         (file+headline "~/Documents/org/catchup.org"
-                        "✨ Manish ([[https://docs.google.com/document/d/1ObXxx36mXhHcKsnYiKc5jMAfDyDeFzIqQdR2dS7sI9E/edit?tab=t.0#heading=h.px0s0g92opc8][topics]])")
+         (file+headline "~/Documents/org/catchup.org" "✨ Manish Nair")
          "** TODO %?Manish\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("s" "\tSathya" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Sathya")
+         (file+headline "~/Documents/org/catchup.org" "🌟 Sathya (Sathyanarayana Chintapalli)")
          "** TODO %?Sathya\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("t" "\tTom" entry
-         (file+headline "~/Documents/org/catchup.org"
-                        "⭐️ Tom ([[https://docs.google.com/document/d/102GWuRqH-sYFMNw9DPKu9npDsGoZXNFW0-mKDWbuRJk/edit#heading=h.2cjiyf4l29p1][topics]])")
+         (file+headline "~/Documents/org/catchup.org" "🌟 Tom Walsh")
          "** TODO %?Tom\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("g" "\tGino" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Gino")
+         (file+headline "~/Documents/org/catchup.org" "👤 Gino (Ilougino Rocha)")
          "** TODO %?Gino\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("y" "\tYogesh" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Yogesh")
+         (file+headline "~/Documents/org/catchup.org" "👤 Yogesh Arora")
          "** TODO %?Yogesh\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("r" "\tRishi" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Rishi")
+         (file+headline "~/Documents/org/catchup.org" "👤 Rishi Raj")
          "** TODO %?Rishi\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("p" "\tPranil" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Pranil")
+         (file+headline "~/Documents/org/catchup.org" "👤 Pranil Gupta")
          "** TODO %?Pranil\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("j" "\tJas" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Jas")
+         (file+headline "~/Documents/org/catchup.org" "👤 Jas (Jaskiran Sodhi)")
          "** TODO %?Jas\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("m" "\tMike" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Mike")
+         (file+headline "~/Documents/org/catchup.org" "👤 Weez (Mike Wiesemann)")
          "** TODO %?Mike\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("a" "\tAbhishek, Amey, Alicija, Alex")
         ("ag" "\tAbhishek" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Abhishek")
+         (file+headline "~/Documents/org/catchup.org" "🌟 AG (Abhishek Gupta)")
          "** TODO %?AG\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("am" "\tAmey" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Amey")
+         (file+headline "~/Documents/org/catchup.org" "👤 Amey  Purandare")
          "** TODO %?Amey\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("al" "\tAlicija" entry
-         (file+headline "~/Documents/org/catchup.org" "👤 Alicija ([[https://docs.google.com/document/d/13rZFsJHeT8UjChTZMPnRT65Oq1pKILwocxjcma5mkoE/edit?tab=t.3eojide0clcg#heading=h.p6lx1dt4yzzc][topics]])")
+         (file+headline "~/Documents/org/catchup.org" "👤 Alicija Bulota")
          "** TODO %?Alicija\n  %i\n"
          :prepend t
          :empty-lines-after 0)
         ("as" "\tAlex" entry
-         (file+headline "~/Documents/org/catchup.org" "⭐️ Alex")
+         (file+headline "~/Documents/org/catchup.org" "✨ Alex Serov")
          "** TODO %?Alex\n  %i\n"
          :prepend t
          :empty-lines-after 0)
