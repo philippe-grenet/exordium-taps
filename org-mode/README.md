@@ -12,6 +12,25 @@
 | <kbd>C-F12</kbd>                    | Open catch up notes                                  |
 | <kbd>C-c o c</kbd>                  | Show next-meeting TODOs for a person (see below)     |
 | <kbd>F19</kbd>                      | Open/close calendar                                  |
+| <kbd>⌃⌥⌘F12</kbd>                   | Capture to Inbox from anywhere in macOS (see below)  |
+| <kbd>⇧⌃⌥⌘F12</kbd>                  | Same, with the full template menu                    |
+
+#### Desktop capture
+
+<kbd>⌃⌥⌘F12</kbd> is Capture (<kbd>M-F12</kbd>) made available everywhere in the macOS
+desktop, not just inside Emacs. It pops a small dedicated Emacs frame, centered on the
+screen holding the focused window, which closes itself on <kbd>C-c C-c</kbd>,
+<kbd>C-c C-k</kbd>, <kbd>C-c C-w</kbd> or <kbd>C-g</kbd>. The plain binding goes straight
+to the Inbox template; add <kbd>⇧</kbd> to get the template menu instead. Pressing the
+hotkey again while a capture is open just refocuses that frame.
+
+The Emacs half lives in `org-capture-frame.el`. The hotkey itself is bound in
+Hammerspoon (`~/dotfiles/init.lua`), which shells out to `emacsclient` and passes the
+screen rectangle to center in — Emacs has no way of knowing which display you are
+looking at. It relies on the Emacs server, started by the `util` tap; if Emacs is not
+running, or the server is down, Hammerspoon reports it as an on-screen alert. Note that
+once the capture frame closes, macOS gives focus back to your main Emacs frame rather
+than to the application you were in.
 
 #### Catch-up TODOs
 

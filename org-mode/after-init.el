@@ -618,6 +618,10 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
 (define-key global-map [(f13)] #'org-capture)
 (define-key global-map [(delete)] #'org-capture)
 
+;; Capture from anywhere in the macOS desktop, via Hammerspoon and emacsclient.
+;; See org-capture-frame.el and ~/dotfiles/init.lua.
+(load-file "~/.emacs.d/taps/org-mode/org-capture-frame.el")
+
 
 ;;; Catch-up TODOs
 ;;; C-c o C: pick a person (same keys as org-capture) and pop up a small buffer
