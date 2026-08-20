@@ -63,11 +63,18 @@ as soon as a display sits to the left of the main one."
 (defun my/org-capture--setup ()
   "Give the capture buffer the whole capture frame, then shrink and recenter.
 `org-capture' splits the window, which would leave half a dozen usable lines,
-and the frame starts tall enough to show the template menu."
+and the frame starts tall enough to show the template menu.  Also force the
+pending fontification, so that the entry is styled as soon as it appears."
   (when (frame-parameter nil 'my/org-capture-frame)
     (delete-other-windows)
     (set-frame-height nil my/org-capture-frame-lines)
-    (my/org-capture--center (selected-frame))))
+    (my/org-capture--center (selected-frame))
+    ;; `jit-lock-defer-time' is non-nil, so the freshly inserted template is
+    ;; left marked `fontified' = `defer': the TODO pill and the bullet would
+    ;; only show up once an edit dirties the line.  The capture buffer is
+    ;; narrowed to the entry, so forcing the pass here is a handful of
+    ;; characters, never the whole of the target file.
+    (font-lock-ensure)))
 
 (add-hook 'org-capture-mode-hook #'my/org-capture--setup)
 
