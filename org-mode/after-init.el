@@ -394,15 +394,9 @@ auto-cycled palette; done-type keywords otherwise fall back to a dimmed face."
                             (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
 
 (defconst notes-root-directories
-  '("~/Documents/org/bql/"
-    "~/Documents/org/calcrt/"
-    "~/Documents/org/planning/"
-    "~/Documents/org/datasets/"
+  '("~/Documents/org/areas/"
     "~/Documents/org/projects/"
-    "~/Documents/org/architecture/"
-    "~/Documents/org/notes/"
-    "~/Documents/org/ap/"
-    "~/Documents/org/ai/")
+    "~/Documents/org/resources/")
   "Root directories to scan for notes. Each root and its subdirectories, down
 to two levels below the root, are included.")
 
