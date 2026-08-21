@@ -261,15 +261,15 @@ to move them all to the archive file in one shot."
                                                       :face 'font-lock-type-face
                                                       :beg 2 :end -2 :inverse nil))))
             ;; Rectangles with plain words: {{Something}}
-            ("\\({{[A-Za-z]+}}\\)" . ((lambda (tag)
-                                        (svg-tag-make tag
-                                                      :face 'font-lock-comment-face
-                                                      :beg 1 :end -1 :inverse nil))))
-            ;; Pills with 1 letter or one or 2 numbers: ((A)) ((10))
-            ("\(\([0-9a-zA-Z]\)\)" . ((lambda (tag)
-                                        (svg-tag-make tag :beg 1 :end -1 :radius 12))))
-            ("\(\([0-9][0-9]\)\)" . ((lambda (tag)
-                                       (svg-tag-make tag :beg 1 :end -1 :radius 8))))
+            ;; ("\\({{[A-Za-z]+}}\\)" . ((lambda (tag)
+            ;;                             (svg-tag-make tag
+            ;;                                           :face 'font-lock-comment-face
+            ;;                                           :beg 1 :end -1 :inverse nil))))
+            ;; Pills with 1 or 2 letters or numbers: ((A)) ((AA)) ((1)) ((10))
+            ("\\((([0-9a-zA-Z]))\\)" . ((lambda (tag)
+                                          (svg-tag-make tag :beg 2 :end -2 :radius 12))))
+            ("\\((([0-9a-zA-Z][0-9a-zA-Z]))\\)" . ((lambda (tag)
+                                                     (svg-tag-make tag :beg 2 :end -2 :radius 8))))
             ;;
             ;; Active date (with or without day name, with or without time)
             (,(format "\\(<%s>\\)" date-re) .

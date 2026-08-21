@@ -154,5 +154,6 @@ buffers (see the Markdown tap), where it maintains a YAML frontmatter
 ## Special syntax
 
 * Backquotes for code block (equivalent of `~`)
-* `{text}` or `{:text:}` for text in pill
-* `(1)` or `(A`) for pills with one letter or one or two digits
+* `{:text:}` for text in a rectangular tag
+* `((A))` or `((1))` for round pills with one letter or digit, and `((AA))` or
+  `((11))` for round pills with two letters or digits
