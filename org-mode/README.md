@@ -1,5 +1,46 @@
 # Org Mode tap
 
+See [ARCHITECTURE.md](ARCHITECTURE.md) for how the tap is organized across its files.
+
+## The org repo
+
+Part of this tap addresses my second-brain notes repo rather than Org Mode itself:
+browsing the notes (<kbd>F12</kbd>, <kbd>S-F12</kbd>, <kbd>C-F12</kbd>), capturing and
+refiling into `todo.org` and `catchup.org`, the agenda, the `org:` link abbreviation, the
+Google Drive sync and the DRQS references the work notes are full of.
+
+That repo is not on every machine. Point the config at it with:
+
+```sh
+export ORG_REPO_DIR="$HOME/Documents/org"   # in ~/.zshrc
+```
+
+Where the variable is not set, those features are simply absent and the rest of the tap
+works as usual — see [ARCHITECTURE.md](ARCHITECTURE.md#the-org-repo-gate) for how the
+gate works and why a shell export alone is not enough for a GUI Emacs.
+
+### Repo-relative links
+
+`org:` is an Org link abbreviation (`org-link-abbrev-alist`, set in `org-notes.el`) that
+expands to the root of the repo, so a link can name a note without a `../../` chain:
+
+```org
+[[org:todo.org][Todo]]
+[[org:areas/hiring.org][Hiring]]
+[[org:todo.org::*☕️ Today][Today]]
+[[org:img/diagram.png]]
+```
+
+Everything after `org:` is appended to the root, so `::*Heading` and `::#custom-id`
+targets work too. Follow the link with <kbd>C-c C-o</kbd>, as usual.
+
+The point is that the link is anchored to the repo rather than to the file it sits in:
+moving the *linking* file to another subdirectory does not break it, unlike a relative
+`[[../../todo.org]]`. Note that <kbd>Tab</kbd> completion after `[[` completes real
+filesystem paths and knows nothing about the abbreviation, so the part after `org:` has
+to be typed by hand; <kbd>C-c C-l</kbd> (`org-insert-link`) does list `org:` among its
+completions.
+
 ## Keys
 
 ### Special keys
@@ -12,8 +53,8 @@
 | <kbd>C-F12</kbd>                    | Open catch up notes                                  |
 | <kbd>C-c o c</kbd>                  | Show next-meeting TODOs for a person (see below)     |
 | <kbd>F19</kbd>                      | Open/close calendar                                  |
-| <kbd>⌃⌥⌘F12</kbd>                   | Capture to Inbox from anywhere in macOS (see below)  |
-| <kbd>⇧⌃⌥⌘F12</kbd>                  | Same, with the full template menu                    |
+| <kbd>⌃⌥⌘F12</kbd>                  | Capture to Inbox from anywhere in macOS (see below)  |
+| <kbd>⇧⌃⌥⌘F12</kbd>                 | Same, with the full template menu                    |
 
 #### Desktop capture
 
@@ -85,10 +126,10 @@ see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
 
 ### Live preview
 
-| Keybinding            | Description                                                             |
-| --------------------- | ---------------------------------------------------------------------- |
+| Keybinding            | Description                                                              |
+| --------------------- | ------------------------------------------------------------------------ |
 | <kbd>C-c o v</kbd>    | Toggle live HTML preview in an xwidget (<kbd>C-u</kbd> to include a TOC) |
-| <kbd>C-c o V</kbd>    | Toggle preview theme (Mocha <-> Latte)                                 |
+| <kbd>C-c o V</kbd>    | Toggle preview theme (Mocha <-> Latte)                                     |
 
 Renders the buffer to HTML via `ox-html` in an xwidget window, re-rendered on save,
 using the same Catppuccin CSS as the Markdown preview. Closing either the source Org

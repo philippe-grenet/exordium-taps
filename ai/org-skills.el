@@ -31,6 +31,8 @@
 (require 'subr-x)
 (require 'claude-code)
 
+(defvar my/org-repo)
+
 ;;; Customization
 
 (defgroup org-skills nil
@@ -38,9 +40,12 @@
   :group 'tools
   :prefix "org-skills-")
 
-(defcustom org-skills-repo (expand-file-name "~/Documents/org/")
-  "Root of the repository whose Claude skills are exposed as commands."
-  :type 'directory
+(defcustom org-skills-repo my/org-repo
+  "Root of the repository whose Claude skills are exposed as commands.
+Defaults to the org repo of this machine, and is nil when there is none, in
+which case no skill command is defined."
+  :type '(choice (const :tag "No repository on this machine" nil)
+                 directory)
   :group 'org-skills)
 
 (defcustom org-skills-command-prefix "skill-"
@@ -119,8 +124,9 @@ spaces.  Return nil when FILE has no front matter."
 
 (defun org-skills--skills-directory ()
   "Return the .claude/skills directory of `org-skills-repo', or nil."
-  (let ((dir (expand-file-name ".claude/skills" org-skills-repo)))
-    (and (file-directory-p dir) dir)))
+  (when org-skills-repo
+    (let ((dir (expand-file-name ".claude/skills" org-skills-repo)))
+      (and (file-directory-p dir) dir))))
 
 (defun org-skills--read-skill (directory)
   "Return a skill plist for DIRECTORY, or nil if it holds no usable skill.
@@ -147,13 +153,16 @@ marked `user-invocable: false'."
                                  (org-skills--read-skill dir)))
                           (directory-files skills-dir t "\\`[^.]")))
             (lambda (a b) (string< (plist-get a :name) (plist-get b :name))))
-    (message "org-skills: no .claude/skills directory under %s" org-skills-repo)
+    (when org-skills-repo
+      (message "org-skills: no .claude/skills directory under %s" org-skills-repo))
     nil))
 
 ;;; Talking to the Claude session
 
 (defun org-skills--claude-buffer ()
   "Return a live Claude buffer rooted at `org-skills-repo', starting one if needed."
+  (unless org-skills-repo
+    (user-error "No org repo on this machine (set ORG_REPO_DIR)"))
   (let ((dir (file-name-as-directory (expand-file-name org-skills-repo))))
     (or (car (claude-code--find-claude-buffers-for-directory dir))
         (progn

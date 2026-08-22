@@ -29,138 +29,10 @@
 
 
 ;;; Keys
+;;
+;; The C-c o bindings and the small commands behind them live in org-util.el.
 
-;; Super + Arrow: navigate through the tree (same level and up heading)
-(define-key org-mode-map [(super down)] #'org-forward-heading-same-level)
-(define-key org-mode-map [(super up)]   #'org-backward-heading-same-level)
-(define-key org-mode-map [(super left)] #'outline-up-heading)
-(define-key org-mode-map (kbd "C-c l") #'org-store-link) ; C-c C-l to org-insert-link
-
-;; C-c o d: Mark a task as DONE
-(defun my-org-todo-toggle ()
-  "Mark the task as DONE if it wasn't, mark it as TODO otherwise."
-  (interactive)
-  (let ((state (org-get-todo-state))
-        post-command-hook)
-    (if (not (string= state "DONE"))
-        (org-todo "DONE")
-      (org-todo "TODO"))
-    (run-hooks 'post-command-hook)
-    (org-fold-subtree t)))
-
-(define-key org-mode-map (kbd "C-c o d") 'my-org-todo-toggle)
-
-;; C-c o l: Paste link a Jira epic (assuming the URL is in hte clipboard)
-(defun my-org-paste-epic-link ()
-  "Paste a Jira epic link in short form."
-  (interactive)
-  (let* ((url      (current-kill 0 t))
-         (filename (url-filename (url-generic-parse-url url))))
-    (insert "[[" url "][")
-    (insert (substring filename (+ 1 (string-match "-" filename))))
-    (insert "]]")))
-
-(define-key org-mode-map (kbd "C-c o l") 'my-org-paste-epic-link)
-
-;; C-c o t/w/b: refile to Today, Week or Backlog.
-;; Move task to the beginning of the section.
-;; With argument C-u, move task to the end of the section.
-(defun my-org-refile-to (target-headline arg)
-  "Refile current headline to TARGET-HEADLINE in todo.org.
-Prepend by default; with prefix ARG, append."
-  (let* ((target-file "~/Documents/org/todo.org")
-         (pos (save-excursion
-                (find-file target-file)
-                (org-find-exact-headline-in-buffer target-headline)))
-         (org-reverse-note-order (not arg)))
-    (org-refile nil nil (list target-headline target-file nil pos))))
-
-(defun my-org-refile-to-today (arg)
-  "Refile current headline to Today." (interactive "P")
-  (my-org-refile-to "☕️ Today" arg))
-
-(defun my-org-refile-to-week (arg)
-  "Refile current headline to Week." (interactive "P")
-  (my-org-refile-to "Week" arg))
-
-(defun my-org-refile-to-backlog (arg)
-  "Refile current headline to Backlog." (interactive "P")
-  (my-org-refile-to "Backlog" arg))
-
-(define-key org-mode-map (kbd "C-c o t") #'my-org-refile-to-today)
-(define-key org-mode-map (kbd "C-c o w") #'my-org-refile-to-week)
-(define-key org-mode-map (kbd "C-c o b") #'my-org-refile-to-backlog)
-
-;;; C-c o i: insert image
-(defun my-org-insert-image ()
-  "Insert an image link with HTML width attribute."
-  (interactive)
-  (let ((file (read-file-name "Image: " nil nil nil "img/")))
-    (insert (format "#+attr_html: :width 900px\n[[%s]]\n" file))))
-
-(define-key org-mode-map (kbd "C-c o i") #'my-org-insert-image)
-
-;;; C-c o m: insert Mermaid class diagram
-(defun my-org-insert-mermaid-diagram ()
-  (interactive)
-  (insert "#+attr_org: :width 900\n")
-  (insert "#+begin_src mermaid :file diagrams/example.png :theme dark :background-color transparent :width 1800\n")
-  (insert "classDiagram\n")
-  (insert "    note \"see https://mermaid.js.org/syntax/classDiagram.html\"\n")
-  (insert "#+end_src\n")
-  (backward-char 73))
-
-(define-key org-mode-map (kbd "C-c o m") #'my-org-insert-mermaid-diagram)
-
-;;; C-c o o: Open image link at point in macOS native app
-;;; Note that the other way is C-c C-o which opens the image in a new buffer.
-(defun my-org-open-image-externally ()
-  "Open the image link at point using macOS's default application."
-  (interactive)
-  (let ((context (org-element-context)))
-    (when (eq (org-element-type context) 'link)
-      (let* ((path (org-element-property :path context))
-             (full-path (expand-file-name path (file-name-directory (buffer-file-name)))))
-        (if (file-exists-p full-path)
-            (start-process "open-image" nil "open" full-path)
-          (user-error "File not found: %s" full-path))))))
-
-(define-key org-mode-map (kbd "C-c o o") #'my-org-open-image-externally)
-
-;; C-c o x: Tag old entries with :ARCHIVE:
-(defun my-org-mark-old-entries (months)
-  "Tag org headings older than MONTHS months with :ARCHIVE:.
-Searches for headings containing a [YYYY-MM-DD] date and adds the
-ARCHIVE tag if the entry is older than MONTHS months from today.
-Archived entries are dimmed and excluded from agenda views.
-Use `org-archive-subtree' (C-c C-x C-a) to move them to the archive file.
-Use C-u C-c C-x C-s (`org-archive-subtree-default' with C-u for batch archiving)
-to move them all to the archive file in one shot."
-  (interactive "nMark entries older than how many months? ")
-  (let* ((cutoff (time-subtract (current-time)
-                                (days-to-time (* months 30))))
-         (count 0)
-         (lines 0))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward
-              "^\\*+\\s-+.*\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)\\]"
-              nil t)
-        (let* ((date-str (match-string 1))
-               (entry-time (encode-time (parse-time-string
-                                         (concat date-str " 00:00:00")))))
-          (when (and (time-less-p entry-time cutoff)
-                     (not (member "ARCHIVE" (org-get-tags nil t))))
-            (let ((beg (line-beginning-position)))
-              (save-excursion
-                (org-end-of-subtree t)
-                (setq lines (+ lines (count-lines beg (point))))))
-            (org-toggle-archive-tag)
-            (setq count (1+ count))))))
-    (message "Tagged %d entries (%d lines) older than %d months with :ARCHIVE:"
-             count lines months)))
-
-(define-key org-mode-map (kbd "C-c o x") #'my-org-mark-old-entries)
+(load-file "~/.emacs.d/taps/org-mode/org-util.el")
 
 
 ;;; Look
@@ -194,169 +66,11 @@ to move them all to the archive file in one shot."
 
 
 
-;;; svg-tag-mode: https://github.com/rougier/svg-tag-mode/
-
-(use-package svg-tag-mode
-  :ensure t
-  :config
-  (progn
-    (defun svg-progress-percent (value)
-      (svg-image (svg-lib-concat
-                  (svg-lib-progress-bar (/ (string-to-number value) 100.0)
-                                        nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-                  (svg-lib-tag (concat value "%")
-                               nil :stroke 0 :margin 0)) :ascent 'center))
-
-    (defun svg-progress-count (value)
-      (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-             (count (float (car seq)))
-             (total (float (cadr seq))))
-        (svg-image (svg-lib-concat
-                    (svg-lib-progress-bar (/ count total) nil
-                                          :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-                    (svg-lib-tag value nil
-                                 :stroke 0 :margin 0)) :ascent 'center)))
-
-    (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
-    (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-    (defconst day-re "[A-Za-z]\\{3\\}")
-    (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
-
-    (setq svg-tag-tags
-          `(
-            ;; Plain TODO statuses
-            ("\\(TODO\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-warning-face :inverse t))))
-            ("\\(DONE\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-string-face :inverse t))))
-            ("\\(WORK\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-type-face :inverse t))))
-            ("\\(STOP\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-comment-face :inverse t))))
-            ("\\(WAIT\\)" . ((lambda (tag)
-                               (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
-            ("\\(BLOCKED\\)" . ((lambda (tag)
-                                  (svg-tag-make tag :face 'dired-flagged :inverse t))))
-            ("\\(READY\\)" . ((lambda (tag)
-                                (svg-tag-make tag :face 'font-lock-function-name-face :inverse t))))
-            ("\\(REVIEW\\)" . ((lambda (tag)
-                                 (svg-tag-make tag :face 'font-lock-variable-name-face :inverse t))))
-            ;; Priorities
-            ("\\(\\[#A\\]\\)" . ((lambda (tag)
-                                   (svg-tag-make tag
-                                                 :face 'font-lock-warning-face :inverse t
-                                                 :beg 1 :end -1))))
-            ("\\(\\[#B\\]\\)" . ((lambda (tag)
-                                   (svg-tag-make tag
-                                                 :face 'font-lock-type-face :inverse t
-                                                 :beg 1 :end -1))))
-            ("\\(\\[#C\\]\\)" . ((lambda (tag)
-                                   (svg-tag-make tag
-                                                 :face 'font-function-name-face :inverse t
-                                                 :beg 1 :end -1))))
-            ;; Rectangles with plain words: {:Something:}
-            ;; Consider expending to "\\({:[A-Za-z0-9]+\\(?:[ ][A-Za-z0-9]+\\)*:}\\)"
-            ("\\({:[A-Za-z]+:}\\)" . ((lambda (tag)
-                                        (svg-tag-make tag
-                                                      :face 'font-lock-type-face
-                                                      :beg 2 :end -2 :inverse nil))))
-            ;; Rectangles with plain words: {{Something}}
-            ;; ("\\({{[A-Za-z]+}}\\)" . ((lambda (tag)
-            ;;                             (svg-tag-make tag
-            ;;                                           :face 'font-lock-comment-face
-            ;;                                           :beg 1 :end -1 :inverse nil))))
-            ;; Pills with 1 or 2 letters or numbers: ((A)) ((AA)) ((1)) ((10))
-            ("\\((([0-9a-zA-Z]))\\)" . ((lambda (tag)
-                                          (svg-tag-make tag :beg 2 :end -2 :radius 12))))
-            ("\\((([0-9a-zA-Z][0-9a-zA-Z]))\\)" . ((lambda (tag)
-                                                     (svg-tag-make tag :beg 2 :end -2 :radius 8))))
-            ;;
-            ;; Active date (with or without day name, with or without time)
-            (,(format "\\(<%s>\\)" date-re) .
-             ((lambda (tag)
-                (svg-tag-make tag :beg 1 :end -1 :margin 0))))
-            (,(format "\\(<%s \\)%s>" date-re day-time-re) .
-             ((lambda (tag)
-                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
-            (,(format "<%s \\(%s>\\)" date-re day-time-re) .
-             ((lambda (tag)
-                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
-            ;; Inactive date  (with or without day name, with or without time)
-            (,(format "\\(\\[%s\\]\\)" date-re) .
-             ((lambda (tag)
-                (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
-            (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
-             ((lambda (tag)
-                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
-            (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
-             ((lambda (tag)
-                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
-            ;;
-            ;; Progress: [1/3] or [42%]
-            ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
-                                                (svg-progress-percent (substring tag 1 -2)))))
-            ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
-                                              (svg-progress-count (substring tag 1 -1)))))))
-    (add-hook 'org-mode-hook 'svg-tag-mode)
-    ))
-
-
-;;; Auto svg-tags for per-file TODO keywords
+;;; svg-tag-mode
 ;;
-;; Files may declare extra states via a "#+todo:" line (e.g. DROPPED, GOAL)
-;; that have no rule in the global `svg-tag-tags'.  For any such keyword we
-;; generate a buffer-local pill on the fly.  Colours are auto-cycled, but a
-;; file can pin them explicitly with one or more directives:
-;;
-;;   #+svg_todo: DROPPED font-lock-comment-face
-;;   #+svg_todo: GOAL    font-lock-warning-face
+;; The status pills, date tags and progress cookies live in org-svg-tags.el.
 
-(defvar my/svg-todo-auto-palette
-  '(font-lock-keyword-face font-lock-constant-face
-    font-lock-preprocessor-face font-lock-doc-face)
-  "Faces cycled through for auto-generated TODO svg tags.")
-
-(defun my/svg-todo-covered-p (kw)
-  "Non-nil if KW already matches an existing `svg-tag-tags' rule."
-  (cl-some (lambda (entry) (string-match-p (car entry) kw)) svg-tag-tags))
-
-(defun my/svg-todo-overrides ()
-  "Return an alist (KEYWORD . FACE) parsed from #+svg_todo: directives."
-  (let (alist)
-    (dolist (val (cdr (assoc "SVG_TODO" (org-collect-keywords '("SVG_TODO")))))
-      (pcase-let ((`(,kw ,face) (split-string (string-trim val) nil t)))
-        (when (and kw face (facep (intern face)))
-          (push (cons kw (intern face)) alist))))
-    alist))
-
-(defun my/svg-todo-auto-tags ()
-  "Give any file-local TODO keyword without an svg rule a default pill.
-Explicit colours from #+svg_todo: directives take precedence over the
-auto-cycled palette; done-type keywords otherwise fall back to a dimmed face."
-  (when (bound-and-true-p svg-tag-mode)
-    (let ((overrides (my/svg-todo-overrides))
-          (extra '())
-          (i 0))
-      (dolist (kw (and (boundp 'org-todo-keywords-1) org-todo-keywords-1))
-        (unless (my/svg-todo-covered-p kw)
-          (let ((face (or (cdr (assoc kw overrides))
-                          (if (member kw org-done-keywords)
-                              'font-lock-comment-face
-                            (prog1 (nth (mod i (length my/svg-todo-auto-palette))
-                                        my/svg-todo-auto-palette)
-                              (setq i (1+ i)))))))
-            (push (cons (format "\\(%s\\)" (regexp-quote kw))
-                        (list (lambda (tag)
-                                (svg-tag-make tag :face face :inverse t))))
-                  extra))))
-      (when extra
-        ;; Buffer-local copy = new rules + global rules; global list untouched.
-        (setq-local svg-tag-tags (append extra svg-tag-tags))
-        (svg-tag-mode -1)
-        (svg-tag-mode 1)))))
-
-;; Append so it runs AFTER svg-tag-mode has been enabled by its own hook.
-(add-hook 'org-mode-hook #'my/svg-todo-auto-tags t)
+(load-file "~/.emacs.d/taps/org-mode/org-svg-tags.el")
 
 
 ;;; Overline startup option
@@ -381,112 +95,6 @@ auto-cycled palette; done-type keywords otherwise fall back to a dimmed face."
 
 (require 'cl-lib)
 
-(defun colorize-note-extension (file-name)
-  (let ((file-ext (file-name-extension file-name t)))
-    (concat (file-name-base file-name)
-            (propertize file-ext 'face (if (string= file-ext ".org")
-                                           'helm-ff-truename
-                                         'helm-ff-file-extension)))))
-
-
-(defconst top-level-notes `((,(colorize-note-extension "todo.org")    . "~/Documents/org/todo.org")
-                            (,(colorize-note-extension "catchup.org") . "~/Documents/org/catchup.org")
-                            (,(colorize-note-extension "roadmap.org") . "~/Documents/org/roadmap.org")))
-
-(defconst notes-root-directories
-  '("~/Documents/org/areas/"
-    "~/Documents/org/projects/"
-    "~/Documents/org/resources/")
-  "Root directories to scan for notes. Each root and its subdirectories, down
-to two levels below the root, are included.")
-
-(defun notes--subdirectories (dir depth)
-  "Return DIR followed by its subdirectories down to DEPTH levels below DIR.
-DEPTH of 0 returns just DIR, DEPTH of 1 returns DIR and its immediate
-subdirectories, and so on. Dot-directories are skipped."
-  (cons dir
-        (when (> depth 0)
-          (cl-mapcan (lambda (sub) (notes--subdirectories sub (1- depth)))
-                     (cl-remove-if-not
-                      #'file-directory-p
-                      (directory-files dir t "^[^.]"))))))
-
-(defun notes-directories ()
-  "Return all notes directories: each root plus its subdirectories, down to
-two levels below each root (three levels including the root)."
-  (cl-remove-duplicates
-   (cl-loop for root in notes-root-directories
-            when (file-directory-p root)
-            append (notes--subdirectories root 2))
-   :test #'string=))
-
-(defun notes--dir-label (dir)
-  "Return DIR's path label starting from its matching notes root.
-For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
-  (let* ((dir (file-name-as-directory (expand-file-name dir)))
-         (root (cl-find-if
-                (lambda (r)
-                  (string-prefix-p (file-name-as-directory (expand-file-name r)) dir))
-                notes-root-directories)))
-    (if root
-        (let ((parent (file-name-directory
-                       (directory-file-name (file-name-as-directory
-                                             (expand-file-name root))))))
-          (directory-file-name (file-relative-name dir parent)))
-      (file-name-nondirectory (directory-file-name dir)))))
-
-(defun list-notes-in-directory (dir)
-  ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
-  ;; file-name includes the sub-directory path relative to the notes root.
-  ;; The list is sorted by file-name ascending.
-  (cl-flet ((note-name-and-path (file)
-              (let* ((file-name (file-name-base file))
-                     (file-ext  (file-name-extension file t)))
-                (cons (concat (propertize (notes--dir-label dir)
-                                          'face 'helm-ff-directory)
-                              "/" file-name
-                              (propertize file-ext 'face (if (string= file-ext ".org")
-                                                             'helm-ff-truename
-                                                           'helm-ff-file-extension)))
-                      file))))
-    (sort (append (mapcar #'note-name-and-path
-                          (directory-files dir :match-regexp "^.*\.org"))
-                  (mapcar #'note-name-and-path
-                          (directory-files dir :match-regexp "^.*\.md")))
-          #'(lambda (a b)
-              (string< (downcase (car a)) (downcase (car b)))))))
-
-(defun list-all-notes ()
-  "Return the full alist of notes (file-name . path)."
-  (append top-level-notes
-          (mapcan #'list-notes-in-directory (notes-directories))))
-
-(defun open-todos (file)
-  "Open a note as FILE from the list of active notes in Documents/org."
-  (interactive
-   (list
-    (completing-read "Open: " (list-all-notes))))
-  (find-file (cdr (assoc file (list-all-notes)))))
-
-(global-set-key [(f12)] #'open-todos)
-
-;; Quick access
-
-(defun open-todo-file ()
-  "Open my todo.org file."
-  (interactive)
-  (find-file "~/Documents/org/todo.org"))
-
-(global-set-key [(shift f12)] #'open-todo-file)
-
-(defun open-catchup-file ()
-  "Open my catch up file."
-  (interactive)
-  (find-file "~/Documents/org/catchup.org"))
-
-(global-set-key [(control f12)] #'open-catchup-file)
-
-
 ;;; Capture task
 ;;; See http://orgmode.org/manual/Capture-templates.html#Capture-templates
 
@@ -511,26 +119,6 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
 
 (add-hook 'org-capture-mode-hook #'my/org-capture-select-word-at-point)
 
-(setq org-default-notes-file "/Users/pgrenet/Documents/org/todo.org")
-
-;; The per-person entries are generated from catchup.org, so that renaming a
-;; section there cannot leave a template pointing at a stale heading.
-;; See org-catchup-people.el, which also binds C-c o p and C-c o c.
-(load-file "~/.emacs.d/taps/org-mode/org-catchup-people.el")
-
-(setq org-capture-templates
-      (append
-       '(("i" "📥\tInbox" entry
-          (file+headline "~/Documents/org/todo.org" "📥 Inbox")
-          "** TODO %?\n  %i\n"
-          :empty-lines-after 1)
-         ("T" "☕️\tToday" entry
-          (file+headline "~/Documents/org/todo.org" "☕️ Today")
-          "** TODO %?\n  %i\n"
-          :prepend t
-          :empty-lines-after 0))
-       (my/org-catchup-capture-templates)))
-
 ;; Org Capture = Meta-F12 + F13
 (define-key global-map [(meta f12)] #'org-capture)
 
@@ -549,10 +137,7 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
 
 ;;; File location
 
-;; Link abbreviations.
-;; For example, this allows for absolute links like [[repo:docs/guide.org][Guide]]
-(setq org-link-abbrev-alist
-      '(("org" . "~/Documents/org/")))
+;; The `org:' link abbreviation points at the org repo; see org-notes.el.
 
 ;; Archive
 (setq org-archive-location "%s_archive::datetree/")
@@ -570,54 +155,6 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
     t))
 
 (add-hook 'org-cycle-tab-first-hook #'my/org-complete-file-in-link)
-
-
-;;; DRQS links
-;; Make {DRQS 1234567} and {DRQS 1234567<GO>} clickable links to the DRQS web app.
-;; C-c o D: open DRQS ticket at point in the browser.
-
-(defun my/org-drqs-open (number)
-  "Open DRQS ticket NUMBER in the default browser."
-  (browse-url (format "https://drqs.prod.bloomberg.com/ticket/%s" number)))
-
-(defun my/org-drqs-buttonize ()
-  "Add font-lock rules to make {DRQS NNN} and {DRQS NNN<GO>} clickable."
-  (font-lock-add-keywords
-   nil
-   '(("{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}"
-      (0 'org-link prepend)))
-   t))
-
-(defun my/org-drqs-follow-at-point ()
-  "If point is on a {DRQS ...} reference, open it in the browser."
-  (interactive)
-  (let ((line (buffer-substring-no-properties
-               (line-beginning-position) (line-end-position))))
-    (if (and (string-match "{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}" line)
-             (let ((mbeg (match-beginning 0))
-                   (mend (match-end 0))
-                   (col  (- (point) (line-beginning-position))))
-               (and (>= col mbeg) (<= col mend))))
-        (my/org-drqs-open (match-string 1 line))
-      (user-error "No DRQS reference at point"))))
-
-(add-hook 'org-mode-hook #'my/org-drqs-buttonize)
-(define-key org-mode-map (kbd "C-c o D") #'my/org-drqs-follow-at-point)
-
-;; Also handle {DRQS ...} via C-c C-o (org-open-at-point)
-(defun my/org-drqs-open-at-point ()
-  "Open {DRQS ...} at point if any; return non-nil if handled."
-  (let ((line (buffer-substring-no-properties
-               (line-beginning-position) (line-end-position))))
-    (when (and (string-match "{DRQS \\([0-9]+\\)\\(?: *<GO>\\)?}" line)
-               (let ((mbeg (match-beginning 0))
-                     (mend (match-end 0))
-                     (col  (- (point) (line-beginning-position))))
-                 (and (>= col mbeg) (<= col mend))))
-      (my/org-drqs-open (match-string 1 line))
-      t)))
-
-(add-hook 'org-open-at-point-functions #'my/org-drqs-open-at-point)
 
 
 ;;; Backticks for code snippets
@@ -645,18 +182,6 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
 
 (add-to-list 'org-export-filter-plain-text-functions
              #'my/org-md-inline-code-filter)
-
-
-;;; Org agenda
-
-(setq org-agenda-files '("/Users/pgrenet/Documents/org/"))
-(setq org-agenda-custom-commands
-      '(("c" "Philippe's agenda view"
-         ((tags "PRIORITY=\"A\""
-                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                 (org-agenda-overriding-header "High-priority items:")))
-          (agenda "")
-          (alltodo "")))))
 
 
 ;;; Calfw mode
@@ -762,23 +287,6 @@ For example ~/Documents/org/bql/subA/subB/ yields \"bql/subA/subB\"."
   (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images))
 
 
-;; Sync todos to Google Drive for PlainOrg
-
-(defun org-sync ()
-  "Copy todos and catch up notes to Google Drive."
-  (interactive)
-  (let ((dest-dir "/Users/pgrenet/Library/CloudStorage/GoogleDrive-pgrenet@bloomberg.net/My Drive/org/"))
-    (if (file-directory-p dest-dir)
-        (progn
-          (copy-file "~/Documents/org/todo.org" (concat dest-dir "todo.org") t)
-          (copy-file "~/Documents/org/catchup.org" (concat dest-dir "catchup.org") t)
-          (message "org-sync: synced"))
-      (message "org-sync: Google Drive not mounted, skipping"))))
-
-;; Schedule the function every hour. See also run-with-timer and cancel-timer.
-(run-at-time "00:00" 3600 'org-sync)
-
-
 ;;; Per-file line number control via #+STARTUP: directive
 
 ;; Declare external variables from init-prefs.el to avoid free variable warnings
@@ -844,6 +352,27 @@ This redefinition adds support for buffer-local override in Org-Mode."
 
 ;; Live HTML preview in an xwidget (C-c o v / C-c o V). See org-preview.el.
 (load-file "~/.emacs.d/taps/org-mode/org-preview.el")
+
+
+;;; The second brain
+;;
+;; Everything above is about Org Mode itself and works on any machine.  What
+;; follows addresses the notes repo, which only some machines have: browsing it
+;; (F12), capturing and refiling into it (M-F12, C-c o t/w/b), syncing it to
+;; Google Drive, and the DRQS references its work notes are full of.
+;; `my/org-repo' is nil elsewhere -- see taps/common/before-init.el for where
+;; the path comes from.
+
+(defvar my/org-repo)
+
+(if my/org-repo
+    (progn
+      (load-file "~/.emacs.d/taps/org-mode/org-notes.el")
+      (load-file "~/.emacs.d/taps/org-mode/org-capture-refile.el")
+      (load-file "~/.emacs.d/taps/org-mode/org-drive-sync.el")
+      (load-file "~/.emacs.d/taps/org-mode/org-drqs.el"))
+  (message "org-mode tap: no org repo on this machine (set ORG_REPO_DIR), \
+skipping notes, capture, sync and DRQS"))
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)

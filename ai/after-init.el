@@ -32,8 +32,11 @@
 (setq claude-code-terminal-backend 'vterm)
 
 ;; Expose the org repo's Claude skills as Emacs commands: M-x skill-reindex,
-;; M-x skill-drqs, etc. See org-skills.el.
-(load-file "~/.emacs.d/taps/ai/org-skills.el")
+;; M-x skill-drqs, etc. See org-skills.el.  Only on a machine that has the
+;; repo -- `my/org-repo' is nil elsewhere, see taps/common/before-init.el.
+(defvar my/org-repo)
+(when my/org-repo
+  (load-file "~/.emacs.d/taps/ai/org-skills.el"))
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)

@@ -1,6 +1,6 @@
 ;;;; Jump to a person's section in catchup.org -*- lexical-binding: t -*-
 ;;;
-;;; Every person section in ~/Documents/org/catchup.org is keyed by an emoji
+;;; Every person section in the org repo's catchup.org is keyed by an emoji
 ;;; encoding the relationship: `✨' a senior leader, `🌟' a direct report, `👤'
 ;;; an individual.  People are either top level, or nested one level below a
 ;;; `👥' group heading (e.g. `** 👤 Dylan Sams' under `* 👥 Team Data Layer').
@@ -22,10 +22,12 @@
 
 (require 'org)
 
-(defconst my/org-catchup-file "~/Documents/org/catchup.org"
+(declare-function my/org-file "before-init")
+
+(defconst my/org-catchup-file (my/org-file "catchup.org")
   "File holding catch-up notes, one section per person.")
 
-(defconst my/org-catchup-todo-file "~/Documents/org/todo.org"
+(defconst my/org-catchup-todo-file (my/org-file "todo.org")
   "File holding the personal TODO list, for the non-person picker targets.")
 
 (defconst my/org-catchup-person-emojis '("✨" "🌟" "👤")
