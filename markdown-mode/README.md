@@ -35,6 +35,15 @@
 | <kbd>C-c m m</kbd>      | Render / refresh all Mermaid blocks as inline images                   |
 | <kbd>C-c m M</kbd>      | Clear the rendered Mermaid diagrams                                    |
 
+### Preview
+
+| Keybinding              | Description                                                            |
+| ----------------------- | ---------------------------------------------------------------------- |
+| <kbd>C-c m v</kbd>      | Toggle the live HTML preview                                           |
+| <kbd>C-c m t</kbd>      | Toggle the preview theme (dark Mocha <-> light Latte)                  |
+| <kbd>C-c m B</kbd>      | Toggle the preview target: xwidget <-> OS default web browser          |
+| <kbd>C-c m b</kbd>      | One-shot: render and open in the OS default web browser                |
+
 ### Table editing
 
 Inside a pipe table, standard keys are context-sensitive:
@@ -92,6 +101,21 @@ pandoc, re-rendered on save), and <kbd>C-c m t</kbd> toggles its theme (dark Moc
 tears down the preview symmetrically: the other buffer is closed and the temporary
 HTML file is deleted. Closing the preview never kills the source buffer, so it
 won't respawn.
+
+The preview target is `my/markdown-preview-target`: `xwidget` (default) or
+`browser`, the OS default web browser. <kbd>C-c m B</kbd> toggles it, restarting
+the preview if one is running. In `browser` mode the browser is opened once when
+the preview starts; later saves only re-render the HTML file, so refresh the page
+to see the changes (set `my/markdown-preview-browser-reopen-on-export` to `t` to
+hand the file back to the browser on every save, which usually means a new tab).
+Live preview then keeps a small bookkeeping buffer, `*markdown-preview
+(browser)*`; killing it stops the preview and deletes the HTML file, as with the
+xwidget. Scroll sync only applies to the xwidget target.
+
+<kbd>C-c m b</kbd> is a one-shot export instead: it renders the buffer and opens
+it in the OS default browser without turning on live preview. The HTML file is
+written next to the Markdown file (so relative image links keep working) and is
+left in place.
 
 ## Files
 

@@ -249,8 +249,8 @@ the same."
                  (not (eq xwidget (current-buffer))))
         (kill-buffer xwidget)))))
 
-(defun my/markdown-preview--on-xwidget-kill ()
-  "Tear down the preview when the xwidget buffer is killed."
+(defun my/markdown-preview--on-preview-kill ()
+  "Tear down the preview when the preview buffer is killed."
   (my/markdown-preview-teardown
    markdown-live-preview-source-buffer
    (current-buffer)
@@ -274,10 +274,96 @@ the same."
       (and (eq buf (current-buffer)) (quit-window))
       (with-current-buffer buf
         (setq-local my/markdown-preview-export-file file)
-        (add-hook 'kill-buffer-hook #'my/markdown-preview--on-xwidget-kill nil t))
+        (add-hook 'kill-buffer-hook #'my/markdown-preview--on-preview-kill nil t))
       (pop-to-buffer buf))))
 
-(setq markdown-live-preview-window-function #'my/markdown-preview-window-xwidget)
+
+;;; Preview in the OS default web browser instead of the xwidget.
+
+(defvar my/markdown-preview-target 'xwidget
+  "Where `markdown-live-preview-mode' displays the exported HTML.
+`xwidget' uses the embedded WebKit browser, `browser' uses the OS
+default web browser via `browse-url'.  Toggle with \\[my/markdown-toggle-preview-target].")
+
+(defvar my/markdown-preview-browser-reopen-on-export nil
+  "When non-nil, re-open the OS browser after every re-export.
+The default is nil: the browser is opened once when the preview
+starts, and later saves only rewrite the HTML file, so the page is
+updated by refreshing the browser.  Set to t to have every save
+hand the file back to the browser (which usually means a new tab).")
+
+(defun my/markdown-preview--on-browser-kill ()
+  "Tear down the preview when the browser bookkeeping buffer is killed.
+Also turns off `markdown-live-preview-mode' in the source buffer, so
+that saving it does not open the browser again."
+  (let ((source markdown-live-preview-source-buffer))
+    (my/markdown-preview--on-preview-kill)
+    (when (buffer-live-p source)
+      (with-current-buffer source
+        (when (bound-and-true-p markdown-live-preview-mode)
+          (markdown-live-preview-mode -1))))))
+
+(defun my/markdown-preview-window-browser (file)
+  "Preview FILE in the OS default web browser.
+Return the bookkeeping buffer that `markdown-live-preview-mode'
+uses to track the preview: killing it (or killing the source
+buffer) stops the preview and deletes FILE, mirroring the xwidget
+preview."
+  (let* ((existing (and (buffer-live-p markdown-live-preview-buffer)
+                        markdown-live-preview-buffer))
+         (buf (or existing (get-buffer-create "*markdown-preview (browser)*"))))
+    (when (or (null existing) my/markdown-preview-browser-reopen-on-export)
+      (browse-url (concat "file://" file)))
+    (with-current-buffer buf
+      (setq-local my/markdown-preview-export-file file)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert "Markdown live preview in the OS default web browser.\n\n"
+                "HTML file: " file "\n\n"
+                "Saving the Markdown buffer re-renders this file; refresh the\n"
+                "browser page to see the changes.  Kill this buffer to stop the\n"
+                "preview and delete the HTML file.\n"))
+      (goto-char (point-min))
+      (setq buffer-read-only t)
+      (unless existing
+        (add-hook 'kill-buffer-hook #'my/markdown-preview--on-browser-kill nil t)))
+    buf))
+
+(defun my/markdown-preview-window (file)
+  "Preview FILE according to `my/markdown-preview-target'."
+  (if (eq my/markdown-preview-target 'browser)
+      (my/markdown-preview-window-browser file)
+    (my/markdown-preview-window-xwidget file)))
+
+(setq markdown-live-preview-window-function #'my/markdown-preview-window)
+
+(defun my/markdown-toggle-preview-target ()
+  "Toggle the live preview between the xwidget and the OS web browser.
+When a live preview is running, it is restarted in the new target."
+  (interactive)
+  (setq my/markdown-preview-target
+        (if (eq my/markdown-preview-target 'browser) 'xwidget 'browser))
+  (when (bound-and-true-p markdown-live-preview-mode)
+    (markdown-live-preview-mode -1)
+    (markdown-live-preview-mode 1))
+  (message "Markdown preview target: %s" my/markdown-preview-target))
+
+(define-key markdown-mode-map (kbd "C-c m B") #'my/markdown-toggle-preview-target)
+
+(defun my/markdown-preview-in-browser ()
+  "Render this buffer with pandoc and open it in the OS default web browser.
+This is a one-shot export, independent of `markdown-live-preview-mode':
+the HTML file is written next to the Markdown file (so relative image
+links keep working) and is left in place."
+  (interactive)
+  (let ((filename (markdown-live-preview-get-filename)))
+    (unless filename
+      (user-error "Buffer %s does not visit a file" (buffer-name)))
+    (let ((file (markdown-export filename)))
+      (browse-url (concat "file://" file))
+      (message "Opened %s in the default browser" file))))
+
+(define-key markdown-mode-map (kbd "C-c m b") #'my/markdown-preview-in-browser)
 
 
 ;;; Scroll sync: keep the preview centered near point in the source buffer.
@@ -291,8 +377,10 @@ the same."
   "Scroll the xwidget preview to match point in the markdown source.
 Uses proportional scroll (point's line / total lines), which is
 approximate but tracks well in practice.  Does nothing when
-`my/markdown-preview-sync-scroll-enabled' is nil."
+`my/markdown-preview-sync-scroll-enabled' is nil, or when the
+preview target is not the xwidget."
   (when (and my/markdown-preview-sync-scroll-enabled
+             (eq my/markdown-preview-target 'xwidget)
              (bound-and-true-p markdown-live-preview-mode)
              my/markdown-preview-xwidget
              (xwidget-live-p my/markdown-preview-xwidget))
