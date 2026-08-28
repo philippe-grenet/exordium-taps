@@ -9,7 +9,14 @@
 ;;;
 ;;; Group headings (`👥') and recurring meeting series (`📅') are not offered as
 ;;; candidates; a group only contributes its name as context for the people
-;;; nested under it.
+;;; nested under it.  A heading carrying the `CATCHUP_IGNORE' property is left
+;;; out too, along with everything below it, since the property is looked up
+;;; with inheritance: put it on a group to hide all of its people at once.
+;;;
+;;;   * 👥 VIP
+;;;   :PROPERTIES:
+;;;   :CATCHUP_IGNORE: t
+;;;   :END:
 ;;;
 ;;;   C-c o p : pick a person and jump to their heading.
 ;;;             With a prefix (C-u C-c o p), open their subtree in an indirect
@@ -36,6 +43,11 @@
 (defconst my/org-catchup-group-emoji "👥"
   "Emoji marking a group heading, whose people are nested one level below.")
 
+(defconst my/org-catchup-ignore-property "CATCHUP_IGNORE"
+  "Property hiding a heading, and its subtree, from the catch-up pickers.
+Looked up with inheritance, so setting it on a `👥' group heading excludes
+every person nested under it.")
+
 (defconst my/org-catchup--heading-re
   (concat "^\\(\\*\\{1,2\\}\\) \\("
           (regexp-opt (cons my/org-catchup-group-emoji
@@ -49,7 +61,9 @@ carry no emoji.")
   "Return an alist of (DISPLAY . HEADING) for every person in catchup.org.
 HEADING is the exact heading text, suitable for
 `org-find-exact-headline-in-buffer'.  DISPLAY appends the group name for
-people nested under a `👥' heading.  Sorted by name, case-insensitively."
+people nested under a `👥' heading.  People under a heading carrying
+`my/org-catchup-ignore-property' are skipped.  Sorted by name,
+case-insensitively."
   (with-current-buffer (find-file-noselect my/org-catchup-file)
     (save-excursion
       (save-restriction
@@ -65,7 +79,10 @@ people nested under a `👥' heading.  Sorted by name, case-insensitively."
               ;; A top-level heading either opens a group or ends the previous one.
               (when (= level 1)
                 (setq group (and group-p name)))
-              (unless group-p
+              (unless (or group-p
+                          ;; Inherited, so one property on the group hides
+                          ;; everybody nested under it.
+                          (org-entry-get (point) my/org-catchup-ignore-property t))
                 (push (cons (concat emoji " " name
                                     (when (and group (= level 2))
                                       (propertize (concat "  " group)
