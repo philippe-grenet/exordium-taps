@@ -52,6 +52,7 @@ completions.
 | <kbd>S-F12</kbd>                    | Open todo list                                       |
 | <kbd>C-F12</kbd>                    | Open catch up notes                                  |
 | <kbd>C-c o c</kbd>                  | Show next-meeting TODOs for a person (see below)     |
+| <kbd>C-c o n</kbd>                  | Move the selected TODOs into today's meeting note (see below) |
 | <kbd>F19</kbd>                      | Open/close calendar                                  |
 | <kbd>⌃⌥⌘F12</kbd>                  | Capture to Inbox from anywhere in macOS (see below)  |
 | <kbd>⇧⌃⌥⌘F12</kbd>                 | Same, with the full template menu                    |
@@ -81,6 +82,20 @@ Today). After picking a person, a small, dismissable buffer lists only their ope
 discussion items — the headings marked `TODO`, `WORK`, or `WAIT` directly under that
 person in `catchup.org` (dated notes and closed items are skipped) — so you can quickly
 see what to raise at your next meeting. Press <kbd>q</kbd> to dismiss.
+
+#### Today's meeting note
+
+<kbd>C-c o n</kbd> is the other half of the loop: once the meeting has happened, the
+items that came up belong in its notes. Put the region over a run of open items under a
+person — with no region it takes the one at point — and the command moves them into a
+new entry dated today, converted from headings to a plain list. Each item's body follows
+its bullet, indented; a nested list keeps its shape. The entry is inserted above the most
+recent dated one, so the section keeps reading newest first, and point is left after the
+date, ready for the title of the meeting.
+
+Only headings marked `TODO`, `WORK` or `WAIT` are taken, so a region that overshoots into
+dated notes, `STOP` items or a `📌 Current work` pin is harmless. The command refuses,
+without touching the buffer, if the region reaches into a second person's section.
 
 ### Navigation
 

@@ -80,7 +80,7 @@ DRQS links simply never come into existence, and `*Messages*` says so once.
 | ----------------------- | ----: | ---------------------------------------------- |
 | `org-notes.el`          |   154 | where the notes live and how to open them: the <kbd>F12</kbd> picker over `areas/`, `projects/`, `resources/`, the <kbd>S-F12</kbd>/<kbd>C-F12</kbd> shortcuts, the `org:` link abbreviation, `org-agenda-files` |
 | `org-capture-refile.el` |    83 | the write side: `org-default-notes-file`, the capture templates, the `C-c o t/w/b` refile commands |
-| `org-catchup-people.el` |   277 | one section per person in `catchup.org`: the `C-c o p` / `C-c o c` pickers, and the per-person capture templates, generated from the file so a renamed heading cannot go stale |
+| `org-catchup-people.el` |   462 | one section per person in `catchup.org`: the `C-c o p` / `C-c o c` pickers, the `C-c o n` move of open items into today's meeting note, and the per-person capture templates, generated from the file so a renamed heading cannot go stale |
 | `org-drive-sync.el`     |    37 | hourly copy of `todo.org` and `catchup.org` to Google Drive, for PlainOrg on the phone |
 | `org-drqs.el`           |    60 | `{DRQS 1234567}` as a clickable link. Bloomberg-specific; gated on the repo because that is where the work notes are |
 

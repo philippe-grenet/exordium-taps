@@ -23,6 +23,8 @@
 ;;;             buffer instead.
 ;;;   C-c o c : pick a person and pop up their open discussion items
 ;;;             (TODO/WORK/WAIT) to raise at the next meeting.
+;;;   C-c o n : region over a run of those open items -- move them into a new
+;;;             meeting entry dated today, as a plain list.
 ;;;
 ;;; The same scan builds the per-person `org-capture' templates; see
 ;;; `my/org-catchup-capture-templates', called from after-init.el.
@@ -188,6 +190,172 @@ NAME is used for the buffer name and header line."
     (my/org-catchup--show heading heading (cdr target))))
 
 (define-key global-map (kbd "C-c o c") #'my/org-catchup-todos)
+
+
+;;; New meeting note: the items that were discussed become the notes.
+;;;
+;;; A person's section holds the open items to raise at the next 1:1, then the
+;;; dated meeting entries, newest first.  Once the meeting has happened the
+;;; items that came up belong in that meeting's notes, as prose rather than as
+;;; tasks.  `C-c o n' does the move: put the region over a run of open items and
+;;; they leave the to-raise list for a new entry dated today, converted to a
+;;; plain list, inserted above the most recent dated entry.
+
+(defconst my/org-catchup--date-format "[%Y-%m-%d]"
+  "Date prefix of a meeting entry, as accepted by `format-time-string'.")
+
+(defun my/org-catchup--dated-child-re (level)
+  "Return a regexp matching a dated meeting entry at LEVEL.
+Only a real `[YYYY-MM-DD]' prefix counts: a `??' heading is a meeting whose
+date was lost, not a date, so it never anchors the insertion."
+  (format "^\\*\\{%d\\} +\\[[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\]" level))
+
+(defun my/org-catchup--undecorate (heading)
+  "Strip the TODO keyword, priority cookie and tags from HEADING text.
+Used for sub-headings, which `org-heading-components' is not applied to
+because they are read back out of the body as plain text."
+  (let ((text heading))
+    (when (and org-todo-keywords-1
+               (string-match (concat "\\`" (regexp-opt org-todo-keywords-1) " +")
+                             text))
+      (setq text (substring text (match-end 0))))
+    (when (string-match "\\`\\[#[A-Z]\\] +" text)
+      (setq text (substring text (match-end 0))))
+    (when (string-match " +:[[:alnum:]_@#%:]+:\\'" text)
+      (setq text (substring text 0 (match-beginning 0))))
+    (string-trim text)))
+
+(defun my/org-catchup--as-list-item (title body level)
+  "Return TITLE as a plain list item, with BODY indented underneath.
+LEVEL is the outline level TITLE came from, which sets how deep a sub-heading
+in BODY nests.  Body lines are shifted right by two columns: prose becomes the
+continuation of the item, and a list keeps its relative depth."
+  (let ((body (string-trim-right body)))
+    (concat
+     "- " title "\n"
+     (unless (string= "" body)
+       (concat
+        (mapconcat
+         (lambda (line)
+           (cond
+            ((string= "" line) "")
+            ;; A sub-heading has no place in a list: make it a nested bullet,
+            ;; one level of indentation per level below the item itself.
+            ((string-match "\\`\\(\\*+\\) +\\(.*\\)\\'" line)
+             (concat "  "
+                     (make-string (* 2 (max 0 (- (length (match-string 1 line))
+                                                 level 1)))
+                                  ?\s)
+                     "- " (my/org-catchup--undecorate (match-string 2 line))))
+            (t (concat "  " line))))
+         (split-string body "\n")
+         "\n")
+        "\n")))))
+
+(defun my/org-catchup--item-at-point ()
+  "Return (START END TITLE BODY) for the entry at point.
+START and END delimit the whole subtree, so deleting that region moves the
+item out.  TITLE has the keyword, priority cookie and tags stripped; BODY
+starts after the planning line and any drawer."
+  (let* ((start (point))
+         (title (or (nth 4 (org-heading-components)) ""))
+         (end (save-excursion (org-end-of-subtree t t) (point)))
+         (body-start (min end (save-excursion (org-end-of-meta-data t) (point)))))
+    (list start end title (buffer-substring-no-properties body-start end))))
+
+(defun my/org-catchup--open-headings (beg end)
+  "Return an alist of (POSITION . LEVEL) for open headings between BEG and END.
+Open means the heading carries one of `my/org-catchup-todo-keywords'.  A
+region starting inside an entry counts that entry, so it is enough to sweep
+roughly over the items rather than land on the first heading exactly."
+  (save-excursion
+    (goto-char beg)
+    (unless (org-at-heading-p)
+      (ignore-errors (org-back-to-heading t)))
+    (let (found)
+      (when (and (org-at-heading-p)
+                 (member (org-get-todo-state) my/org-catchup-todo-keywords))
+        (push (cons (point) (org-current-level)) found))
+      (while (and (outline-next-heading) (< (point) end))
+        (when (member (org-get-todo-state) my/org-catchup-todo-keywords)
+          (push (cons (point) (org-current-level)) found)))
+      (nreverse found))))
+
+(defun my/org-catchup--selected-items ()
+  "Return (PARENT LEVEL ITEMS) for the open items the user selected.
+The selection is the region, or the entry at point when there is none.  Only
+the shallowest open headings are taken, so an open sub-item stays part of its
+parent's body.  Signals if nothing is open, or if the selection reaches into
+more than one person's section."
+  (let* ((bounds (if (use-region-p)
+                     (cons (region-beginning) (region-end))
+                   (save-excursion
+                     (org-back-to-heading t)
+                     (cons (point) (line-end-position)))))
+         (headings (my/org-catchup--open-headings (car bounds) (cdr bounds))))
+    (unless headings
+      (user-error "No %s item in the selection"
+                  (mapconcat #'identity my/org-catchup-todo-keywords "/")))
+    (let* ((level (apply #'min (mapcar #'cdr headings)))
+           (tops (seq-filter (lambda (heading) (= (cdr heading) level)) headings))
+           (parents (mapcar (lambda (heading)
+                              (save-excursion
+                                (goto-char (car heading))
+                                (and (org-up-heading-safe) (point))))
+                            tops)))
+      (unless (car parents)
+        (user-error "Open item is not under a person heading"))
+      (unless (apply #'= (mapcar (lambda (parent) (or parent -1)) parents))
+        (user-error "The selection spans more than one section"))
+      (list (car parents) level
+            (mapcar (lambda (heading)
+                      (save-excursion
+                        (goto-char (car heading))
+                        (my/org-catchup--item-at-point)))
+                    tops)))))
+
+(defun my/org-catchup--meeting-note-point (parent level)
+  "Return where a new meeting entry goes in the subtree of PARENT.
+The start of the first dated child at LEVEL -- the entries run newest first,
+so that is above the most recent meeting and below whatever open or undated
+headings come before it.  The end of the subtree if there is no dated entry."
+  (save-excursion
+    (goto-char parent)
+    (let ((limit (save-excursion (org-end-of-subtree t t) (point))))
+      (if (re-search-forward (my/org-catchup--dated-child-re level) limit t)
+          (line-beginning-position)
+        limit))))
+
+(defun my/org-catchup-new-meeting-note ()
+  "Move the selected open items into a new meeting entry dated today.
+The items are the ones the region touches -- or the one at point, with no
+region -- among those carrying a `my/org-catchup-todo-keywords' keyword.  They
+are converted to a plain list under a new heading dated today, inserted above
+the most recent dated entry of the same section, and removed from where they
+were.  Point is left after the date, for the title of the meeting."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not an Org buffer"))
+  (pcase-let* ((`(,parent ,level ,items) (my/org-catchup--selected-items))
+               (date (format-time-string my/org-catchup--date-format))
+               (note (mapconcat (pcase-lambda (`(,_ ,_ ,title ,body))
+                                  (my/org-catchup--as-list-item title body level))
+                                items "")))
+    (atomic-change-group
+      ;; Last first: deleting from the end keeps the earlier positions valid.
+      (dolist (item (reverse items))
+        (delete-region (nth 0 item) (nth 1 item)))
+      (goto-char (my/org-catchup--meeting-note-point parent level))
+      (unless (bolp) (insert "\n"))
+      (let ((start (point)))
+        (insert (make-string level ?*) " " date " \n" note)
+        (goto-char start)
+        (end-of-line)))
+    (deactivate-mark)
+    (message "Moved %d item%s into %s"
+             (length items) (if (= 1 (length items)) "" "s") date)))
+
+(define-key org-mode-map (kbd "C-c o n") #'my/org-catchup-new-meeting-note)
 
 
 ;;; Capture templates
