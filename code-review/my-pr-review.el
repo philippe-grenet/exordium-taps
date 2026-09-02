@@ -49,7 +49,68 @@ set that way.  For example:
   :custom
   (pr-review-forges-alist
    (append my/pr-review-extra-forges
-           '(("github.com" . (github nil nil))))))
+           '(("github.com" . (github nil nil)))))
+  ;; `pr-review-notification' fetches GET /notifications with all=true when
+  ;; this is non-nil, which is the package default.  That returns every thread
+  ;; the API still knows about, and the API has no notion of the web UI's
+  ;; "Done" -- marking a notification done there only marks it read, so it
+  ;; keeps coming back and the buffer accumulates months of them.  Unread-only
+  ;; matches what the web inbox shows.  `C-c C-t' toggles it back per buffer.
+  (pr-review-notification-include-read nil))
+
+;; Dired-style single-key marks in the notification list.
+;;
+;; The notification buffer is a `tabulated-list-mode' derivative and read-only,
+;; so bare letters are free -- and the package already defines exactly this set
+;; for evil users (`pr-review--notification-mode-map-setup-for-evil'), leaving
+;; plain Emacs with only the `C-c C-<key>' forms.  The mark/execute split is
+;; already dired's: `d' and `r' only set a mark, `x' is what talks to the API.
+;;
+;; The feature is `pr-review-notification', not `pr-review' -- nothing in
+;; pr-review.el requires it, it arrives via the autoload on
+;; `pr-review-notification', so an eval-after-load on `pr-review' would run too
+;; early.  `:ensure nil' because this is a feature inside the pr-review
+;; package, not a package of its own, and Exordium sets
+;; `use-package-always-ensure'.
+;;
+;; `x' is confirmed for `D' marks by the advice below.
+(defvar pr-review--notification-marks)  ; buffer-local, in pr-review-notification.el
+
+(defun my/pr-review-notification-confirm-delete (orig-fun &rest args)
+  "Confirm pending `D' marks, then apply ORIG-FUN to ARGS.
+
+Advice for `pr-review-notification-execute-mark', the one command in the
+notification buffer that reaches the API.  A `D' mark is not dired's
+delete: executing it calls DELETE on the thread's subscription, which
+unsubscribes from the pull request itself, so a stray `d' silently stops
+future notifications for a PR you are reviewing.  `-' (read) marks are
+harmless and pass through unprompted, which keeps the common case at one
+keystroke."
+  (let ((n (seq-count (lambda (mark) (eq (nth 1 mark) 'delete))
+                      pr-review--notification-marks)))
+    (if (and (> n 0)
+             (not (yes-or-no-p
+                   (format "Unsubscribe from %d pull request%s (D mark%s)? "
+                           n (if (= n 1) "" "s") (if (= n 1) "" "s")))))
+        (message "Nothing executed; marks kept")
+      (apply orig-fun args))))
+
+(use-package pr-review-notification
+  :ensure nil
+  :defer t
+  :bind
+  (:map pr-review-notification-mode-map
+   ("r" . #'pr-review-notification-mark-read)
+   ("d" . #'pr-review-notification-mark-delete)
+   ("u" . #'pr-review-notification-remove-mark)
+   ("x" . #'pr-review-notification-execute-mark)
+   ("o" . #'pr-review-notification-open-in-browser)
+   ("t" . #'pr-review-notification-toggle-filter))
+  ;; Advice rather than a wrapper command bound to `x', so the prompt also
+  ;; covers `C-c C-s' and evil's `x', not just the binding added above.
+  :config
+  (advice-add 'pr-review-notification-execute-mark :around
+              #'my/pr-review-notification-confirm-delete))
 
 ;; pr-review renders comment bodies as HTML through shr, whose `shr-text' face
 ;; inherits `variable-pitch' -- spec'd as the generic family "Sans Serif",

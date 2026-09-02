@@ -48,6 +48,8 @@ Already done, in `my-pr-review.el`:
   pr-review.
 - `my/pr-review-use-buffer-font`, on `pr-review-mode-hook`: renders comment
   bodies in the buffer's own font. See [Fonts](#fonts) below.
+- `pr-review-notification-include-read` set to nil. See
+  [Notifications](#notifications) below.
 
 `C-c M-v` was chosen because `C-c C-r` is already taken in both maps
 (`forge-create-post`, `magit-next-reference`), and Exordium's own forge
@@ -231,15 +233,82 @@ So "where is point" is the whole interface.
 
 ### In `pr-review-notification`
 
-| Key       | Command                  |
-| --------- | ------------------------ |
-| `RET`     | open PR                  |
-| `C-c C-r` | mark read                |
-| `C-c C-d` | mark for deletion        |
-| `C-c C-u` | remove mark              |
-| `C-c C-s` | execute marks            |
-| `C-c C-t` | toggle read filter       |
-| `C-c C-o` | open in browser          |
+The list is a read-only `tabulated-list-mode` buffer, so it is driven like
+dired — bare letters, and marks that do nothing until you execute them:
+
+| Key   | Command                    | Also      |
+| ----- | -------------------------- | --------- |
+| `RET` | open PR                    |           |
+| `r`   | mark read                  | `C-c C-r` |
+| `d`   | mark for deletion          | `C-c C-d` |
+| `u`   | remove mark                | `C-c C-u` |
+| `x`   | **execute marks**          | `C-c C-s` |
+| `t`   | toggle read filter         | `C-c C-t` |
+| `o`   | open in browser            | `C-c C-o` |
+| `n`   | next line                  |           |
+| `p`   | previous line              |           |
+| `g`   | refresh                    |           |
+| `q`   | quit                       |           |
+
+The letters are added by this tap (`my-pr-review.el`); the `C-c C-*` forms are
+the package's own and still work. pr-review already ships this exact set for
+evil users, so this only brings plain Emacs in line.
+
+`r` and `d` just put a `-` or `D` in the margin. **`x` is the one that talks to
+the API.** Marks are discarded if the notification changes upstream before you
+execute them, and killing the buffer with marks pending prompts.
+
+A `D` mark is not dired's delete. Executing it calls `DELETE` on the thread's
+subscription, which unsubscribes you from the **pull request itself** — a stray
+`d` silently stops future notifications for a PR you are in the middle of
+reviewing. So this tap advises `pr-review-notification-execute-mark` to confirm
+first:
+
+```
+Unsubscribe from 2 pull requests (D marks)? (yes or no)
+```
+
+Answer `no` and nothing is sent; the marks stay put, so you can `u` the ones
+you did not mean. `-` (read) marks pass through unprompted, which keeps the
+common case at one keystroke. The advice is on the command rather than on the
+`x` binding, so `C-c C-s` and evil's `x` are covered too.
+
+Page navigation is `C-c C-n` / `C-c C-p`, inherited from
+`pr-review-listview-mode` and shared with `pr-review-search`.
+
+## Notifications
+
+`pr-review-notification` calls `GET /notifications`, and the header line states
+the active filter, e.g. `Page 1, 7 items. Filter: -read +unsubscribed`.
+
+The package ships with **both** halves of that filter on, and `+read` makes the
+list far longer than the web inbox — on one bbgithub account, 50 items against
+the web's 8. The cause is that the REST API has no notion of the web UI's
+**Done**. Marking a notification done in the browser only marks it *read*, so
+the API keeps returning it, and months of dealt-with threads pile up. Nothing
+in pr-review can mark a notification done, either.
+
+Hence `pr-review-notification-include-read` is nil here: the buffer opens on
+unread only, which is what the web inbox shows. `C-c C-t` toggles it back for
+the current buffer when you do want the history.
+
+The other half of the filter is left at `+unsubscribed`, and the two marks are
+worth telling apart before reaching for either:
+
+| Key       | API call                             | Effect                                        |
+| --------- | ------------------------------------ | --------------------------------------------- |
+| `C-c C-r` | `PATCH /notifications/threads/:id`   | marks read — still listed under `+read`       |
+| `C-c C-d` | `DELETE .../threads/:id/subscription`| unsubscribes from the PR entirely             |
+
+So `C-c C-d` plus a `-unsubscribed` filter is the closest thing to Done, but it
+is destructive in a way Done is not — you stop hearing about that PR at all.
+Filtering `-read` is the better habit. Note that pr-review's notion of
+"unsubscribed" is not the REST `subscribed` field but `viewerSubscription` on
+the pull request, read over GraphQL (`pr-review--notification-unsubscribed`).
+
+One more trap: `pr-review--get-notifications-per-page` is 50, so a full page
+reads as `50 items` whether or not there are more. Check page 2 (`C-c C-n` /
+`pr-review-listview-next-page`) before believing the count.
 
 ## Walkthrough: your own PR, being reviewed
 
