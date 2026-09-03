@@ -283,35 +283,65 @@ Return a list of line strings."
       (push current lines)
       (nreverse lines))))
 
-(defun my/org-table--compute-proportional-widths (content-widths budget)
+(defun my/org-table--compute-min-widths (rows)
+  "Compute the minimum viable content width per column across all ROWS.
+`my/org-table--wrap-text' never breaks inside a word, so a column
+narrower than its longest word would overflow and misalign the table.
+Return a list of integers."
+  (let* ((ncols (length (car rows)))
+         (mins (make-list ncols 0)))
+    (dolist (row rows)
+      (cl-loop for cell in row
+               for i from 0
+               while (< i ncols)
+               do (dolist (word (split-string cell " " t))
+                    (setf (nth i mins)
+                          (max (nth i mins) (string-width word))))))
+    mins))
+
+(defun my/org-table--indices-by-desc (values)
+  "Return the indices of VALUES, sorted by descending value."
+  (sort (number-sequence 0 (1- (length values)))
+        (lambda (a b) (> (nth a values) (nth b values)))))
+
+(defun my/org-table--compute-proportional-widths (content-widths budget
+                                                                &optional
+                                                                min-widths)
   "Distribute BUDGET across columns proportional to CONTENT-WIDTHS.
-Each column gets at least 1.  Return a list of integers summing
-to BUDGET."
+MIN-WIDTHS, when non-nil, is a list of per-column lower bounds (see
+`my/org-table--compute-min-widths'): no column is allocated less than
+its bound, so wrapped cells never overflow their column.  No column is
+allocated more than its content width either.  Return a list of
+integers summing to BUDGET, except when the lower bounds do not fit
+within BUDGET, in which case the sum is larger and the caller's table
+ends up wider than requested."
   (let* ((ncols (length content-widths))
-         (total (apply #'+ content-widths))
-         (total (if (zerop total) ncols total))
-         (raw (mapcar (lambda (w)
-                        (max 1 (floor (* budget (/ (float (max w 1)) total)))))
-                      content-widths))
-         (allocated (apply #'+ raw))
-         (remainder (- budget allocated)))
-    (when (> remainder 0)
-      (let* ((indices (number-sequence 0 (1- ncols)))
-             (sorted (sort (copy-sequence indices)
-                           (lambda (a b)
-                             (> (nth a content-widths)
-                                (nth b content-widths))))))
-        (cl-loop for i in sorted
-                 repeat remainder
-                 do (cl-incf (nth i raw)))))
-    (when (< remainder 0)
-      (let* ((indices (number-sequence 0 (1- ncols)))
-             (sorted (sort (copy-sequence indices)
-                           (lambda (a b)
-                             (> (nth a raw) (nth b raw))))))
-        (cl-loop for i in sorted
-                 repeat (abs remainder)
-                 do (cl-decf (nth i raw)))))
+         (caps (mapcar (lambda (w) (max 1 w)) content-widths))
+         (mins (if min-widths
+                   (cl-mapcar (lambda (m c) (max 1 (min m c))) min-widths caps)
+                 (make-list ncols 1)))
+         (total (apply #'+ caps))
+         (raw (cl-mapcar
+               (lambda (c m)
+                 (min c (max m (floor (* budget (/ (float c) total))))))
+               caps mins))
+         (remainder (- budget (apply #'+ raw))))
+    ;; Grow the widest columns that are still narrower than their content.
+    (while (and (> remainder 0)
+                (cl-some (lambda (i) (< (nth i raw) (nth i caps)))
+                         (number-sequence 0 (1- ncols))))
+      (cl-loop for i in (my/org-table--indices-by-desc caps)
+               while (> remainder 0)
+               when (< (nth i raw) (nth i caps))
+               do (cl-incf (nth i raw)) (cl-decf remainder)))
+    ;; Shrink the widest columns that are still above their minimum.
+    (while (and (< remainder 0)
+                (cl-some (lambda (i) (> (nth i raw) (nth i mins)))
+                         (number-sequence 0 (1- ncols))))
+      (cl-loop for i in (my/org-table--indices-by-desc raw)
+               while (< remainder 0)
+               when (> (nth i raw) (nth i mins))
+               do (cl-decf (nth i raw)) (cl-incf remainder)))
     raw))
 
 (defun my/org-table--wrap-rows (rows content-widths)
@@ -449,6 +479,7 @@ than being hard-broken."
            (rows (nth 1 parsed))
            (indent (nth 2 parsed))
            (content-widths (my/org-table--compute-widths rows))
+           (min-widths (my/org-table--compute-min-widths rows))
            (ncols (length content-widths))
            (indent-len (string-width indent))
            (current-width (+ indent-len (1+ ncols)
@@ -461,17 +492,23 @@ than being hard-broken."
             (user-error "Table cannot fit: too many columns for fill-column"))
           (let* ((new-content-widths
                   (my/org-table--compute-proportional-widths
-                   content-widths budget))
+                   content-widths budget min-widths))
                  (new-col-widths (mapcar (lambda (w) (+ w 2))
                                         new-content-widths))
                  (wrapped-rows (my/org-table--wrap-rows
                                 rows new-content-widths))
                  (result (my/org-table--render-resized
-                          fmt wrapped-rows new-col-widths indent)))
+                          fmt wrapped-rows new-col-widths indent))
+                 (new-width (+ indent-len (1+ ncols)
+                               (apply #'+ new-col-widths))))
             (delete-region beg end)
             (goto-char beg)
             (insert result "\n")
-            (goto-char (min (+ beg offset) (point)))))))))
+            (goto-char (min (+ beg offset) (point)))
+            (when (> new-width fill-column)
+              (message (concat "Table resized to %d columns: narrower would "
+                               "break words (fill-column is %d)")
+                       new-width fill-column))))))))
 
 (provide 'table-format)
 
