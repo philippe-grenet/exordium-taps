@@ -62,14 +62,45 @@ or comment block. See also `repunctuate-sentences'."
                               ("\x2019" . "'"))
                             nil beg end)))
 
-(defun note ()
-  "Create a new scratch bufer to edit markdown, that does not
-  need to be safed."
+;;; Transient scratch buffers, e.g. to draft a Slack message or an MSG.
+
+(defvar my/scratch-directory "~/Documents/scratch/"
+  "Directory offered by default when saving a `my/scratch' buffer.")
+
+(defvar-local my/scratch-buffer-p nil
+  "Non-nil when this buffer was created by `my/scratch'.")
+;; Survive a major mode change, so F8 keeps recognizing the buffer.
+(put 'my/scratch-buffer-p 'permanent-local t)
+
+(defun my/scratch ()
+  "Create a transient markdown buffer, or dispose of the current one.
+When the current buffer is already a scratch buffer, copy its whole
+content to the clipboard and kill it without asking to save.
+Otherwise create a new scratch buffer in `markdown-mode' whose
+default directory is `my/scratch-directory', so that \\[save-buffer]
+offers to save it there."
   (interactive)
-  (let ((buffer (generate-new-buffer (make-temp-name "scratch-"))))
-    (switch-to-buffer buffer)
-    (setq-local default-directory "/Users/pgrenet/Documents/scratch")
-    (markdown-mode)))
+  (if my/scratch-buffer-p
+      (let ((text (buffer-substring-no-properties (point-min) (point-max)))
+            ;; Bypass `exordium--scratch-kill-buffer-query-function', which
+            ;; asks before killing an unsaved buffer named "scratch-...".
+            (kill-buffer-query-functions nil))
+        (kill-new text)
+        (set-buffer-modified-p nil)
+        (kill-buffer)
+        (message "Scratch copied to clipboard (%d characters)" (length text)))
+    (let ((dir (expand-file-name my/scratch-directory))
+          (buffer (generate-new-buffer
+                   (format-time-string "scratch-%Y%m%d-%H%M%S.md"))))
+      (make-directory dir t)
+      (switch-to-buffer buffer)
+      (markdown-mode)
+      (setq-local default-directory dir
+                  buffer-offer-save nil
+                  my/scratch-buffer-p t))))
+
+(defalias 'note #'my/scratch)
+(defalias 'scratch #'my/scratch)
 
 
 ;; Meta and Super key for the BB keyboard
@@ -173,6 +204,7 @@ order."
 ;; Keys
 (global-set-key [(f6)] #'symbol-overlay-put)
 (global-set-key [(f7)] #'flyspell-auto-correct-previous-word)
+(global-set-key [(f8)] #'my/scratch)
 (global-set-key [(end)] #'move-end-of-line)
 (global-set-key [(home)] #'move-beginning-of-line)
 
