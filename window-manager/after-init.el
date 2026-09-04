@@ -8,15 +8,54 @@
 
 (add-to-list 'default-frame-alist `(width . ,pg/window-width))
 
+(defun my/frame-top (frame)
+  "Return the top pixel position of FRAME as a plain integer.
+The `top' frame parameter can be a cons such as (+ 23) or (- 0)."
+  (let ((top (frame-parameter frame 'top)))
+    (cond ((consp top) (if (eq (car top) '-)
+                           (- (nth 3 (frame-monitor-workarea frame)) (cadr top))
+                         (cadr top)))
+          ((integerp top) top)
+          (t (nth 1 (frame-monitor-workarea frame))))))
+
+(defun my/set-frame-height (frame lines)
+  "Set FRAME height to LINES, clamped so the frame fits on its monitor.
+Without clamping, a LINES value larger than the display can hold pushes
+the mode line and the minibuffer below the bottom of the screen."
+  (pcase-let* ((`(,_ ,wa-top ,_ ,wa-height) (frame-monitor-workarea frame))
+               (char-height (frame-char-height frame))
+               ;; Title bar, menu/tool/tab bars and internal borders: the
+               ;; difference between the outer height and the text lines.
+               (decorations (max 0 (- (frame-outer-height frame)
+                                      (* char-height (frame-height frame)))))
+               (top (max wa-top (min (my/frame-top frame)
+                                     (+ wa-top wa-height))))
+               (available (- (+ wa-top wa-height) top decorations))
+               (max-lines (max 10 (floor available char-height))))
+    (set-frame-height frame (min lines max-lines))))
+
+(defun my/resize-frame (width height)
+  "Resize the selected frame to WIDTH columns and at most HEIGHT lines.
+Leave any maximized or fullscreen state first, otherwise the window
+manager fights the explicit geometry."
+  (let ((frame (selected-frame)))
+    (when (frame-parameter frame 'fullscreen)
+      (set-frame-parameter frame 'fullscreen nil)
+      ;; macOS applies the un-maximize asynchronously; let it land before
+      ;; measuring the frame geometry below.
+      (redisplay t))
+    (set-frame-width frame width)
+    (my/set-frame-height frame height)))
+
 (defun frame-show-one-window ()
   "Show a single window"
   (interactive)
   (delete-other-windows)
   ;; doesn't work with multiple monitors, need to find a solution
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
-  (set-frame-width (selected-frame) (+ pg/window-width
-                                       (if (eq (treemacs-current-visibility) 'visible) 20 0)))
-  (set-frame-height (selected-frame) pg/frame-height))
+  (my/resize-frame (+ pg/window-width
+                      (if (eq (treemacs-current-visibility) 'visible) 20 0))
+                   pg/frame-height))
 
 (global-set-key [(f10)] #'frame-show-one-window)
 
@@ -26,9 +65,9 @@
   (delete-other-windows)
   ;; doesn't work with multiple monitors, need to find a solution
   ;;(modify-frame-parameters (selected-frame) '((top . 0) (left . 0)))
-  (set-frame-width (selected-frame) (+ (* 2 pg/window-width)
-                                         (if (eq (treemacs-current-visibility) 'visible) 20 0)))
-  (set-frame-height (selected-frame) pg/frame-height)
+  (my/resize-frame (+ (* 2 pg/window-width)
+                      (if (eq (treemacs-current-visibility) 'visible) 20 0))
+                   pg/frame-height)
   (let ((win (split-window-right)))
     (switch-to-other-buffer)))
 
