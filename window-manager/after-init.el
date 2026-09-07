@@ -153,24 +153,24 @@ i.e. change right window to bottom, or change bottom window to right."
 ;;     (frame-show-two-windows)
 ;;     (toggle-window-split)))
 
-(defun split-window-func-with-other-buffer (split-function)
-  (let ((s-f split-function))
-    (lambda ()
-      (interactive)
-      (funcall s-f)
-      (set-window-buffer (next-window) (other-buffer)))))
+(defun my-split-window-with-other-buffer (split-function)
+  "Call SPLIT-FUNCTION, then display `other-buffer' in the new window."
+  (funcall split-function)
+  (set-window-buffer (next-window) (other-buffer)))
 
 (defun split-window-horizontally-instead ()
+  "Delete other windows, split horizontally and show the other buffer."
   (interactive)
   (save-excursion
     (delete-other-windows)
-    (funcall (split-window-func-with-other-buffer 'split-window-horizontally))))
+    (my-split-window-with-other-buffer #'split-window-horizontally)))
 
 (defun split-window-vertically-instead ()
+  "Delete other windows, split vertically and show the other buffer."
   (interactive)
   (save-excursion
     (delete-other-windows)
-    (funcall (split-window-func-with-other-buffer 'split-window-vertically))))
+    (my-split-window-with-other-buffer #'split-window-vertically)))
 
 (global-set-key "\C-c3" 'split-window-horizontally-instead)
 (global-set-key "\C-c2" 'split-window-vertically-instead)
