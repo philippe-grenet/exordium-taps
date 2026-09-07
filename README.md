@@ -15,6 +15,7 @@ tap's `after-init.el` — so a tap can rely on values declared in another tap's
 | `ai`             | Claude Code in Emacs (`C-c c`), plus the org repo's Claude skills as `M-x` commands            |
 | `code-review`    | Reviewing GitHub pull requests, and reviewing local changes written by a coding agent          |
 | `common`         | Shared libraries for all taps:  table formatting, file descriptions, and the org repo location |
+| `dashboard`      | Calendar, agenda, this week's tasks and recent projects; the startup buffer in a GUI           |
 | `lsp`            | C++ tree-sitter settings and an (off by default) LSP setup                                     |
 | `markdown-mode`  | Markdown editing: Mermaid diagrams, inline images, tables, macOS dictionary                    |
 | `org-mode`       | Org Mode and my second-brain notes repo: capture, refile, agenda, Drive sync, DRQS links       |
@@ -29,8 +30,8 @@ explicitly by the taps that need it rather than by Exordium, since it has no
 
 ## The org repo
 
-Parts of the `ai` and `org-mode` taps address my notes repo, which is not on
-every machine. Point the config at it with:
+The `dashboard` tap, and parts of the `ai` and `org-mode` taps, address my notes
+repo, which is not on every machine. Point the config at it with:
 
 ```sh
 export ORG_REPO_DIR="$HOME/Documents/org"   # in ~/.zshrc
