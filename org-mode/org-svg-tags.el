@@ -67,7 +67,7 @@
                                                  :beg 1 :end -1))))
             ("\\(\\[#C\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
-                                                 :face 'font-function-name-face :inverse t
+                                                 :face 'font-lock-function-name-face :inverse t
                                                  :beg 1 :end -1))))
             ;; Rectangles with plain words: {:Something:}
             ;; Consider expending to "\\({:[A-Za-z0-9]+\\(?:[ ][A-Za-z0-9]+\\)*:}\\)"
