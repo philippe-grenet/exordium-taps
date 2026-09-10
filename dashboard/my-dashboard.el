@@ -336,6 +336,7 @@ from the top of FILE.  The spot is revealed when FILE is in Org mode."
   (let ((inhibit-read-only t)
         (my-dashboard--width (max 40 (window-body-width))))
     (erase-buffer)
+    (insert "\n")
     (my-dashboard--insert-logo)
     (my-dashboard--insert-date)
     (my-dashboard-insert-separator)
@@ -352,8 +353,7 @@ from the top of FILE.  The spot is revealed when FILE is in Org mode."
     ;; Drop the final newline, so the last line is the key reminder rather
     ;; than an empty one.
     (when (bolp) (delete-char -1))
-    ;; Leave point there: on the logo, `hl-line-mode' would otherwise draw a
-    ;; band across the image.
+    (goto-char (point-min))
     (set-buffer-modified-p nil)))
 
 
