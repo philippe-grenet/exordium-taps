@@ -45,7 +45,8 @@ rather than submitted with no comments.")
 (defvar my/emacs-review--review nil
   "Review buffer opened for the waiting agent, or nil.")
 
-(declare-function my/review-local-changes "my-diff-review" (&optional prompt-p))
+(declare-function my/review-local-changes "my-diff-review"
+                  (&optional prompt-p range paths))
 (declare-function my-diff-review--markdown "my-diff-review" ())
 (defvar my-diff-review-mode-map)
 (defvar pr-review--pending-review-threads)
@@ -58,13 +59,27 @@ rather than submitted with no comments.")
                              nil t)
       (string-trim (match-string 1)))))
 
+(defun my/emacs-review--fields (name)
+  "Return the values of every `NAME:' line in the current buffer.
+One line per value, so a value may contain spaces -- which file names do."
+  (save-excursion
+    (goto-char (point-min))
+    (let (values)
+      (while (re-search-forward
+              (format "^%s:[ \t]*\\(.+\\)$" (regexp-quote name)) nil t)
+        (push (string-trim (match-string 1)) values))
+      (nreverse values))))
+
 (defun my/emacs-review--visit ()
   "Turn a review request file into a review buffer.
 Runs from `server-visit-hook'."
   (when (and buffer-file-name
              (string-match-p my/emacs-review-file-regexp buffer-file-name))
-    (let ((repo (my/emacs-review--field "repo"))
-          (handoff (current-buffer)))
+    (let* ((repo (my/emacs-review--field "repo"))
+           (range (when-let* ((r (my/emacs-review--field "range")))
+                    (split-string r nil t)))
+           (paths (my/emacs-review--fields "path"))
+           (handoff (current-buffer)))
       (cond
        ((not (and repo (file-directory-p repo)))
         (message "emacs-review: request names no usable repo, leaving it alone"))
@@ -80,16 +95,17 @@ Runs from `server-visit-hook'."
         ;; handoff never releases the agent.  The review still ends up
         ;; displayed; only the current buffer is restored.
         (save-current-buffer
-          (my/emacs-review--open repo)))))))
+          (my/emacs-review--open repo range paths)))))))
 
-(defun my/emacs-review--open (repo)
-  "Open a review of REPO for a waiting agent."
+(defun my/emacs-review--open (repo &optional range paths)
+  "Open a review of REPO for a waiting agent.
+RANGE limits it to a `git diff' range, PATHS to a list of pathspecs."
   ;; An agent-initiated review starts clean, so answer the "discard existing
   ;; comments?" prompt for it.  Nothing must block here: a `yes-or-no-p' nobody
   ;; is looking at would wedge Emacs while the agent waits on it.
   (let ((default-directory (file-name-as-directory repo)))
     (cl-letf (((symbol-function 'yes-or-no-p) (lambda (&rest _) t)))
-      (my/review-local-changes)))
+      (my/review-local-changes nil range paths)))
   (setq my/emacs-review--review (current-buffer)))
 
 (defun my/emacs-review--switch ()

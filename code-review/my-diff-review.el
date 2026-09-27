@@ -101,6 +101,11 @@ The value `ref' means prompt for a revision.")
 (defvar-local my-diff-review--args nil
   "Extra `git diff' arguments used to build this buffer.")
 
+(defvar-local my-diff-review--paths nil
+  "Pathspecs the review is limited to, relative to the repository root.
+Nil reviews the whole repository.  Applies to untracked files too, so
+scoping a review to one new file does not drag in every other one.")
+
 (defvar-local my-diff-review--label nil
   "Human-readable description of what is being reviewed.")
 
@@ -121,14 +126,17 @@ Used by `my-diff-review-insert-suggestion'.")
       (apply #'call-process "git" nil t nil args))
     (buffer-string)))
 
-(defun my-diff-review--untracked-files (repo)
+(defun my-diff-review--untracked-files (repo &optional paths)
   "Return the untracked, not-ignored files in REPO, relative to its root.
+PATHS, when non-nil, is a list of pathspecs limiting the result.
 Excludes `my-diff-review-output-file-name', so saving the review into the
 repository does not make the next review include it."
   (seq-remove
    (lambda (file) (equal file my-diff-review-output-file-name))
    (split-string
-    (my-diff-review--git-output repo "ls-files" "--others" "--exclude-standard")
+    (apply #'my-diff-review--git-output
+           repo "ls-files" "--others" "--exclude-standard"
+           (when paths (cons "--" paths)))
     "\n" t)))
 
 (defun my-diff-review--untracked-diff (repo file)
@@ -138,8 +146,9 @@ header naming FILE on both sides, so the result needs no fixing up."
   (my-diff-review--git-output
    repo "diff" "--no-color" "--no-prefix" "--no-index" "--" "/dev/null" file))
 
-(defun my-diff-review--build-diff (repo args)
+(defun my-diff-review--build-diff (repo args &optional paths)
   "Return the unified diff for REPO with extra `git diff' ARGS.
+PATHS, when non-nil, is a list of pathspecs the diff is limited to.
 Appends synthetic diffs for untracked files when
 `my-diff-review-include-untracked' is non-nil and ARGS does not restrict
 the diff to the index.
@@ -149,11 +158,12 @@ expects file names without the a/ and b/ prefixes.  Leaving them in makes
 every file heading render as \"a/foo -> b/foo\"."
   (concat
    (apply #'my-diff-review--git-output
-          repo "diff" "--no-color" "--no-prefix" args)
+          repo "diff" "--no-color" "--no-prefix"
+          (append args (when paths (cons "--" paths))))
    (when (and my-diff-review-include-untracked
               (not (member "--cached" args)))
      (mapconcat (lambda (file) (my-diff-review--untracked-diff repo file))
-                (my-diff-review--untracked-files repo)
+                (my-diff-review--untracked-files repo paths)
                 ""))))
 
 
@@ -241,7 +251,8 @@ slot is bound, so unbinding it opts out."
   (let ((inhibit-read-only t)
         (threads (reverse pr-review--pending-review-threads))
         (diff (my-diff-review--build-diff my-diff-review--repo
-                                          my-diff-review--args)))
+                                          my-diff-review--args
+                                          my-diff-review--paths)))
     (erase-buffer)
     (setq-local pr-review--pending-review-threads nil)
     (my-diff-review--insert-header)
@@ -608,6 +619,16 @@ comment comes before the line comments."
 
 ;;; Entry point
 
+(defun my-diff-review--scope-label (range paths)
+  "Return a human-readable label for RANGE limited to PATHS.
+RANGE is a list of `git diff' arguments, or nil for the default."
+  (let* ((args (or range '("HEAD")))
+         (base (or (car (rassoc args my-diff-review--ranges))
+                   (format "git diff %s" (string-join args " ")))))
+    (if paths
+        (format "%s, limited to %s" base (string-join paths ", "))
+      base)))
+
 (defun my-diff-review--read-args (prompt-p)
   "Return (LABEL . ARGS) for `git diff'.
 When PROMPT-P is non-nil, ask which range to review."
@@ -623,18 +644,28 @@ When PROMPT-P is non-nil, ask which range to review."
         (cons label args)))))
 
 ;;;###autoload
-(defun my/review-local-changes (&optional prompt-p)
+(defun my/review-local-changes (&optional prompt-p range paths)
   "Review the local changes in the current repository.
 
 Renders the diff in a dedicated buffer where you can comment on individual
 lines, then export every comment as markdown for a coding agent to act on.
 
 By default reviews all uncommitted changes (staged and unstaged) plus
-untracked files.  With a prefix argument PROMPT-P, choose what to review."
+untracked files.  With a prefix argument PROMPT-P, choose what to review.
+
+RANGE and PATHS are for non-interactive callers -- chiefly an agent going
+through `my-review-server'.  RANGE is a list of `git diff' arguments such
+as \\='(\"--cached\"), nil meaning the default.  PATHS is a list of
+pathspecs relative to the repository root; when given, the review covers
+only those files, untracked ones included.  Supplying either skips the
+PROMPT-P prompt."
   (interactive "P")
   (let* ((repo (or (magit-toplevel)
                    (user-error "Not inside a Git repository")))
-         (spec (my-diff-review--read-args prompt-p))
+         (spec (if (or range paths)
+                   (cons (my-diff-review--scope-label range paths)
+                         (or range '("HEAD")))
+                 (my-diff-review--read-args prompt-p)))
          (buffer (get-buffer-create
                   (format "*diff review: %s*"
                           (file-name-nondirectory
@@ -652,6 +683,7 @@ untracked files.  With a prefix argument PROMPT-P, choose what to review."
       (my-diff-review-mode)
       (setq-local my-diff-review--repo repo
                   my-diff-review--args (cdr spec)
+                  my-diff-review--paths paths
                   my-diff-review--label (car spec)
                   pr-review--pending-review-threads nil)
       (my-diff-review--render))
