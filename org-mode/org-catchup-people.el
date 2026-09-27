@@ -373,12 +373,15 @@ were.  Point is left after the date, for the title of the meeting."
   '(("S" "Shabbir"  "Shabbir")
     ("A" "Anthony"  "AC ("           "AC")
     ("M" "Manish"   "Manish")
+    ("t" "Tom"      "Tom Walsh")
+    ("g" "Ganesh"   "Ganesh")
+    ("m" "Murali"   "Murali")
+    ("G" "Gino"     "Gino (")
     ("a" "Abhishek" "Abhishek Gupta" "AG")
     ("s" "Sathya"   "Sathya (")
-    ("t" "Tom"      "Tom Walsh")
-    ("g" "Gino"     "Gino (")
+    ("n" "Neeraj"   "Neeraj")
     ("y" "Yogesh"   "Yogesh")
-    ("m" "Amey"     "Amey")
+    ("p" "Amey"     "Amey")
     ("j" "Jas"      "Jas ("))
   "People to offer as `org-capture' targets, in menu order.
 Each entry is (KEY LABEL MATCH [PLACEHOLDER]).  KEY is the `org-mks'
