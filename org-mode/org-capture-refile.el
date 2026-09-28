@@ -37,21 +37,20 @@ Prepend by default; with prefix ARG, append."
          (org-reverse-note-order (not arg)))
     (org-refile nil nil (list target-headline target-file nil pos))))
 
-(defun my-org-refile-to-today (arg)
-  "Refile current headline to Today." (interactive "P")
-  (my-org-refile-to "☕️ Today" arg))
+(defmacro my-org-define-refile (name heading key)
+  "Define command `my-org-refile-to-NAME' refiling to HEADING, bound to KEY."
+  (let ((command (intern (format "my-org-refile-to-%s" name))))
+    `(progn
+       (defun ,command (arg)
+         ,(format "Refile current headline to %s.
+Prepend by default; with prefix ARG, append." (capitalize (symbol-name name)))
+         (interactive "P")
+         (my-org-refile-to ,heading arg))
+       (define-key org-mode-map (kbd ,key) #',command))))
 
-(defun my-org-refile-to-week (arg)
-  "Refile current headline to Week." (interactive "P")
-  (my-org-refile-to "Week" arg))
-
-(defun my-org-refile-to-backlog (arg)
-  "Refile current headline to Backlog." (interactive "P")
-  (my-org-refile-to "Backlog" arg))
-
-(define-key org-mode-map (kbd "C-c o t") #'my-org-refile-to-today)
-(define-key org-mode-map (kbd "C-c o w") #'my-org-refile-to-week)
-(define-key org-mode-map (kbd "C-c o b") #'my-org-refile-to-backlog)
+(my-org-define-refile today   "☕️ Today" "C-c o t")
+(my-org-define-refile week    "Week"     "C-c o w")
+(my-org-define-refile backlog "Backlog"  "C-c o b")
 
 
 ;;; Capture

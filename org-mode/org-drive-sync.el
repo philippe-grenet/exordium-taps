@@ -20,12 +20,9 @@
   (interactive)
   (if (file-directory-p my/org-sync-directory)
       (progn
-        (copy-file (my/org-file "todo.org")
-                   (expand-file-name "todo.org" my/org-sync-directory) t)
-        (copy-file (my/org-file "catchup.org")
-                   (expand-file-name "catchup.org" my/org-sync-directory) t)
-        (copy-file (my/org-file "perso.org")
-                   (expand-file-name "perso.org" my/org-sync-directory) t)
+        (dolist (file '("todo.org" "catchup.org" "perso.org"))
+          (copy-file (my/org-file file)
+                     (expand-file-name file my/org-sync-directory) t))
         (message "org-sync: synced"))
     (message "org-sync: Google Drive not mounted, skipping")))
 

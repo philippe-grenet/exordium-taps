@@ -31,10 +31,9 @@
 
 
 (defconst top-level-notes
-  `((,(colorize-note-extension "todo.org")    . ,(my/org-file "todo.org"))
-    (,(colorize-note-extension "catchup.org") . ,(my/org-file "catchup.org"))
-    (,(colorize-note-extension "roadmap.org") . ,(my/org-file "roadmap.org"))
-    (,(colorize-note-extension "perso.org")   . ,(my/org-file "perso.org"))))
+  (mapcar (lambda (name)
+            (cons (colorize-note-extension name) (my/org-file name)))
+          '("todo.org" "catchup.org" "roadmap.org" "perso.org")))
 
 (defconst notes-root-directories
   (list (my/org-file "areas/")
@@ -82,22 +81,12 @@ For example <org repo>/projects/subA/subB/ yields \"projects/subA/subB\"."
   ;; Return a alist of (file-name . path) for all org and markdown files in 'dir'.
   ;; file-name includes the sub-directory path relative to the notes root.
   ;; The list is sorted by file-name ascending.
-  (cl-flet ((note-name-and-path (file)
-              (let* ((file-name (file-name-base file))
-                     (file-ext  (file-name-extension file t)))
-                (cons (concat (propertize (notes--dir-label dir)
-                                          'face 'helm-ff-directory)
-                              "/" file-name
-                              (propertize file-ext 'face (if (string= file-ext ".org")
-                                                             'helm-ff-truename
-                                                           'helm-ff-file-extension)))
-                      file))))
-    (sort (append (mapcar #'note-name-and-path
-                          (directory-files dir :match-regexp "^.*\.org"))
-                  (mapcar #'note-name-and-path
-                          (directory-files dir :match-regexp "^.*\.md")))
-          #'(lambda (a b)
-              (string< (downcase (car a)) (downcase (car b)))))))
+  (let ((label (propertize (notes--dir-label dir) 'face 'helm-ff-directory)))
+    (sort (mapcar (lambda (file)
+                    (cons (concat label "/" (colorize-note-extension file)) file))
+                  (directory-files dir t "\\.\\(org\\|md\\)\\'"))
+          (lambda (a b)
+            (string< (downcase (car a)) (downcase (car b)))))))
 
 (defun list-all-notes ()
   "Return the full alist of notes (file-name . path)."
@@ -105,11 +94,11 @@ For example <org repo>/projects/subA/subB/ yields \"projects/subA/subB\"."
           (mapcan #'list-notes-in-directory (notes-directories))))
 
 (defun open-todos (file)
-  "Open a note as FILE from the list of active notes in the org repo."
+  "Open FILE, picked by name from the list of active notes in the org repo."
   (interactive
-   (list
-    (completing-read "Open: " (list-all-notes))))
-  (find-file (cdr (assoc file (list-all-notes)))))
+   (let ((notes (list-all-notes)))
+     (list (cdr (assoc (completing-read "Open: " notes) notes)))))
+  (find-file file))
 
 (global-set-key [(f12)] #'open-todos)
 
