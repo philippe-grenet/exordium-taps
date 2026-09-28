@@ -24,6 +24,8 @@
                    (expand-file-name "todo.org" my/org-sync-directory) t)
         (copy-file (my/org-file "catchup.org")
                    (expand-file-name "catchup.org" my/org-sync-directory) t)
+        (copy-file (my/org-file "perso.org")
+                   (expand-file-name "perso.org" my/org-sync-directory) t)
         (message "org-sync: synced"))
     (message "org-sync: Google Drive not mounted, skipping")))
 

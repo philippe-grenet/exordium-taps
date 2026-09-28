@@ -33,7 +33,8 @@
 (defconst top-level-notes
   `((,(colorize-note-extension "todo.org")    . ,(my/org-file "todo.org"))
     (,(colorize-note-extension "catchup.org") . ,(my/org-file "catchup.org"))
-    (,(colorize-note-extension "roadmap.org") . ,(my/org-file "roadmap.org"))))
+    (,(colorize-note-extension "roadmap.org") . ,(my/org-file "roadmap.org"))
+    (,(colorize-note-extension "perso.org")   . ,(my/org-file "perso.org"))))
 
 (defconst notes-root-directories
   (list (my/org-file "areas/")
