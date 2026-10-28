@@ -304,6 +304,11 @@ order."
 ;; Tab for autocomplete of directory path with Helm (default is C-j)
 (define-key helm-find-files-map "\t" 'helm-execute-persistent-action)
 
+;; Restore helm-find-files on C-x C-f: dired-x (with `dired-x-hands-off-my-keys'
+;; nil) remaps `find-file' to `dired-x-find-file', shadowing Exordium's binding.
+(with-eval-after-load 'dired-x
+  (define-key global-map [remap find-file] #'helm-find-files))
+
 ;; insert date
 (defun exordium-insert-today ()
   "Insert today's date as an Org inactive timestamp [YYYY-MM-DD]."

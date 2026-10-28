@@ -23,8 +23,9 @@
         (dolist (file '("todo.org" "catchup.org" "perso.org"))
           (copy-file (my/org-file file)
                      (expand-file-name file my/org-sync-directory) t))
-        (message "org-sync: synced"))
-    (message "org-sync: Google Drive not mounted, skipping")))
+        (message "Org files synced at %s" (format-time-string "%H:%M")))
+    (message "Org files not synced at %s, destination not mounted"
+             (format-time-string "%H:%M"))))
 
 ;; Schedule the function every hour. See also run-with-timer and cancel-timer.
 (run-at-time "00:00" 3600 'org-sync)
