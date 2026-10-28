@@ -109,11 +109,25 @@ box-drawing tables, or nil if point is not in a table."
       ('format-2
        (string-match-p "^[┌├└]" trimmed)))))
 
+(defun my/org-table--group-to-row (group ncols)
+  "Convert GROUP, a list of split lines, into a row of NCOLS cells.
+Each cell of the returned row is the list of its visual lines."
+  (apply #'cl-mapcar #'list
+         (mapcar (lambda (cells)
+                   (append cells (make-list (max 0 (- ncols (length cells)))
+                                            "")))
+                 group)))
+
 (defun my/org-table-parse (beg end)
   "Parse the table between BEG and END.
 Return a list (FORMAT ROWS INDENT) where FORMAT is `format-1' or
-`format-2', ROWS is a list of lists of trimmed cell strings (first
-element is the header), and INDENT is the leading whitespace string."
+`format-2', ROWS is a list of rows (first element is the header),
+and INDENT is the leading whitespace string.  Each row is a list of
+cells, and each cell is a list of trimmed line strings: a row spans
+several lines when it is not delimited by separators.
+
+In Format 1, separators between data rows are optional.  When there
+are none, each line is a row of its own."
   (let* ((text (buffer-substring-no-properties beg end))
          (lines (split-string text "\n" t))
          (format (save-excursion
@@ -122,15 +136,45 @@ element is the header), and INDENT is the leading whitespace string."
          (indent (if (string-match "^\\([ \t]*\\)" (car lines))
                      (match-string 1 (car lines))
                    ""))
-         (rows '()))
+         (groups '())
+         (current '()))
+    ;; Group consecutive data lines between separators.
     (dolist (line lines)
-      (unless (my/org-table--separator-p line format)
+      (if (my/org-table--separator-p line format)
+          (when current
+            (push (nreverse current) groups)
+            (setq current nil))
         (let ((cells (pcase format
                        ('format-1 (my/org-table--split-cells-format-1 line))
                        ('format-2 (my/org-table--split-cells-format-2 line)))))
           (when cells
-            (push cells rows)))))
-    (list format (nreverse rows) indent)))
+            (push cells current)))))
+    (when current
+      (push (nreverse current) groups))
+    (setq groups (nreverse groups))
+    ;; No separators between data rows: each line is a row.
+    (when (and (eq format 'format-1) (<= (length groups) 2))
+      (setq groups (if (cdr groups)
+                       (cons (car groups) (mapcar #'list (cadr groups)))
+                     (mapcar #'list (car groups)))))
+    (let ((ncols (apply #'max 0 (mapcar #'length (apply #'append groups)))))
+      (list format
+            (mapcar (lambda (g) (my/org-table--group-to-row g ncols)) groups)
+            indent))))
+
+(defun my/org-table--row-lines (rows)
+  "Flatten multi-line ROWS into a list of single-line rows.
+Each returned row is a list of cell strings."
+  (mapcan (lambda (row) (apply #'cl-mapcar #'list row)) rows))
+
+(defun my/org-table--row-texts (rows)
+  "Join the lines of each cell in multi-line ROWS with spaces.
+Return a list of rows, each being a list of cell strings."
+  (mapcar (lambda (row)
+            (mapcar (lambda (cell-lines)
+                      (string-join (remove "" cell-lines) " "))
+                    row))
+          rows))
 
 ;;;; Width computation
 
@@ -190,76 +234,6 @@ otherwise left-align with 1-space padding."
            (cl-mapcar #'cons cells col-widths)
            (string delim))
           (string delim)))
-
-;;;; Renderers
-
-(defun my/org-table-render-format-1 (rows indent)
-  "Render ROWS as a Format 1 (standard org) table.
-INDENT is prepended to each line.  First row is the header."
-  (let* ((content-widths (my/org-table--compute-widths rows))
-         (col-widths (mapcar (lambda (w) (+ w 2)) content-widths))
-         (header (car rows))
-         (data (cdr rows))
-         (lines '()))
-    ;; Header row
-    (push (concat indent (my/org-table--data-line ?| header col-widths nil))
-          lines)
-    ;; Separator
-    (push (concat indent "|"
-                  (mapconcat (lambda (w) (make-string w ?-))
-                             col-widths "|")
-                  "|")
-          lines)
-    ;; Data rows
-    (dolist (row data)
-      (push (concat indent (my/org-table--data-line ?| row col-widths nil))
-            lines))
-    (mapconcat #'identity (nreverse lines) "\n")))
-
-(defun my/org-table-render-format-2 (rows indent)
-  "Render ROWS as a Format 2 (box-drawing) table.
-INDENT is prepended to each line.  First row is the header (centered)."
-  (let* ((content-widths (my/org-table--compute-widths rows))
-         (col-widths (mapcar (lambda (w) (+ w 2)) content-widths))
-         (header (car rows))
-         (data (cdr rows))
-         (lines '()))
-    ;; Top border
-    (push (concat indent
-                  (my/org-table--separator-line
-                   my/org-table-box-tl my/org-table-box-tt my/org-table-box-tr
-                   col-widths))
-          lines)
-    ;; Header row (centered)
-    (push (concat indent
-                  (my/org-table--data-line my/org-table-box-v
-                                          header col-widths t))
-          lines)
-    ;; Header separator
-    (push (concat indent
-                  (my/org-table--separator-line
-                   my/org-table-box-lt my/org-table-box-x my/org-table-box-rt
-                   col-widths))
-          lines)
-    ;; Data rows with separators between them
-    (cl-loop for (row . rest) on data do
-             (push (concat indent
-                           (my/org-table--data-line my/org-table-box-v
-                                                   row col-widths nil))
-                   lines)
-             (when rest
-               (push (concat indent
-                             (my/org-table--separator-line
-                              my/org-table-box-lt my/org-table-box-x
-                              my/org-table-box-rt col-widths))
-                     lines)))
-    ;; Bottom border
-    (push (concat indent
-                  (my/org-table--separator-line
-                   my/org-table-box-bl my/org-table-box-bt my/org-table-box-br
-                   col-widths))
-          lines)
-    (mapconcat #'identity (nreverse lines) "\n")))
 
 ;;;; Resize / word-wrap support
 
@@ -378,12 +352,14 @@ COL-WIDTHS includes padding.  CENTER-P centers text if non-nil."
               result)))
     (nreverse result)))
 
-(defun my/org-table--render-resized (format wrapped-rows col-widths indent)
-  "Render a resized table with multi-line cells.
+(defun my/org-table-render (format rows col-widths indent)
+  "Render a table with multi-line cells.
 FORMAT is `format-1' or `format-2'.
-WRAPPED-ROWS is the output of `my/org-table--wrap-rows'.
+ROWS is a list of rows as returned by `my/org-table-parse' or
+`my/org-table--wrap-rows'; the first row is the header.
 COL-WIDTHS is the list of column widths (including padding).
-INDENT is the leading whitespace string."
+INDENT is the leading whitespace string.
+In Format 1, data rows are separated only if one spans several lines."
   (let ((lines '()))
     (pcase format
       ('format-2
@@ -393,14 +369,14 @@ INDENT is the leading whitespace string."
                       col-widths))
              lines)
        (dolist (hl (my/org-table--render-multiline-row
-                    my/org-table-box-v (car wrapped-rows) col-widths t))
+                    my/org-table-box-v (car rows) col-widths t))
          (push (concat indent hl) lines))
        (push (concat indent
                      (my/org-table--separator-line
                       my/org-table-box-lt my/org-table-box-x my/org-table-box-rt
                       col-widths))
              lines)
-       (cl-loop for (row . rest) on (cdr wrapped-rows) do
+       (cl-loop for (row . rest) on (cdr rows) do
                 (dolist (dl (my/org-table--render-multiline-row
                              my/org-table-box-v row col-widths nil))
                   (push (concat indent dl) lines))
@@ -417,18 +393,22 @@ INDENT is the leading whitespace string."
              lines))
 
       ('format-1
-       (dolist (hl (my/org-table--render-multiline-row
-                    ?| (car wrapped-rows) col-widths nil))
-         (push (concat indent hl) lines))
-       (push (concat indent "|"
-                     (mapconcat (lambda (w) (make-string w ?-))
-                                col-widths "|")
-                     "|")
-             lines)
-       (dolist (row (cdr wrapped-rows))
-         (dolist (dl (my/org-table--render-multiline-row
-                      ?| row col-widths nil))
-           (push (concat indent dl) lines)))))
+       (let ((separator (concat indent "|"
+                                (mapconcat (lambda (w) (make-string w ?-))
+                                           col-widths "|")
+                                "|"))
+             (multiline-p (cl-some (lambda (row) (cdr (car row)))
+                                   (cdr rows))))
+         (dolist (hl (my/org-table--render-multiline-row
+                      ?| (car rows) col-widths nil))
+           (push (concat indent hl) lines))
+         (push separator lines)
+         (cl-loop for (row . rest) on (cdr rows) do
+                  (dolist (dl (my/org-table--render-multiline-row
+                               ?| row col-widths nil))
+                    (push (concat indent dl) lines))
+                  (when (and rest multiline-p)
+                    (push separator lines))))))
 
     (mapconcat #'identity (nreverse lines) "\n")))
 
@@ -452,9 +432,10 @@ from Format 2 to Format 1."
            (indent (nth 2 parsed))
            (target (if arg 'format-1
                      (if (eq fmt 'format-1) 'format-2 'format-1)))
-           (result (pcase target
-                     ('format-1 (my/org-table-render-format-1 rows indent))
-                     ('format-2 (my/org-table-render-format-2 rows indent)))))
+           (col-widths (mapcar (lambda (w) (+ w 2))
+                               (my/org-table--compute-widths
+                                (my/org-table--row-lines rows))))
+           (result (my/org-table-render target rows col-widths indent)))
       (delete-region beg end)
       (goto-char beg)
       (insert result "\n")
@@ -476,7 +457,7 @@ than being hard-broken."
            (end (my/org-table-end))
            (offset (- (point) beg))
            (parsed (my/org-table-parse beg end))
-           (rows (nth 1 parsed))
+           (rows (my/org-table--row-texts (nth 1 parsed)))
            (indent (nth 2 parsed))
            (content-widths (my/org-table--compute-widths rows))
            (min-widths (my/org-table--compute-min-widths rows))
@@ -497,7 +478,7 @@ than being hard-broken."
                                         new-content-widths))
                  (wrapped-rows (my/org-table--wrap-rows
                                 rows new-content-widths))
-                 (result (my/org-table--render-resized
+                 (result (my/org-table-render
                           fmt wrapped-rows new-col-widths indent))
                  (new-width (+ indent-len (1+ ncols)
                                (apply #'+ new-col-widths))))
