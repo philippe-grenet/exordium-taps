@@ -59,15 +59,15 @@
             ;; Priorities
             ("\\(\\[#A\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
-                                                 :face 'font-lock-warning-face :inverse t
+                                                 :face 'font-lock-warning-face :inverse nil
                                                  :beg 1 :end -1))))
             ("\\(\\[#B\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
-                                                 :face 'font-lock-type-face :inverse t
+                                                 :face 'font-lock-type-face :inverse nil
                                                  :beg 1 :end -1))))
             ("\\(\\[#C\\]\\)" . ((lambda (tag)
                                    (svg-tag-make tag
-                                                 :face 'font-lock-function-name-face :inverse t
+                                                 :face 'font-lock-function-name-face :inverse nil
                                                  :beg 1 :end -1))))
             ;; Rectangles with plain words: {:Something:}
             ;; Consider expending to "\\({:[A-Za-z0-9]+\\(?:[ ][A-Za-z0-9]+\\)*:}\\)"
