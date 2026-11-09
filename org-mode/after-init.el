@@ -53,6 +53,29 @@
 
 (setq org-ellipsis "⤵")  ;; or "…"
 
+;; Horizontal rules: display a line of 5+ dashes as a line across the window.
+;; In a TUI frame the dashes are only dimmed, since strike-through over spaces
+;; is not reliably rendered by terminals.
+(defface my-org-horizontal-rule
+  '((t :inherit shadow :strike-through t))
+  "Face for Org horizontal rules (lines of five or more dashes)."
+  :group 'org-faces)
+
+(defun my-org-horizontal-rule-setup ()
+  "Fontify Org horizontal rules as a line spanning the window width."
+  (font-lock-add-keywords
+   nil
+   `(("^[ \t]*-\\{5,\\}[ \t]*$"
+      (0 ',(if (display-graphic-p)
+               '(face my-org-horizontal-rule display (space :width text))
+             '(face shadow))
+         t)))
+   'append)
+  (setq-local font-lock-extra-managed-props
+              (cl-adjoin 'display font-lock-extra-managed-props)))
+
+(add-hook 'org-mode-hook #'my-org-horizontal-rule-setup)
+
 ;; org-fontify-todo-headline -> TODO => face org-headline-todo
 ;;(setq org-not-done-regexp "STOP")
 ;;(setq org-fontify-todo-headline t)
