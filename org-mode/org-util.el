@@ -7,6 +7,7 @@
 ;;;   C-c l         : store a link          C-c o m : insert a Mermaid diagram
 ;;;   C-c o d       : toggle TODO/DONE      C-c o o : open the image at point
 ;;;   C-c o l       : paste a Jira link     C-c o x : tag old entries :ARCHIVE:
+;;;   C-c o y       : paste TSV as a table  C-c o C : color a numeric column
 
 (require 'org)
 (require 'org-element)
@@ -127,6 +128,135 @@ NO-HEADER, omit the rule."
   (my/table-paste-tsv "\\vert{}" (not no-header) #'org-table-align))
 
 (define-key org-mode-map (kbd "C-c o y") #'org-table-paste-tsv)
+
+;;; C-c o C: Color a numeric table column by value (like Excel's color scales)
+(require 'cl-lib)
+(require 'color)
+
+(defgroup my-org-table-color nil
+  "Coloring numeric Org table columns by value (`org-table-color-column')."
+  :group 'org-table)
+
+(defcustom my-org-table-color-low "#f38ba8"
+  "Cell color for the lowest value of the default scale (Catppuccin red)."
+  :type 'color)
+
+(defcustom my-org-table-color-high "#a6e3a1"
+  "Cell color for the highest value of both scales (Catppuccin green)."
+  :type 'color)
+
+(defcustom my-org-table-color-negative "#f38ba8"
+  "Cell color for the most negative value of the zero-centered scale.
+The default is Catppuccin red."
+  :type 'color)
+
+(defcustom my-org-table-color-zero "#cdd6f4"
+  "Cell color for zero in the zero-centered scale (Catppuccin text)."
+  :type 'color)
+
+(defun my-org-table-color-rgb (color)
+  "Return the (R G B) components, from 0 to 1, of COLOR.
+A \"#rrggbb\" COLOR is parsed directly, so the result does not depend
+on the display; other color names go through `color-name-to-rgb'."
+  (if (string-match-p "\\`#[0-9a-fA-F]\\{6\\}\\'" color)
+      (mapcar (lambda (i)
+                (/ (string-to-number (substring color i (+ i 2)) 16) 255.0))
+              '(1 3 5))
+    (or (color-name-to-rgb color)
+        (user-error "Unknown color: %s" color))))
+
+(defun my-org-table-color-blend (from to ratio)
+  "Return the hex color at RATIO (0 to 1) between colors FROM and TO."
+  (apply #'color-rgb-to-hex
+         (append (cl-mapcar (lambda (a b) (+ a (* ratio (- b a))))
+                            (my-org-table-color-rgb from)
+                            (my-org-table-color-rgb to))
+                 '(2))))
+
+(defun my-org-table-color-cells (col)
+  "Return (BEG END VALUE) for each numeric cell of column COL in the table.
+BEG and END span the whole cell between its two vertical bars."
+  (let ((cells '()))
+    (save-excursion
+      (goto-char (org-table-begin))
+      (while (< (point) (org-table-end))
+        (unless (org-at-table-hline-p)
+          (let ((bars '())
+                (eol (line-end-position)))
+            (while (search-forward "|" eol t)
+              (push (point) bars))
+            (setq bars (nreverse bars))
+            (when (> (length bars) col)
+              (let* ((beg (nth (1- col) bars))
+                     (end (1- (nth col bars)))
+                     (text (string-trim (buffer-substring-no-properties beg end))))
+                (when (string-match-p
+                       "\\`[-+]?\\([0-9]+\\.?[0-9]*\\|\\.[0-9]+\\)\\([eE][-+]?[0-9]+\\)?%?\\'"
+                       text)
+                  (push (list beg end (string-to-number text)) cells))))))
+        (forward-line 1)))
+    (nreverse cells)))
+
+(defun my-org-table-color-remove (col)
+  "Remove the color overlays of column COL in the table at point.
+Return non-nil if there were any."
+  (let ((found nil))
+    (dolist (ov (overlays-in (org-table-begin) (org-table-end)))
+      (when (eql (overlay-get ov 'my-org-table-color) col)
+        (delete-overlay ov)
+        (setq found t)))
+    found))
+
+(defun org-table-color-column (&optional centered)
+  "Color the background of the numeric cells of the table column at point.
+The color depends on the cell value: by default it goes from
+`my-org-table-color-low' for the lowest value of the column to
+`my-org-table-color-high' for the highest.  With prefix argument
+CENTERED, use a scale centered on zero instead: negative values go
+from `my-org-table-color-zero' to `my-org-table-color-negative' and
+positive ones to `my-org-table-color-high', each side relative to its
+own extreme.  Non-numeric cells, such as the header, are skipped.
+
+Run again on the same column to remove the colors.  They are only
+displayed, not saved, and they disappear when realigning changes the
+table."
+  (interactive "P")
+  (unless (org-at-table-p)
+    (user-error "Not in an Org table"))
+  (let ((col (org-table-current-column)))
+    (if (my-org-table-color-remove col)
+        (message "Removed colors from column %d" col)
+      (let* ((cells (or (my-org-table-color-cells col)
+                        (user-error "No numbers in column %d" col)))
+             (values (mapcar #'caddr cells))
+             (lo (apply #'min values))
+             (hi (apply #'max values)))
+        (pcase-dolist (`(,beg ,end ,value) cells)
+          (let* ((bg (cond
+                      (centered
+                       (cond ((and (< value 0) (< lo 0))
+                              (my-org-table-color-blend
+                               my-org-table-color-zero my-org-table-color-negative
+                               (/ value (float lo))))
+                             ((and (> value 0) (> hi 0))
+                              (my-org-table-color-blend
+                               my-org-table-color-zero my-org-table-color-high
+                               (/ value (float hi))))
+                             (t my-org-table-color-zero)))
+                      ((= lo hi) my-org-table-color-high)
+                      (t (my-org-table-color-blend
+                          my-org-table-color-low my-org-table-color-high
+                          (/ (- value lo) (float (- hi lo)))))))
+                 (fg (if (color-dark-p (my-org-table-color-rgb bg)) "white" "black"))
+                 (ov (make-overlay beg end)))
+            (overlay-put ov 'my-org-table-color col)
+            (overlay-put ov 'face `(:background ,bg :foreground ,fg))
+            (overlay-put ov 'evaporate t)
+            (overlay-put ov 'priority 10)))
+        (message "Colored %d cells in column %d (range %s to %s)"
+                 (length cells) col lo hi)))))
+
+(define-key org-mode-map (kbd "C-c o C") #'org-table-color-column)
 
 
 ;;; org-util.el ends here

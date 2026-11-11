@@ -131,6 +131,7 @@ without touching the buffer, if the region reaches into a second person's sectio
 | <kbd>C-c o T</kbd>    | Toggle table format: standard <-> box-drawing (<kbd>C-u</kbd> to force back) |
 | <kbd>C-c o R</kbd>    | Resize table to fit `fill-column` by wrapping cell content                 |
 | <kbd>C-c o y</kbd>    | Paste TSV clipboard (e.g. Excel cells) as a table (<kbd>C-u</kbd>: no header) |
+| <kbd>C-c o C</kbd>    | Color numeric column by value, red to green (<kbd>C-u</kbd>: red/0/green); again to clear |
 
 ### Viewing
 
