@@ -17,6 +17,9 @@
 ;;   └────────┴──────┘
 ;;
 ;; Bound to C-c o T (toggle).  C-u C-c o T forces Format 2 -> Format 1.
+;;
+;; Also provides `my/table-paste-tsv', which inserts TSV clipboard
+;; content (e.g. cells copied from Excel) as a pipe table.
 
 ;;; Code:
 
@@ -490,6 +493,92 @@ than being hard-broken."
               (message (concat "Table resized to %d columns: narrower would "
                                "break words (fill-column is %d)")
                        new-width fill-column))))))))
+
+;;;; Paste TSV (e.g. cells copied from Excel) as a pipe table
+
+(defun my/table-parse-tsv (text)
+  "Parse TSV TEXT into a list of rows, each a list of cell strings.
+Handle Excel's quoting: a cell containing a tab, newline or double
+quote is wrapped in double quotes, with inner quotes doubled.
+Line endings may be CRLF, CR or LF.  A trailing empty line is dropped."
+  (let ((text (replace-regexp-in-string "\r\n?" "\n" text))
+        (pos 0)
+        (rows '())
+        (row '()))
+    (while (< pos (length text))
+      (let (cell)
+        (if (eq (aref text pos) ?\")
+            ;; Quoted cell: read up to the closing quote, unescaping "".
+            (let ((start (1+ pos))
+                  (parts '()))
+              (setq pos start)
+              (while (and (< pos (length text))
+                          (not (and (eq (aref text pos) ?\")
+                                    (not (and (< (1+ pos) (length text))
+                                              (eq (aref text (1+ pos)) ?\"))))))
+                (if (eq (aref text pos) ?\")
+                    (progn (push (substring text start (1+ pos)) parts)
+                           (setq pos (+ pos 2) start pos))
+                  (setq pos (1+ pos))))
+              (push (substring text start (min pos (length text))) parts)
+              (setq cell (apply #'concat (nreverse parts)))
+              (setq pos (1+ pos)))
+          ;; Plain cell: read up to the next tab or newline.
+          (let ((end (or (string-match "[\t\n]" text pos) (length text))))
+            (setq cell (substring text pos end)
+                  pos end)))
+        (push cell row)
+        ;; Consume the separator that ends the cell.
+        (cond ((>= pos (length text))
+               (push (nreverse row) rows)
+               (setq row '()))
+              ((eq (aref text pos) ?\t)
+               (setq pos (1+ pos))
+               (when (>= pos (length text)) ; trailing tab: one more empty cell
+                 (push "" row)
+                 (push (nreverse row) rows)
+                 (setq row '())))
+              ((eq (aref text pos) ?\n)
+               (setq pos (1+ pos))
+               (push (nreverse row) rows)
+               (setq row '())))))
+    (nreverse rows)))
+
+(defun my/table-paste-tsv (bar-escape header align-fn)
+  "Insert the clipboard, in TSV format, as a pipe table at point.
+Whitespace in each cell (including newlines) is collapsed to single
+spaces and vertical bars are replaced by BAR-ESCAPE.  Short rows are
+padded with empty cells.  When HEADER is non-nil and there is more
+than one row, a separator line follows the first row.  ALIGN-FN is
+called with point on the first row to align the table."
+  (let* ((text (or (current-kill 0 t) (user-error "Clipboard is empty")))
+         (rows (my/table-parse-tsv text))
+         (ncols (apply #'max 0 (mapcar #'length rows))))
+    (unless rows
+      (user-error "Clipboard is empty"))
+    (unless (bolp)
+      (insert "\n"))
+    (let ((start (point)))
+      (dolist (row rows)
+        (let ((cells (mapcar
+                      (lambda (cell)
+                        (replace-regexp-in-string
+                         "|" bar-escape
+                         (string-trim
+                          (replace-regexp-in-string "[ \t\n]+" " " cell))
+                         t t))
+                      row)))
+          (setq cells (append cells (make-list (- ncols (length cells)) "")))
+          (insert "| " (mapconcat #'identity cells " | ") " |\n")))
+      (when (and header (cdr rows))
+        (save-excursion
+          (goto-char start)
+          (forward-line 1)
+          (insert "|-|\n")))
+      (save-excursion
+        (goto-char start)
+        (funcall align-fn)))
+    (message "Pasted %d row%s" (length rows) (if (cdr rows) "s" ""))))
 
 (provide 'table-format)
 

@@ -26,6 +26,19 @@
 (define-key markdown-mode-map (kbd "C-c m T") 'my/org-table-toggle-format)
 (define-key markdown-mode-map (kbd "C-c m R") 'my/org-table-resize-to-fill-column)
 
+;; C-c m y: Paste TSV (e.g. cells copied from Excel) as a Markdown table
+(defun markdown-table-paste-tsv ()
+  "Insert the clipboard, in TSV format, as a Markdown table at point.
+This is the format Excel (and most spreadsheets) put on the
+clipboard when copying a block of cells.  The first row becomes the
+header, since a Markdown table requires one."
+  (interactive)
+  ;; `markdown-table-align' (upstream) understands escaped pipes, unlike
+  ;; `markdown-pipe-table-align' from markdown-mode-table.el.
+  (my/table-paste-tsv "\\|" t #'markdown-table-align))
+
+(define-key markdown-mode-map (kbd "C-c m y") #'markdown-table-paste-tsv)
+
 ;; C-c m #: Insert/update the file description (YAML frontmatter `description:')
 (load-file "~/.emacs.d/taps/common/description-field.el")
 (define-key markdown-mode-map (kbd "C-c m #") #'my/update-description)

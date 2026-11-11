@@ -27,6 +27,7 @@
 | ----------------------- | ---------------------------------------------------------------------- |
 | <kbd>C-c m T</kbd>      | Toggle table format: standard <-> box-drawing (<kbd>C-u</kbd> to force back) |
 | <kbd>C-c m R</kbd>      | Resize table to fit `fill-column` by wrapping cell content             |
+| <kbd>C-c m y</kbd>      | Paste TSV clipboard (e.g. Excel cells) as a table                      |
 
 ### Mermaid
 

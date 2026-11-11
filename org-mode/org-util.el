@@ -114,6 +114,20 @@ to move them all to the archive file in one shot."
 
 (define-key org-mode-map (kbd "C-c o x") #'my-org-mark-old-entries)
 
+;;; C-c o y: Paste TSV (e.g. cells copied from Excel) as an Org table
+(load-file "~/.emacs.d/taps/common/table-format.el")
+
+(defun org-table-paste-tsv (&optional no-header)
+  "Insert the clipboard, in TSV format, as an Org table at point.
+This is the format Excel (and most spreadsheets) put on the
+clipboard when copying a block of cells.  The first row is treated
+as a header and followed by a horizontal rule; with prefix argument
+NO-HEADER, omit the rule."
+  (interactive "P")
+  (my/table-paste-tsv "\\vert{}" (not no-header) #'org-table-align))
+
+(define-key org-mode-map (kbd "C-c o y") #'org-table-paste-tsv)
+
 
 ;;; org-util.el ends here
 

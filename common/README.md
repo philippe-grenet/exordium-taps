@@ -9,5 +9,5 @@ explicitly.
 
 | File                  | Description                                                        |
 | --------------------- | ------------------------------------------------------------------ |
-| `table-format.el`     | Toggle pipe tables between standard and box-drawing format, resize tables to fit `fill-column`. Used by the `org-mode` and `markdown-mode` taps. |
+| `table-format.el`     | Toggle pipe tables between standard and box-drawing format, resize tables to fit `fill-column`, paste TSV clipboard (e.g. Excel cells) as a table. Used by the `org-mode` and `markdown-mode` taps. |
 | `description-field.el` | `my/update-description`: insert/update a one-line file description — Org `#+description:` keyword or Markdown YAML frontmatter `description:` key, chosen by major mode. Used by the `org-mode` and `markdown-mode` taps. |
